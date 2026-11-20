@@ -20,3 +20,13 @@ spring:
     locations: classpath:db/migration
     # Cho phép khởi động khi chưa có file migration nào
     fail-on-missing-locations: false
+
+# Actuator: chỉ expose health + info, không lộ endpoint nhạy cảm
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+  endpoint:
+    health:
+      show-details: never

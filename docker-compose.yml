@@ -49,11 +49,12 @@ services:
       gotrips-db:
         condition: service_healthy
 
-    # Kiểm tra cổng 8080 đã mở chưa (không cần thêm Actuator)
+    # Gọi /actuator/health, phải trả về "UP" (bao gồm kiểm tra kết nối DB)
     healthcheck:
       test:
         - CMD-SHELL
-        - bash -c '</dev/tcp/localhost/8080'
+        - |
+          bash -c 'exec 3<>/dev/tcp/localhost/8080; echo "GET /actuator/health HTTP/1.0" >&3; echo >&3; grep -q \"status\":\"UP\" <&3'
       interval: 10s
       timeout: 5s
       retries: 10
