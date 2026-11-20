@@ -1,0 +1,104 @@
+name: gotrips
+
+services:
+  # PostgreSQL Database
+  gotrips-db:
+    image: postgres:17-alpine
+    restart: unless-stopped
+
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+
+    # Chỉ mở cho máy local (để chạy API bằng IDE / mvnw), không mở ra mạng ngoài
+    ports:
+      - "127.0.0.1:5432:5432"
+
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+    healthcheck:
+      test:
+        - CMD-SHELL
+        - pg_isready -U "$${POSTGRES_USER}" -d "$${POSTGRES_DB}"
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+    networks:
+      - gotrips-network
+  # Spring Boot Backend
+  gotrips-api:
+    build:
+      context: ./gotrips-api
+      dockerfile: Dockerfile
+
+    restart: unless-stopped
+
+    ports:
+      - "8080:8080"
+
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://gotrips-db:5432/${POSTGRES_DB}
+      SPRING_DATASOURCE_USERNAME: ${POSTGRES_USER}
+      SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD}
+      SERVER_PORT: 8080
+
+    depends_on:
+      gotrips-db:
+        condition: service_healthy
+
+    # Kiểm tra cổng 8080 đã mở chưa (không cần thêm Actuator)
+    healthcheck:
+      test:
+        - CMD-SHELL
+        - bash -c '</dev/tcp/localhost/8080'
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 40s
+
+    networks:
+      - gotrips-network
+  # React Vite Admin
+  gotrips-admin:
+    build:
+      context: ./gotrips-admin
+      dockerfile: Dockerfile
+
+    restart: unless-stopped
+
+    ports:
+      - "8081:80"
+
+    depends_on:
+      gotrips-api:
+        condition: service_healthy
+
+    networks:
+      - gotrips-network
+  # Next.js Customer Website
+  gotrips-web:
+    build:
+      context: ./gotrips-web
+      dockerfile: Dockerfile
+
+    restart: unless-stopped
+
+    ports:
+      - "3000:3000"
+
+    depends_on:
+      gotrips-api:
+        condition: service_healthy
+
+    networks:
+      - gotrips-network
+
+volumes:
+  postgres_data:
+
+networks:
+  gotrips-network:
+    driver: bridge

@@ -1,0 +1,22 @@
+spring:
+  application:
+    name: gotrips-api
+
+  # Kết nối PostgreSQL.
+  # Trong Docker: lấy từ biến môi trường do docker-compose truyền vào.
+  # Chạy local (IDE / mvnw): dùng giá trị mặc định sau dấu ":" (DB mở ở localhost:5432).
+  datasource:
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/gotrips}
+    username: ${SPRING_DATASOURCE_USERNAME:gotrips}
+    password: ${SPRING_DATASOURCE_PASSWORD:123456}
+
+  jpa:
+    hibernate:
+      ddl-auto: validate # schema do Flyway quản lý, Hibernate chỉ kiểm tra
+    open-in-view: false
+
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+    # Cho phép khởi động khi chưa có file migration nào
+    fail-on-missing-locations: false

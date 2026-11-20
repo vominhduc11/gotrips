@@ -1,0 +1,131 @@
+# =====================================================
+# GoTrips monorepo
+#   gotrips-api   : Spring Boot (Maven, Java)
+#   gotrips-admin : React + Vite (TypeScript)
+#   gotrips-web   : Next.js (TypeScript)
+#   docker-compose: PostgreSQL + 3 services
+# =====================================================
+
+# ---------- Environment / secrets ----------
+# Chứa POSTGRES_PASSWORD, ... -> KHÔNG commit
+.env
+.env.*
+!.env.example
+!.env.sample
+*.local
+*.pem
+*.key
+*.p12
+*.jks
+*.keystore
+secrets/
+
+# Spring Boot: cấu hình riêng theo máy / môi trường
+application-local.*
+application-dev.*
+application-secret*.*
+application-prod.*
+**/src/main/resources/application-local.*
+**/src/main/resources/application-secret*.*
+
+# ---------- Docker ----------
+docker-compose.override.yml
+postgres_data/
+pgdata/
+*.sql.gz
+*.dump
+
+# ---------- Node.js (admin + web) ----------
+node_modules/
+.pnp
+.pnp.*
+.yarn/*
+!.yarn/patches
+!.yarn/plugins
+!.yarn/releases
+!.yarn/versions
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+.pnpm-debug.log*
+lerna-debug.log*
+*.tsbuildinfo
+
+# ---------- Build output ----------
+# Vite (gotrips-admin)
+gotrips-admin/dist/
+gotrips-admin/dist-ssr/
+# Next.js (gotrips-web)
+gotrips-web/.next/
+gotrips-web/out/
+gotrips-web/build/
+gotrips-web/next-env.d.ts
+.vercel
+.turbo/
+# Spring Boot / Maven (gotrips-api)
+target/
+!**/src/main/**/target/
+!**/src/test/**/target/
+.mvn/wrapper/maven-wrapper.jar
+HELP.md
+*.jar
+*.war
+*.ear
+hs_err_pid*
+replay_pid*
+
+# ---------- Test / coverage ----------
+coverage/
+.nyc_output/
+*.lcov
+
+# ---------- Logs ----------
+logs/
+*.log
+
+# ---------- Uploads / file tạm do app sinh ra ----------
+uploads/
+tmp/
+temp/
+*.tmp
+*.bak
+
+# ---------- IDE / Editor ----------
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.json
+.idea/
+*.iml
+*.iws
+*.ipr
+.classpath
+.project
+.settings/
+.factorypath
+.apt_generated
+.springBeans
+.sts4-cache
+/nbproject/private/
+/nbbuild/
+/nbdist/
+.nb-gradle/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# ---------- OS ----------
+.DS_Store
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+
+# ---------- Office temp files ----------
+~$*
+.~lock.*#
+
+# ---------- Claude Code (cấu hình cá nhân) ----------
+.claude/settings.local.json
