@@ -14,9 +14,9 @@ Ngữ cảnh đầu vào cho Claude Code khi làm việc trong repo **GoTrips** 
 Tài liệu nghiệp vụ ở gốc repo (`.docx`): `GoTrips_Phan_tich_chuc_nang_va_MVP.docx` (phân tích chức năng & MVP) — đọc khi cần hiểu phạm vi MVP.
 
 ### Trạng thái hiện tại
-- `gotrips-api`: mới có khung (SecurityConfig, actuator health), **chưa có entity/controller/migration**. Thư mục `db/migration` chưa tồn tại (Flyway cấu hình `fail-on-missing-locations: false`).
-- `gotrips-admin`: vẫn là template Vite mặc định.
-- `gotrips-web`: Trang chủ đã dựng xong bằng **dữ liệu mock** (chưa gọi API thật).
+- `gotrips-api`: đã cài thư viện nền (validation, OAuth2 resource server — chưa bật, MapStruct, Testcontainers, CORS, ProblemDetail) nhưng **chưa có entity/controller/migration**. Thư mục `db/migration` chưa tồn tại (Flyway cấu hình `fail-on-missing-locations: false`).
+- `gotrips-admin`: đã dọn template Vite, cài và cấu hình đủ thư viện; mới có Dashboard tạm và trang 404, chưa gọi API (xem mục "gotrips-admin" bên dưới).
+- `gotrips-web`: Trang chủ đã dựng xong bằng **dữ liệu mock** (chưa gọi API thật). Đã cài và cấu hình đủ thư viện; `lib/api/http.ts` và Orval đã sẵn sàng nhưng chưa có chỗ nào gọi API.
 - **Combo thư viện đã chốt** (22/11/2026) — xem mục "Quy tắc dùng thư viện". Muốn biết thư viện nào **đã cài thật** thì xem `package.json` / `pom.xml`, không suy ra từ file này.
 
 ## Lệnh thường dùng
@@ -42,10 +42,12 @@ npm run dev
 npm run build
 npm run lint
 
-# Có sau khi chạy prompt cài thư viện (web + admin):
-npm test           # vitest
-npm run test:e2e   # playwright (chỉ web), chạy trên cổng 3100
-npm run api:gen    # orval: sinh client/type từ http://localhost:8080/v3/api-docs
+# Web + admin
+npm test           # vitest run (web: 18 test đơn vị; test:watch để chạy chế độ theo dõi)
+npm run api:gen    # orval: sinh client/type từ http://localhost:8080/v3/api-docs (API phải đang chạy)
+
+# Chỉ web
+npm run test:e2e   # playwright (thư mục e2e/): tự build rồi chạy next start trên cổng 3100
 ```
 
 ### Lưu ý môi trường (máy dev Windows của người dùng)
@@ -55,6 +57,14 @@ npm run api:gen    # orval: sinh client/type từ http://localhost:8080/v3/api-d
 
 ## Quy ước chung
 - **Không commit** `.env`, `.env.*` (trừ `.env.example`) hay bí mật. Mật khẩu DB chỉ nằm trong `.env`.
+- **Biến môi trường kết nối API** (mẫu ở `.env.example` của từng dự án; chưa có trong `docker-compose.yml` — thêm khi cần):
+
+  | Dự án | Biến | Ý nghĩa |
+  |---|---|---|
+  | web | `API_URL` | Địa chỉ API mà web gọi từ phía server. Mặc định `http://localhost:8080`; trong Docker là `http://gotrips-api:8080` |
+  | admin | `VITE_API_URL` | Địa chỉ API mà trình duyệt gọi. Vite nhúng giá trị lúc **build** nên trong Docker phải là build arg |
+  | api | `GOTRIPS_CORS_ORIGINS` | Các origin được gọi API từ trình duyệt (admin), cách nhau bằng dấu phẩy. Mặc định `http://localhost:8081,http://localhost:5173` |
+  | api | `SPRINGDOC_ENABLED` | `false` để tắt `/v3/api-docs` (mặc định `true`) |
 - Ngôn ngữ giao diện: **tiếng Việt** (`<html lang="vi">`). Định dạng số/ngày theo `vi-VN` (xem `gotrips-web/lib/format.ts`: `formatVND`, `formatDate`, `formatDuration`...).
 - Comment trong code viết bằng tiếng Việt, giải thích *vì sao* chứ không chỉ *làm gì*.
 - Chỉ commit / push khi người dùng yêu cầu.
@@ -87,7 +97,7 @@ Mục tiêu: session nào cũng dùng đúng thư viện đã chốt, **không "
 | Toast / thông báo | Sonner (`toast()`, `<Toaster />` trong providers) | Không tự làm toast bằng state |
 | Ngày | Tính toán: `date-fns` trên chuỗi `YYYY-MM-DD`. Hiển thị: `lib/format.ts`. Chọn ngày: `Calendar` của shadcn (react-day-picker). "Hôm nay": `getTodayInVietnam()` | Không gọi `new Date()` rải rác; không chuyển ngày `DATE` sang có múi giờ |
 | Lọc / sắp xếp / phân trang / bước booking | URL search params | Không lưu các giá trị này vào state toàn cục |
-| Ghép class | `cn()` trong `lib/cn.ts`, là hàm `cn` **duy nhất** (alias `utils` của shadcn trỏ về đây) | Không tạo thêm `lib/utils.ts`. Nếu `cn()` chưa dùng `tailwind-merge` thì không truyền class chồng nhau |
+| Ghép class | `cn()` trong `lib/cn.ts`, là hàm `cn` **duy nhất** (alias `utils` của shadcn trỏ về đây). Dùng `tailwind-merge` nên gộp được class chồng nhau | Không tạo thêm `lib/utils.ts` |
 | Kiểu DTO của API | Sinh bằng Orval vào `lib/api/generated/` (`npm run api:gen`). Kiểu "View" vẫn nằm ở `lib/types.ts` | Không viết tay DTO mà Orval đã sinh; không sửa file trong `generated/` |
 | SEO | Metadata API, `generateMetadata`, `sitemap.ts`, `robots.ts`, JSON-LD | Không thêm thư viện SEO |
 | Unit test | Vitest, file `*.test.ts` đặt cạnh file nguồn | Không test async Server Component bằng Vitest (dùng Playwright) |
@@ -131,14 +141,22 @@ Zustand, MSW, Axios, next-intl, NextAuth/Auth.js, Prisma/Drizzle (hay bất kỳ
 - Package gốc: `com.gotrips.gotrips_api` (lưu ý dấu gạch dưới). Cấu hình ở `src/main/resources/application.yaml`.
 - **Schema do Flyway quản lý**, Hibernate chỉ `ddl-auto: validate` → mọi thay đổi bảng phải là file migration mới trong `src/main/resources/db/migration` (`V1__...sql`), không sửa migration đã áp dụng.
 - `open-in-view: false` → không lazy-load ngoài transaction; map sang DTO trong service.
-- Bảo mật (`config/SecurityConfig.java`): stateless, CSRF tắt, HTTP Basic, chỉ `/actuator/health/**` mở công khai, còn lại cần xác thực. Khi thêm endpoint công khai cho website (danh sách tour...) phải mở rõ ràng trong cấu hình này.
+- Bảo mật (`config/SecurityConfig.java`): stateless, CSRF tắt, HTTP Basic, công khai chỉ có `/actuator/health/**` và `/v3/api-docs/**`, `/swagger-ui/**` (để Orval đọc spec), còn lại cần xác thực. Khi thêm endpoint công khai cho website (danh sách tour...) phải mở rõ ràng trong cấu hình này. Đã có bean CORS (`gotrips.cors.allowed-origins`) cho admin; web gọi từ server nên không cần CORS. `oauth2-resource-server` mới chỉ là dependency, **chưa bật JWT** trong `SecurityConfig`.
+- Lỗi API: `common/error/GlobalExceptionHandler` trả `ProblemDetail`; lỗi `@Valid` là 400 kèm `errors: [{field, message}]` (web/admin parse đúng format này trong `ApiError`). Map entity ↔ DTO dùng `@Mapper(config = MapStructConfig.class)` (`unmappedTargetPolicy = ERROR`: thiếu field thì lỗi lúc compile).
+- Test: `GotripsApiApplicationTests` import `TestcontainersConfiguration` (PostgreSQL 17 qua `@ServiceConnection`) nên **cần Docker đang chạy** và **JDK 25** (`java.version` trong `pom.xml`).
 - Actuator chỉ expose `health,info`; Docker healthcheck phụ thuộc `/actuator/health` trả `UP` — **đừng làm hỏng**, vì `gotrips-admin` và `gotrips-web` đợi API healthy mới khởi động.
 - Lombok dùng qua `annotationProcessorPaths` trong `pom.xml`.
 - Tài liệu API: springdoc-openapi (Swagger UI).
 
 ## gotrips-admin (React + Vite)
 - TypeScript, ESLint 10 flat config. Build production được nginx phục vụ với fallback SPA (`nginx.conf`: mọi route → `index.html`).
-- Stack đã chốt: React Router, TanStack Query/Table, React Hook Form + Zod, Tailwind v4 (`@tailwindcss/vite`) + shadcn/ui. Chi tiết ở bảng "gotrips-admin" thuộc mục Quy tắc dùng thư viện. Alias `@/*` → `src/*`.
+- Stack đã chốt: React Router, TanStack Query/Table, React Hook Form + Zod, Tailwind v4 (`@tailwindcss/vite`) + shadcn/ui. Chi tiết ở bảng "gotrips-admin" thuộc mục Quy tắc dùng thư viện. Alias `@/*` → `src/*` (chỉ khai báo bằng `paths`; TypeScript 6 đã bỏ `baseUrl`).
+- Đã cài và cấu hình: Router data mode (`src/app/router.tsx`: `/` Dashboard tạm trong `AdminLayout` dùng `sidebar` shadcn, `*` trang 404), `src/app/providers.tsx` (QueryClientProvider + devtools chỉ khi dev + `<Toaster />`), `src/lib/api/http.ts` (`apiFetch`, `ApiError` có `errors: {field, message}[]` khớp `GlobalExceptionHandler`, `credentials: "include"`), Orval (`react-query` + `fetch`, mutator `apiFetch`, `includeHttpResponseReturnType: false` để kiểu sinh ra là dữ liệu thuần; **chưa chạy** `api:gen`), Vitest (cấu hình nằm trong `vite.config.ts`, `jsdom`, `src/test/setup.ts`).
+- Lệnh: `npm run dev|build|lint`, `npm test` (vitest run), `npm run api:gen`. Dev server dùng cổng 5173 (cổng 3000 do Docker chiếm).
+- shadcn ở admin: component trong `src/components/ui/`; dùng `field` + `Controller` của React Hook Form (registry hiện không có file `form`). Gói `shadcn` nằm ở devDependencies vì chỉ cần lúc build (`shadcn/tailwind.css`).
+- **`cn()` của admin (`src/lib/utils.ts`) tự viết, chưa gộp được class xung đột** vì chưa cài `clsx` + `tailwind-merge` (cần người dùng duyệt). Cho tới lúc đó đừng truyền class chồng nhóm (ví dụ `p-2` và `p-4`) cho component shadcn. Không cài package npm `cn` (preset `nova` của shadcn hay kéo nhầm gói này); `next-themes` cũng đã gỡ (chỉ chế độ sáng).
+- `jsdom` đang ở 29.x (bản 31 yêu cầu Node ≥ 24.15; máy dev đang Node 24.8).
+- `VITE_API_URL` được Vite nhúng lúc build: trong Docker phải là build arg (Dockerfile và `docker-compose.yml` hiện **chưa** có `ARG VITE_API_URL`), xem mục "Biến môi trường kết nối API".
 
 ## gotrips-web (Next.js)
 
@@ -155,13 +173,26 @@ app/                 layout.tsx (Header + <main id="noi-dung-chinh"> + Footer), 
 components/home/     các section Trang chủ
 components/layout/   Header, Footer, MobileNav, Logo, nav-items
 components/tour/     TourCard
-components/ui/       Button, Badge, Container, CoverImage, AppLink, SectionHeading, icons
-                     (sau khi cài thư viện: chỉ còn primitive shadcn; component riêng chuyển sang components/common/)
+components/ui/       CHỈ primitive của shadcn (button, badge, input, dialog, calendar, field, sonner...). Tên file chữ thường
+components/common/   component riêng dùng chung: Container, CoverImage, AppLink, SectionHeading
+app/providers.tsx    "use client": QueryClientProvider (staleTime 60s) + devtools (chỉ dev) + <Toaster /> của Sonner
 lib/types.ts         kiểu dữ liệu: nhóm "bảng" (khớp DB MVP) + nhóm "View" (suy ra cho UI)
 lib/data/            lớp truy cập dữ liệu — component CHỈ import từ đây
 lib/mock/            dữ liệu giả (destinations, tours, departures, testimonials, images, site)
-lib/format.ts, cn.ts tiện ích
+lib/api/http.ts      lớp HTTP duy nhất gọi gotrips-api (server-only): apiFetch, ApiError, customFetch (mutator của Orval)
+lib/api/generated/   do Orval sinh (chưa có; chạy `npm run api:gen` khi API có endpoint). Không sửa tay
+lib/schemas/         schema Zod dùng chung cho client + Server Action (search, newsletter)
+lib/format.ts, cn.ts tiện ích; file *.test.ts đặt cạnh file nguồn
+e2e/                 test Playwright
 ```
+
+### Cài / thêm shadcn trên Windows (các lỗi đã gặp)
+- Windows không phân biệt hoa/thường: tên file trong `components/ui/` phải chữ thường (`button.tsx`). Nếu từng có `Button.tsx`, git index (`core.ignorecase=true`) sẽ giữ tên cũ — kiểm tra `git ls-files components/ui` trước khi commit.
+- `shadcn add` sinh `import { cn } from "cn"` (npm package `cn`, không dùng). Sau mỗi lần add phải sửa thành `@/lib/cn`, và không cài package `cn`.
+- `shadcn add` các component phụ thuộc `button` sẽ hỏi ghi đè `button.tsx`/`badge.tsx` (đã tuỳ biến theo GoTrips). Sao lưu trước, hoặc trả lời "không"; nếu dùng `-o` thì khôi phục lại hai file này.
+- `button.tsx` chỉ có size `sm|md|lg|icon|icon-sm|icon-lg` và variant `primary|accent|outline|ghost`. Component shadcn dùng `size="default"` hay variant khác (`secondary`, `destructive`, `link`) sẽ lỗi tsc: đổi sang giá trị có sẵn hoặc thêm vào `button.tsx` cho đúng token.
+- `next-themes` không dùng (chỉ chế độ sáng): `sonner.tsx` cố định `theme="light"`.
+- Vitest 5 (rolldown) trên Windows có thể báo "Cannot find native binding": chạy `npm install @rolldown/binding-win32-x64-msvc --no-save` (lỗi optional-deps của npm, không ghi vào package.json).
 Alias import: `@/*` → thư mục gốc `gotrips-web/`.
 
 ### Quy tắc kiến trúc dữ liệu
@@ -174,7 +205,7 @@ Alias import: `@/*` → thư mục gốc `gotrips-web/`.
 - Nguồn duy nhất của màu, bo góc, đổ bóng, font là khối `@theme` trong `app/globals.css`. Bảng màu mặc định của Tailwind **đã bị xoá** (`--color-*: initial`) → chỉ dùng token: `primary-*` (teal), `accent-*` (cam, cho giá/CTA), `neutral-*`, `danger/success`, alias `surface`, `ink`, `ink-muted`, `line`; `rounded-control|card|pill`; `shadow-card|card-hover|search|header`. **Không hard-code mã màu.**
 - Chỉ có chế độ sáng. Chữ trắng chỉ đặt trên `primary-700+` / `accent-700+` để đạt tương phản AA.
 - Font: Be Vietnam Pro (subset `vietnamese` + `latin`, khai báo weight).
-- `cn()` (`lib/cn.ts`): xem bảng thư viện ở trên. Nếu file chưa dùng `tailwind-merge` thì `cn()` chỉ nối class, không gộp được class xung đột, nên đừng truyền class chồng nhau.
+- `cn()` (`lib/cn.ts`) = `clsx` + `tailwind-merge` (`extendTailwindMerge`): gộp class xung đột, class sau thắng. Đã khai báo token riêng `rounded-control|card|pill`, `shadow-card|card-hover|search|header`, `max-w-page`. **Thêm token mới vào `@theme` thì phải khai báo thêm ở `lib/cn.ts`**, nếu không không gộp được (có test ở `lib/cn.test.ts`).
 - **Khi dùng shadcn:** biến `--accent` của shadcn là **nền khi hover** (được gán sang `primary-50`). Nó khác với dải màu cam `accent-*` của GoTrips dùng cho giá và CTA. Cần màu cam thì dùng `accent-700`; không dùng `bg-accent` với ý là màu cam.
 - Accessibility: giữ skip-link "Bỏ qua điều hướng", `id="noi-dung-chinh"`, focus ring theo token `focus`.
 - **Ảnh hiện tại là ảnh mock Unsplash** (placeholder, không phải ảnh thật của địa danh) — phải thay bằng ảnh thật/có bản quyền trước khi ra mắt (`lib/mock/images.ts`).
