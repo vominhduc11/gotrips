@@ -1,4 +1,10 @@
 @import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
+/*
+ ---break---
+ */
+@custom-variant dark (&:is(.dark *));
 
 /*
  * Design tokens của GoTrips — nguồn duy nhất cho màu, bo góc, đổ bóng, font.
@@ -87,17 +93,58 @@
   --font-sans:
     var(--font-be-vietnam-pro), ui-sans-serif, system-ui, "Segoe UI", Roboto, "Helvetica Neue",
     Arial, sans-serif;
+  --font-heading: var(--font-sans);
+  --color-sidebar-ring: var(--sidebar-ring);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar: var(--sidebar);
+  --color-chart-5: var(--chart-5);
+  --color-chart-4: var(--chart-4);
+  --color-chart-3: var(--chart-3);
+  --color-chart-2: var(--chart-2);
+  --color-chart-1: var(--chart-1);
+  --color-ring: var(--ring);
+  --color-input: var(--input);
+  --color-border: var(--border);
+  --color-destructive: var(--destructive);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-accent: var(--accent);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-muted: var(--muted);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-secondary: var(--secondary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary: var(--primary);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-popover: var(--popover);
+  --color-card-foreground: var(--card-foreground);
+  --color-card: var(--card);
+  --color-foreground: var(--foreground);
+  --color-background: var(--background);
+  --radius-sm: calc(var(--radius) * 0.6);
+  --radius-md: calc(var(--radius) * 0.8);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) * 1.4);
+  --radius-2xl: calc(var(--radius) * 1.8);
+  --radius-3xl: calc(var(--radius) * 2.2);
+  --radius-4xl: calc(var(--radius) * 2.6);
 }
 
 @layer base {
   html {
     color-scheme: light;
     -webkit-text-size-adjust: 100%;
+    @apply font-sans;
   }
 
   body {
     background-color: var(--color-surface);
     color: var(--color-ink);
+    @apply bg-background text-foreground;
   }
 
   /* Viền focus rõ ràng cho mọi phần tử tương tác (≥ 3:1 so với nền). */
@@ -121,4 +168,48 @@
       scroll-behavior: auto !important;
     }
   }
+  * {
+    @apply border-border outline-ring/50;
+  }
+}
+
+/*
+ * Biến của shadcn/ui, gán sang token GoTrips ở trên — không đặt mã màu riêng ở đây.
+ * Lưu ý: `--accent` của shadcn là NỀN KHI HOVER (primary-50), khác với dải cam `accent-*` dùng cho giá/CTA.
+ * Giao diện chỉ có chế độ sáng nên không có khối `.dark`.
+ */
+:root {
+  --background: var(--color-surface);
+  --foreground: var(--color-ink);
+  --card: var(--color-surface);
+  --card-foreground: var(--color-ink);
+  --popover: var(--color-surface);
+  --popover-foreground: var(--color-ink);
+  --primary: var(--color-primary-700);
+  --primary-foreground: var(--color-white);
+  --secondary: var(--color-neutral-100);
+  --secondary-foreground: var(--color-ink);
+  --muted: var(--color-neutral-100);
+  --muted-foreground: var(--color-ink-muted);
+  --accent: var(--color-primary-50);
+  --accent-foreground: var(--color-primary-800);
+  --destructive: var(--color-danger-700);
+  --border: var(--color-line);
+  /* Viền input cần tương phản AA (≥ 3:1) nên dùng neutral-500 thay vì `line`. */
+  --input: var(--color-neutral-500);
+  --ring: var(--color-focus);
+  --chart-1: var(--color-primary-700);
+  --chart-2: var(--color-accent-600);
+  --chart-3: var(--color-primary-400);
+  --chart-4: var(--color-neutral-600);
+  --chart-5: var(--color-accent-200);
+  --radius: 0.75rem;
+  --sidebar: var(--color-surface-muted);
+  --sidebar-foreground: var(--color-ink);
+  --sidebar-primary: var(--color-primary-700);
+  --sidebar-primary-foreground: var(--color-white);
+  --sidebar-accent: var(--color-primary-50);
+  --sidebar-accent-foreground: var(--color-primary-800);
+  --sidebar-border: var(--color-line);
+  --sidebar-ring: var(--color-focus);
 }

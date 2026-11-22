@@ -1,7 +1,8 @@
-import { ButtonLink } from "@/components/ui/Button";
-import { Container } from "@/components/ui/Container";
-import { SectionHeading } from "@/components/ui/SectionHeading";
-import { ArrowRightIcon } from "@/components/ui/icons";
+import { Button } from "@/components/ui/button";
+import { AppLink } from "@/components/common/AppLink";
+import { Container } from "@/components/common/Container";
+import { SectionHeading } from "@/components/common/SectionHeading";
+import { ArrowRight } from "lucide-react";
 import { TourCard } from "@/components/tour/TourCard";
 import { getFeaturedTours } from "@/lib/data/home";
 
@@ -33,10 +34,10 @@ export async function FeaturedTours() {
         )}
 
         <div className="mt-10 text-center">
-          <ButtonLink href="/tours" variant="outline" size="lg">
+          <Button asChild variant="outline" size="lg"><AppLink href="/tours">
             Xem tất cả tour
-            <ArrowRightIcon className="size-5" />
-          </ButtonLink>
+            <ArrowRight aria-hidden="true" className="size-5" />
+          </AppLink></Button>
         </div>
       </Container>
     </section>

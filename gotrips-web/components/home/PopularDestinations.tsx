@@ -1,7 +1,7 @@
-import { AppLink } from "@/components/ui/AppLink";
-import { Container } from "@/components/ui/Container";
-import { CoverImage } from "@/components/ui/CoverImage";
-import { SectionHeading } from "@/components/ui/SectionHeading";
+import { AppLink } from "@/components/common/AppLink";
+import { Container } from "@/components/common/Container";
+import { CoverImage } from "@/components/common/CoverImage";
+import { SectionHeading } from "@/components/common/SectionHeading";
 import { getPopularDestinations } from "@/lib/data/home";
 
 export async function PopularDestinations() {

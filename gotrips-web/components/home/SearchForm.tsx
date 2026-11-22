@@ -1,10 +1,13 @@
 "use client";
 
+import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/navigation";
-import { useState, type FormEvent, type ReactNode } from "react";
-import { Button } from "@/components/ui/Button";
-import { CalendarIcon, MapPinIcon, SearchIcon, UsersIcon } from "@/components/ui/icons";
+import type { ReactNode } from "react";
+import { useForm } from "react-hook-form";
+import { Button } from "@/components/ui/button";
+import { Calendar, MapPin, Search, Users } from "lucide-react";
 import { normalizeSearchText } from "@/lib/format";
+import { searchSchema, type SearchFormValues } from "@/lib/schemas/search";
 
 export interface DestinationOption {
   slug: string;
@@ -47,22 +50,19 @@ function Field({
  */
 export function SearchForm({ destinations }: { destinations: DestinationOption[] }) {
   const router = useRouter();
-  const [guestsError, setGuestsError] = useState<string | null>(null);
+  // Validate bằng schema Zod dùng chung; khi lỗi, React Hook Form tự focus vào ô lỗi đầu tiên.
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<SearchFormValues>({
+    resolver: zodResolver(searchSchema),
+    defaultValues: { q: "", date: "", guests: 2 },
+  });
+  const guestsError = errors.guests?.message;
 
-  function handleSubmit(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault();
-    const form = new FormData(event.currentTarget);
-
-    const guests = Number(form.get("guests"));
-    if (!Number.isInteger(guests) || guests < 1) {
-      setGuestsError("Vui lòng nhập số khách từ 1 trở lên.");
-      document.getElementById("tim-so-khach")?.focus();
-      return;
-    }
-    setGuestsError(null);
-
+  function onValid({ q: destinationText, date, guests }: SearchFormValues) {
     const params = new URLSearchParams();
-    const destinationText = String(form.get("q") ?? "").trim();
     if (destinationText) {
       const normalized = normalizeSearchText(destinationText);
       const match = destinations.find(
@@ -71,7 +71,6 @@ export function SearchForm({ destinations }: { destinations: DestinationOption[]
       if (match) params.set("destination", match.slug);
       else params.set("q", destinationText);
     }
-    const date = String(form.get("date") ?? "");
     if (date) params.set("date", date);
     params.set("guests", String(guests));
 
@@ -80,16 +79,16 @@ export function SearchForm({ destinations }: { destinations: DestinationOption[]
 
   return (
     // noValidate: dùng thông báo lỗi tiếng Việt của mình thay cho bong bóng theo ngôn ngữ trình duyệt.
-    <form action="/tours" method="get" onSubmit={handleSubmit} noValidate>
+    <form action="/tours" method="get" onSubmit={handleSubmit(onValid)} noValidate>
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-[1.5fr_1fr_0.6fr_auto] lg:items-start">
         <Field
           htmlFor="tim-diem-den"
           label="Điểm đến"
-          icon={<MapPinIcon className="size-4 text-primary-700" />}
+          icon={<MapPin aria-hidden="true" className="size-4 text-primary-700" />}
         >
           <input
             id="tim-diem-den"
-            name="q"
+            {...register("q")}
             type="text"
             list="goi-y-diem-den"
             autoComplete="off"
@@ -106,20 +105,19 @@ export function SearchForm({ destinations }: { destinations: DestinationOption[]
         <Field
           htmlFor="tim-ngay-khoi-hanh"
           label="Ngày khởi hành"
-          icon={<CalendarIcon className="size-4 text-primary-700" />}
+          icon={<Calendar aria-hidden="true" className="size-4 text-primary-700" />}
         >
-          <input id="tim-ngay-khoi-hanh" name="date" type="date" className={inputClass} />
+          <input id="tim-ngay-khoi-hanh" {...register("date")} type="date" className={inputClass} />
         </Field>
 
-        <Field htmlFor="tim-so-khach" label="Số khách" icon={<UsersIcon className="size-4 text-primary-700" />}>
+        <Field htmlFor="tim-so-khach" label="Số khách" icon={<Users aria-hidden="true" className="size-4 text-primary-700" />}>
           <input
             id="tim-so-khach"
-            name="guests"
+            {...register("guests", { valueAsNumber: true })}
             type="number"
             inputMode="numeric"
             min={1}
             step={1}
-            defaultValue={2}
             aria-invalid={guestsError ? true : undefined}
             aria-describedby={guestsError ? "loi-so-khach" : undefined}
             className={inputClass}
@@ -134,7 +132,7 @@ export function SearchForm({ destinations }: { destinations: DestinationOption[]
         {/* Căn nút với hàng input (bỏ phần label ở lg). */}
         <div className="md:col-span-2 lg:col-span-1 lg:pt-[1.625rem]">
           <Button type="submit" variant="accent" size="lg" className="w-full">
-            <SearchIcon className="size-5" />
+            <Search aria-hidden="true" className="size-5" />
             Tìm tour
           </Button>
         </div>

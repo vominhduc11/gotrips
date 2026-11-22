@@ -1,32 +1,26 @@
 "use client";
 
-import { useState, type FormEvent } from "react";
-import { Button } from "@/components/ui/Button";
-import { SectionHeading } from "@/components/ui/SectionHeading";
-import { Container } from "@/components/ui/Container";
-import { ArrowRightIcon, ShieldCheckIcon } from "@/components/ui/icons";
-
-// Kiểm tra định dạng cơ bản, đủ cho prototype (xác thực thật nằm ở backend).
-const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+import { Button } from "@/components/ui/button";
+import { SectionHeading } from "@/components/common/SectionHeading";
+import { Container } from "@/components/common/Container";
+import { ArrowRight, ShieldCheck } from "lucide-react";
+import { newsletterSchema, type NewsletterFormValues } from "@/lib/schemas/newsletter";
 
 /** Đăng ký nhận ưu đãi. Chỉ validate phía client và hiện lời cảm ơn tại chỗ — không gửi đi đâu. */
 export function NewsletterCta() {
-  const [error, setError] = useState<string | null>(null);
-  const [subscribed, setSubscribed] = useState(false);
-
-  function handleSubmit(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault();
-    const email = String(new FormData(event.currentTarget).get("email") ?? "").trim();
-
-    if (!email) {
-      setError("Vui lòng nhập địa chỉ email.");
-    } else if (!EMAIL_PATTERN.test(email)) {
-      setError("Địa chỉ email chưa đúng định dạng, ví dụ: ban@example.com.");
-    } else {
-      setError(null);
-      setSubscribed(true);
-    }
-  }
+  const {
+    register,
+    handleSubmit,
+    formState: { errors, isSubmitSuccessful },
+  } = useForm<NewsletterFormValues>({
+    resolver: zodResolver(newsletterSchema),
+    defaultValues: { email: "" },
+  });
+  const error = errors.email?.message;
+  // Chưa có API đăng ký: submit hợp lệ là đủ để hiện lời cảm ơn.
+  const subscribed = isSubmitSuccessful;
 
   return (
     <section aria-labelledby="uu-dai-heading" className="py-14 sm:py-20">
@@ -45,7 +39,7 @@ export function NewsletterCta() {
             <div role="status" aria-live="polite">
               {subscribed ? (
                 <p className="flex items-start gap-3 rounded-control bg-success-50 p-4 text-base font-medium text-success-700">
-                  <ShieldCheckIcon className="mt-0.5 size-6 shrink-0" />
+                  <ShieldCheck aria-hidden="true" className="mt-0.5 size-6 shrink-0" />
                   <span>
                     Cảm ơn bạn! Chúng tôi sẽ gửi những ưu đãi mới nhất tới email bạn vừa đăng ký.
                   </span>
@@ -54,14 +48,14 @@ export function NewsletterCta() {
             </div>
 
             {subscribed ? null : (
-              <form onSubmit={handleSubmit} noValidate>
+              <form onSubmit={handleSubmit(() => {})} noValidate>
                 <label htmlFor="email-uu-dai" className="sr-only">
                   Địa chỉ email của bạn
                 </label>
                 <div className="flex flex-col gap-3 sm:flex-row">
                   <input
                     id="email-uu-dai"
-                    name="email"
+                    {...register("email")}
                     type="email"
                     autoComplete="email"
                     placeholder="Nhập địa chỉ email của bạn"
@@ -71,7 +65,7 @@ export function NewsletterCta() {
                   />
                   <Button type="submit" variant="accent" size="lg">
                     Đăng ký
-                    <ArrowRightIcon className="size-5" />
+                    <ArrowRight aria-hidden="true" className="size-5" />
                   </Button>
                 </div>
                 {error ? (

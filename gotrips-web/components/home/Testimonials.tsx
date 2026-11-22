@@ -1,13 +1,19 @@
-import { Container } from "@/components/ui/Container";
-import { SectionHeading } from "@/components/ui/SectionHeading";
-import { StarIcon } from "@/components/ui/icons";
+import { Container } from "@/components/common/Container";
+import { SectionHeading } from "@/components/common/SectionHeading";
+import { Star } from "lucide-react";
 import { getTestimonials } from "@/lib/data/home";
 
 function Stars({ rating }: { rating: number }) {
   return (
     <div role="img" aria-label={`${rating} trên 5 sao`} className="flex gap-0.5">
       {Array.from({ length: 5 }, (_, index) => (
-        <StarIcon key={index} className={index < rating ? "size-5 text-star" : "size-5 text-neutral-300"} />
+        <Star
+          key={index}
+          aria-hidden="true"
+          fill="currentColor"
+          stroke="none"
+          className={index < rating ? "size-5 text-star" : "size-5 text-neutral-300"}
+        />
       ))}
     </div>
   );

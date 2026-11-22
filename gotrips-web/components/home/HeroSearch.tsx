@@ -1,5 +1,5 @@
-import { Container } from "@/components/ui/Container";
-import { CoverImage } from "@/components/ui/CoverImage";
+import { Container } from "@/components/common/Container";
+import { CoverImage } from "@/components/common/CoverImage";
 import { getHeroBanner, getPopularDestinations } from "@/lib/data/home";
 import { SearchForm } from "./SearchForm";
 import { ServiceTabs } from "./ServiceTabs";

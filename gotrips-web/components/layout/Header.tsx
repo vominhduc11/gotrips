@@ -1,7 +1,7 @@
-import { AppLink } from "@/components/ui/AppLink";
-import { Badge } from "@/components/ui/Badge";
-import { ButtonLink } from "@/components/ui/Button";
-import { Container } from "@/components/ui/Container";
+import { AppLink } from "@/components/common/AppLink";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Container } from "@/components/common/Container";
 import { Logo } from "./Logo";
 import { MobileNav } from "./MobileNav";
 import { NAV_ITEMS } from "./nav-items";
@@ -40,12 +40,12 @@ export function Header() {
         </nav>
 
         <div className="hidden items-center gap-2 lg:flex">
-          <ButtonLink href="/login" variant="ghost" size="sm">
+          <Button asChild variant="ghost" size="sm"><AppLink href="/login">
             Đăng nhập
-          </ButtonLink>
-          <ButtonLink href="/register" variant="primary" size="sm">
+          </AppLink></Button>
+          <Button asChild variant="primary" size="sm"><AppLink href="/register">
             Đăng ký
-          </ButtonLink>
+          </AppLink></Button>
         </div>
 
         <MobileNav items={NAV_ITEMS} />

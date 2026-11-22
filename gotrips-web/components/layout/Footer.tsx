@@ -1,7 +1,7 @@
-import { AppLink } from "@/components/ui/AppLink";
-import { Badge } from "@/components/ui/Badge";
-import { Container } from "@/components/ui/Container";
-import { MailIcon, MapPinIcon, PhoneIcon } from "@/components/ui/icons";
+import { AppLink } from "@/components/common/AppLink";
+import { Badge } from "@/components/ui/badge";
+import { Container } from "@/components/common/Container";
+import { Mail, MapPin, Phone } from "lucide-react";
 import { Logo } from "./Logo";
 
 interface FooterLink {
@@ -54,7 +54,7 @@ export function Footer() {
             </p>
             <address className="mt-6 space-y-3 text-sm not-italic">
               <p className="flex items-start gap-3">
-                <PhoneIcon className="mt-0.5 size-4 shrink-0 text-primary-300" />
+                <Phone aria-hidden="true" className="mt-0.5 size-4 shrink-0 text-primary-300" />
                 <span>
                   Hotline 24/7:{" "}
                   <a href="tel:1900000000" className={linkClass}>
@@ -63,13 +63,13 @@ export function Footer() {
                 </span>
               </p>
               <p className="flex items-start gap-3">
-                <MailIcon className="mt-0.5 size-4 shrink-0 text-primary-300" />
+                <Mail aria-hidden="true" className="mt-0.5 size-4 shrink-0 text-primary-300" />
                 <a href="mailto:hello@gotrips.example" className={linkClass}>
                   hello@gotrips.example
                 </a>
               </p>
               <p className="flex items-start gap-3">
-                <MapPinIcon className="mt-0.5 size-4 shrink-0 text-primary-300" />
+                <MapPin aria-hidden="true" className="mt-0.5 size-4 shrink-0 text-primary-300" />
                 <span>123 Đường Mẫu, Quận 1, TP. Hồ Chí Minh</span>
               </p>
             </address>

@@ -1,8 +1,8 @@
-import { AppLink } from "@/components/ui/AppLink";
-import { Badge } from "@/components/ui/Badge";
-import { buttonStyles } from "@/components/ui/Button";
-import { CoverImage } from "@/components/ui/CoverImage";
-import { CalendarIcon, ClockIcon, CompassIcon, MapPinIcon, StarIcon, UsersIcon } from "@/components/ui/icons";
+import { AppLink } from "@/components/common/AppLink";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { CoverImage } from "@/components/common/CoverImage";
+import { Calendar, Clock, Compass, MapPin, Star, Users } from "lucide-react";
 import { formatDate, formatDuration, formatRating, formatVND } from "@/lib/format";
 import type { TourCardView } from "@/lib/types";
 
@@ -32,25 +32,25 @@ export function TourCard({ tour }: { tour: TourCardView }) {
 
       <div className="flex flex-1 flex-col p-4">
         <p className="flex items-center gap-1.5 text-sm font-semibold text-primary-800">
-          <MapPinIcon className="size-4" />
+          <MapPin aria-hidden="true" className="size-4" />
           {tour.destinationName}
         </p>
         <h3 className="mt-1 line-clamp-2 min-h-14 text-lg font-bold leading-7 text-ink">{tour.title}</h3>
 
         <ul className="mt-3 space-y-1.5 text-sm text-ink-muted">
           <li className="flex items-center gap-2">
-            <ClockIcon className="size-4 shrink-0" />
+            <Clock aria-hidden="true" className="size-4 shrink-0" />
             <span aria-hidden="true">{formatDuration(tour.durationDays, tour.durationNights)}</span>
             <span className="sr-only">
               {tour.durationDays} ngày {tour.durationNights} đêm
             </span>
           </li>
           <li className="flex items-center gap-2">
-            <CompassIcon className="size-4 shrink-0" />
+            <Compass aria-hidden="true" className="size-4 shrink-0" />
             Khởi hành từ {tour.departureCity}
           </li>
           <li className="flex items-center gap-2">
-            <CalendarIcon className="size-4 shrink-0" />
+            <Calendar aria-hidden="true" className="size-4 shrink-0" />
             {tour.nextDepartureDate ? (
               <span>
                 Ngày đi gần nhất: <time dateTime={tour.nextDepartureDate}>{formatDate(tour.nextDepartureDate)}</time>
@@ -61,14 +61,14 @@ export function TourCard({ tour }: { tour: TourCardView }) {
           </li>
           {tour.isAlmostFull && tour.seatsLeft !== null ? (
             <li className="flex items-center gap-2 font-semibold text-danger-700">
-              <UsersIcon className="size-4 shrink-0" />
+              <Users aria-hidden="true" className="size-4 shrink-0" />
               Chỉ còn {tour.seatsLeft} chỗ
             </li>
           ) : null}
         </ul>
 
         <p className="mt-3 flex items-center gap-1.5 text-sm text-ink-muted">
-          <StarIcon className="size-4 text-star" />
+          <Star aria-hidden="true" fill="currentColor" stroke="none" className="size-4 text-star" />
           <span className="font-semibold text-ink">{formatRating(tour.rating)}</span>
           <span>({tour.reviewCount.toLocaleString("vi-VN")} đánh giá)</span>
         </p>
@@ -95,17 +95,11 @@ export function TourCard({ tour }: { tour: TourCardView }) {
             )}
           </div>
 
-          <AppLink
-            href={`/tours/${tour.slug}`}
-            aria-label={`Xem chi tiết tour ${tour.title}`}
-            className={buttonStyles({
-              variant: "primary",
-              size: "md",
-              className: "mt-3 w-full after:absolute after:inset-0",
-            })}
-          >
-            Xem chi tiết
-          </AppLink>
+          <Button asChild variant="primary" size="md" className="mt-3 w-full after:absolute after:inset-0">
+            <AppLink href={`/tours/${tour.slug}`} aria-label={`Xem chi tiết tour ${tour.title}`}>
+              Xem chi tiết
+            </AppLink>
+          </Button>
         </div>
       </div>
     </article>

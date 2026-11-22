@@ -1,10 +1,10 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { AppLink } from "@/components/ui/AppLink";
-import { Badge } from "@/components/ui/Badge";
-import { ButtonLink } from "@/components/ui/Button";
-import { CloseIcon, MenuIcon } from "@/components/ui/icons";
+import { AppLink } from "@/components/common/AppLink";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { X, Menu } from "lucide-react";
 import type { NavItem } from "./nav-items";
 
 /** Menu hamburger cho màn hình < lg. Đóng bằng Esc, bằng nút, hoặc khi chọn một liên kết. */
@@ -37,7 +37,7 @@ export function MobileNav({ items }: { items: NavItem[] }) {
         onClick={() => setOpen((value) => !value)}
         className="inline-flex size-11 items-center justify-center rounded-control text-ink hover:bg-neutral-100"
       >
-        {open ? <CloseIcon className="size-6" /> : <MenuIcon className="size-6" />}
+        {open ? <X aria-hidden="true" className="size-6" /> : <Menu aria-hidden="true" className="size-6" />}
       </button>
 
       {open ? (
@@ -66,12 +66,12 @@ export function MobileNav({ items }: { items: NavItem[] }) {
               </li>
             ))}
             <li className="mt-2 grid grid-cols-2 gap-3 border-t border-line pt-4">
-              <ButtonLink href="/login" variant="outline" onClick={close}>
+              <Button asChild variant="outline"><AppLink href="/login" onClick={close}>
                 Đăng nhập
-              </ButtonLink>
-              <ButtonLink href="/register" variant="primary" onClick={close}>
+              </AppLink></Button>
+              <Button asChild variant="primary"><AppLink href="/register" onClick={close}>
                 Đăng ký
-              </ButtonLink>
+              </AppLink></Button>
             </li>
           </ul>
         </nav>

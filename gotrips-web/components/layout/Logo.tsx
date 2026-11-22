@@ -1,5 +1,5 @@
 import { cn } from "@/lib/cn";
-import { AppLink } from "@/components/ui/AppLink";
+import { AppLink } from "@/components/common/AppLink";
 
 /** Logo chữ "GoTrips". `tone="dark"` dùng trên nền tối (footer). */
 export function Logo({ tone = "light", className }: { tone?: "light" | "dark"; className?: string }) {
