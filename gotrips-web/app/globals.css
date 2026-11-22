@@ -1,26 +1,124 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+/*
+ * Design tokens của GoTrips — nguồn duy nhất cho màu, bo góc, đổ bóng, font.
+ * Component chỉ dùng token (bg-primary-700, text-ink-muted, rounded-card, shadow-card...),
+ * không hard-code mã màu.
+ *
+ * Giao diện chỉ có chế độ sáng.
+ */
+@theme {
+  /* Bỏ bảng màu mặc định của Tailwind để bắt buộc dùng token bên dưới. */
+  --color-*: initial;
+
+  --color-white: #ffffff;
+  --color-black: #000000;
+
+  /* Primary — xanh biển/teal. Chữ trắng trên 700+ đạt AA (≥ 5.4:1). */
+  --color-primary-50: #f0fdfa;
+  --color-primary-100: #ccfbf1;
+  --color-primary-200: #99f6e4;
+  --color-primary-300: #5eead4;
+  --color-primary-400: #2dd4bf;
+  --color-primary-500: #14b8a6;
+  --color-primary-600: #0d9488;
+  --color-primary-700: #0f766e;
+  --color-primary-800: #115e59;
+  --color-primary-900: #134e4a;
+  --color-primary-950: #042f2e;
+
+  /* Accent — cam, dùng cho giá và CTA. Chữ trắng trên 700 đạt AA (5.2:1). */
+  --color-accent-50: #fff7ed;
+  --color-accent-100: #ffedd5;
+  --color-accent-200: #fed7aa;
+  --color-accent-500: #f97316;
+  --color-accent-600: #ea580c;
+  --color-accent-700: #c2410c;
+  --color-accent-800: #9a3412;
+
+  /* Neutral — xám xanh (slate). */
+  --color-neutral-50: #f8fafc;
+  --color-neutral-100: #f1f5f9;
+  --color-neutral-200: #e2e8f0;
+  --color-neutral-300: #cbd5e1;
+  --color-neutral-400: #94a3b8;
+  --color-neutral-500: #64748b;
+  --color-neutral-600: #475569;
+  --color-neutral-700: #334155;
+  --color-neutral-800: #1e293b;
+  --color-neutral-900: #0f172a;
+  --color-neutral-950: #020617;
+
+  /* Trạng thái. */
+  --color-danger-50: #fef2f2;
+  --color-danger-100: #fee2e2;
+  --color-danger-700: #b91c1c;
+  --color-success-50: #f0fdf4;
+  --color-success-100: #dcfce7;
+  --color-success-700: #15803d;
+  --color-star: #d97706;
+
+  /* Alias ngữ nghĩa. */
+  --color-surface: var(--color-white);
+  --color-surface-muted: var(--color-neutral-50);
+  --color-ink: var(--color-neutral-900);
+  --color-ink-muted: var(--color-neutral-600);
+  --color-line: var(--color-neutral-200);
+  --color-focus: var(--color-primary-700);
+  --color-focus-on-dark: var(--color-white);
+
+  /* Bo góc. */
+  --radius-control: 0.75rem;
+  --radius-card: 1.25rem;
+  --radius-pill: 9999px;
+
+  /* Đổ bóng. */
+  --shadow-card: 0 1px 2px rgb(15 23 42 / 0.06), 0 6px 20px rgb(15 23 42 / 0.07);
+  --shadow-card-hover: 0 2px 4px rgb(15 23 42 / 0.08), 0 14px 32px rgb(15 23 42 / 0.13);
+  --shadow-search: 0 24px 60px -16px rgb(2 47 46 / 0.55);
+  --shadow-header: 0 1px 0 rgb(15 23 42 / 0.06), 0 8px 24px -12px rgb(15 23 42 / 0.18);
+
+  /* Bề rộng nội dung (max-w-page). */
+  --container-page: 80rem;
 }
 
+/* Font lấy từ next/font (xem app/layout.tsx), kèm font hệ thống dự phòng có hỗ trợ tiếng Việt. */
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --font-sans:
+    var(--font-be-vietnam-pro), ui-sans-serif, system-ui, "Segoe UI", Roboto, "Helvetica Neue",
+    Arial, sans-serif;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+@layer base {
+  html {
+    color-scheme: light;
+    -webkit-text-size-adjust: 100%;
   }
-}
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  body {
+    background-color: var(--color-surface);
+    color: var(--color-ink);
+  }
+
+  /* Viền focus rõ ràng cho mọi phần tử tương tác (≥ 3:1 so với nền). */
+  :focus-visible {
+    outline: 3px solid var(--color-focus);
+    outline-offset: 2px;
+  }
+
+  /* Trên nền tối (footer, hero) dùng viền trắng. */
+  .on-dark :focus-visible {
+    outline-color: var(--color-focus-on-dark);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    ::before,
+    ::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
 }
