@@ -21,6 +21,22 @@ spring:
     # Cho phép khởi động khi chưa có file migration nào
     fail-on-missing-locations: false
 
+  # Lỗi MVC trả ProblemDetail (RFC 9457), khớp với GlobalExceptionHandler
+  mvc:
+    problemdetails:
+      enabled: true
+
+# Tài liệu API (springdoc). Orval đọc /v3/api-docs để sinh client cho admin.
+# Đặt SPRINGDOC_ENABLED=false để tắt hẳn
+springdoc:
+  api-docs:
+    enabled: ${SPRINGDOC_ENABLED:true}
+
+# CORS cho admin (SPA gọi API từ trình duyệt). Nhiều origin cách nhau bằng dấu phẩy
+gotrips:
+  cors:
+    allowed-origins: ${GOTRIPS_CORS_ORIGINS:http://localhost:8081,http://localhost:5173}
+
 # Actuator: chỉ expose health + info, không lộ endpoint nhạy cảm
 management:
   endpoints:
