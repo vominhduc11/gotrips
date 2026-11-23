@@ -1,23 +1,7 @@
 import { Container } from "@/components/common/Container";
 import { SectionHeading } from "@/components/common/SectionHeading";
-import { Star } from "lucide-react";
+import { StarRating } from "@/components/common/StarRating";
 import { getTestimonials } from "@/lib/data/home";
-
-function Stars({ rating }: { rating: number }) {
-  return (
-    <div role="img" aria-label={`${rating} trên 5 sao`} className="flex gap-0.5">
-      {Array.from({ length: 5 }, (_, index) => (
-        <Star
-          key={index}
-          aria-hidden="true"
-          fill="currentColor"
-          stroke="none"
-          className={index < rating ? "size-5 text-star" : "size-5 text-neutral-300"}
-        />
-      ))}
-    </div>
-  );
-}
 
 export async function Testimonials() {
   const testimonials = await getTestimonials();
@@ -40,7 +24,7 @@ export async function Testimonials() {
             return (
               <li key={testimonial.id}>
                 <figure className="flex h-full flex-col rounded-card bg-surface p-6 shadow-card">
-                  <Stars rating={testimonial.rating} />
+                  <StarRating rating={testimonial.rating} />
                   <blockquote className="mt-4 flex-1 text-base leading-7 text-ink">
                     <p>“{testimonial.content}”</p>
                   </blockquote>

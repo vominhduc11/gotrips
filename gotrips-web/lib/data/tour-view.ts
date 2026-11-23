@@ -1,4 +1,12 @@
-import type { Destination, Tour, TourCardView, TourDeparture } from "@/lib/types";
+import type {
+  Destination,
+  Testimonial,
+  Tour,
+  TourCardView,
+  TourDeparture,
+  TourDepartureView,
+  TourDetailView,
+} from "@/lib/types";
 
 /** Chỉ còn ≤ ngưỡng này thì hiện nhãn "Sắp hết chỗ". */
 export const ALMOST_FULL_THRESHOLD = 5;
@@ -71,5 +79,47 @@ export function toTourCardView(
         ? Math.round(((originalPriceFrom - cheapest.price) / originalPriceFrom) * 100)
         : null,
     isAlmostFull: seatsLeft !== null && seatsLeft <= ALMOST_FULL_THRESHOLD,
+  };
+}
+
+export function toDepartureView(departure: TourDeparture): TourDepartureView {
+  const seatsLeft = getSeatsLeft(departure);
+  const hasDiscount = departure.originalPrice !== undefined && departure.originalPrice > departure.price;
+
+  return {
+    id: departure.id,
+    departureDate: departure.departureDate,
+    price: departure.price,
+    originalPrice: hasDiscount ? (departure.originalPrice ?? null) : null,
+    discountPercent:
+      hasDiscount && departure.originalPrice
+        ? Math.round(((departure.originalPrice - departure.price) / departure.originalPrice) * 100)
+        : null,
+    seatsLeft,
+    isSoldOut: seatsLeft === 0,
+    isAlmostFull: seatsLeft > 0 && seatsLeft <= ALMOST_FULL_THRESHOLD,
+  };
+}
+
+/**
+ * Dữ liệu trang chi tiết tour. Hàm thuần (nhận `today`).
+ * Thông tin "giá từ"/"ngày gần nhất" lấy từ `toTourCardView` để trang chi tiết và thẻ tour luôn khớp nhau;
+ * danh sách chuyến thì giữ cả chuyến đã đầy (hiện "Hết chỗ") nhưng bỏ chuyến đã qua.
+ */
+export function toTourDetailView(
+  tour: Tour,
+  destination: Destination,
+  tourDepartures: TourDeparture[],
+  testimonials: Testimonial[],
+  today: string,
+): TourDetailView {
+  return {
+    ...toTourCardView(tour, destination, tourDepartures, today),
+    shortDescription: tour.shortDescription,
+    departures: tourDepartures
+      .filter((d) => d.departureDate > today)
+      .sort((a, b) => a.departureDate.localeCompare(b.departureDate))
+      .map(toDepartureView),
+    testimonials,
   };
 }

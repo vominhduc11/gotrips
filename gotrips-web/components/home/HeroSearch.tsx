@@ -1,12 +1,24 @@
+import { Suspense } from "react";
 import { Container } from "@/components/common/Container";
 import { CoverImage } from "@/components/common/CoverImage";
+import { getAirports } from "@/lib/data/airports";
 import { getHeroBanner, getPopularDestinations } from "@/lib/data/home";
+import { FlightSearchForm } from "./FlightSearchForm";
+import { HeroGreeting, HeroGreetingFallback } from "./HeroGreeting";
+import { HotelSearchForm } from "./HotelSearchForm";
 import { SearchForm } from "./SearchForm";
 import { ServiceTabs } from "./ServiceTabs";
+import { SERVICE_TAB_HASH, SERVICE_TABS } from "./service-tab-hash";
 
-/** Hero: ảnh nền + tiêu đề `h1` duy nhất của trang + ô tìm kiếm. */
+/** Hero: ảnh nền + tiêu đề `h1` duy nhất của trang + ô tìm kiếm (3 tab: Tour, Khách sạn, Vé máy bay). */
 export async function HeroSearch() {
-  const [banner, destinations] = await Promise.all([getHeroBanner(), getPopularDestinations()]);
+  const [banner, destinations, airports] = await Promise.all([
+    getHeroBanner(),
+    getPopularDestinations(),
+    getAirports(),
+  ]);
+  // Chỉ truyền xuống client những trường form cần, không đẩy cả object điểm đến (ảnh, số tour...) vào payload.
+  const destinationOptions = destinations.map(({ slug, name, region }) => ({ slug, name, region }));
 
   return (
     <section aria-labelledby="hero-heading" className="relative isolate">
@@ -21,7 +33,9 @@ export async function HeroSearch() {
       <Container className="relative py-12 sm:py-20 lg:py-24">
         <div className="max-w-2xl text-white">
           <p className="text-sm font-semibold uppercase tracking-wide text-primary-200">
-            Đặt tour du lịch trực tuyến
+            <Suspense fallback={<HeroGreetingFallback />}>
+              <HeroGreeting />
+            </Suspense>
           </p>
           <h1
             id="hero-heading"
@@ -36,12 +50,21 @@ export async function HeroSearch() {
         </div>
 
         <div className="mt-8 rounded-card bg-surface text-ink shadow-search sm:mt-10">
-          <ServiceTabs />
-          <div className="p-4 sm:p-6">
-            <SearchForm
-              destinations={destinations.map(({ slug, name, region }) => ({ slug, name, region }))}
-            />
-          </div>
+          {/*
+            Đích cuộn của các liên kết `/#tim-tour`, `/#tim-khach-san`, `/#tim-ve-may-bay` (menu Header).
+            Next và trình duyệt cuộn tới phần tử có `id` BẰNG hash; nếu không có thì Next coi như đã xử lý và
+            không cuộn gì cả. Vì mỗi tab có một hash riêng nên cần đủ ba điểm ở đầu ô tìm kiếm, chiều cao 0, không
+            ảnh hưởng bố cục. Đặt ở đây (không đặt trên panel của tab) vì panel tab không chọn bị `display: none`.
+            `scroll-mt-20` = chiều cao header dính (h-16) + 1rem hở, để header không che mép trên của ô tìm kiếm.
+          */}
+          {SERVICE_TABS.map((tab) => (
+            <span key={tab} id={SERVICE_TAB_HASH[tab]} className="block h-0 scroll-mt-20" />
+          ))}
+          <ServiceTabs
+            tourForm={<SearchForm destinations={destinationOptions} />}
+            hotelForm={<HotelSearchForm destinations={destinationOptions} />}
+            flightForm={<FlightSearchForm airports={airports} />}
+          />
         </div>
       </Container>
     </section>

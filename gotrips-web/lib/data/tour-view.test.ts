@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import type { Destination, Tour, TourDeparture } from "@/lib/types";
-import { ALMOST_FULL_THRESHOLD, getTodayInVietnam, toTourCardView } from "./tour-view";
+import { ALMOST_FULL_THRESHOLD, getTodayInVietnam, toDepartureView, toTourCardView, toTourDetailView } from "./tour-view";
 
 const TODAY = "2027-01-01";
 
@@ -119,5 +119,64 @@ describe("getTodayInVietnam", () => {
   it("tính theo giờ Việt Nam (UTC+7), không theo UTC", () => {
     // 20:00 UTC ngày 31/12 đã là 03:00 ngày 01/01 ở Việt Nam.
     expect(getTodayInVietnam(new Date("2026-12-31T20:00:00Z"))).toBe("2027-01-01");
+  });
+});
+
+describe("toDepartureView", () => {
+  it("tính chỗ còn lại, hết chỗ và sắp hết chỗ", () => {
+    expect(toDepartureView(departure({ totalSeats: 20, bookedSeats: 20 }))).toMatchObject({
+      seatsLeft: 0,
+      isSoldOut: true,
+      isAlmostFull: false,
+    });
+    expect(toDepartureView(departure({ totalSeats: 20, bookedSeats: 20 - ALMOST_FULL_THRESHOLD }))).toMatchObject({
+      seatsLeft: ALMOST_FULL_THRESHOLD,
+      isSoldOut: false,
+      isAlmostFull: true,
+    });
+    expect(toDepartureView(departure({ totalSeats: 20, bookedSeats: 0 }))).toMatchObject({
+      isSoldOut: false,
+      isAlmostFull: false,
+    });
+  });
+
+  it("chỉ coi là giảm giá khi giá gốc cao hơn giá bán", () => {
+    expect(toDepartureView(departure({ price: 8_000_000, originalPrice: 10_000_000 }))).toMatchObject({
+      originalPrice: 10_000_000,
+      discountPercent: 20,
+    });
+    expect(toDepartureView(departure({ price: 8_000_000, originalPrice: 8_000_000 }))).toMatchObject({
+      originalPrice: null,
+      discountPercent: null,
+    });
+  });
+});
+
+describe("toTourDetailView", () => {
+  it("giữ chuyến đã đầy, bỏ chuyến đã qua, sắp theo ngày; giá từ chỉ tính chuyến còn chỗ", () => {
+    const view = toTourDetailView(
+      tour,
+      destination,
+      [
+        departure({ id: 1, departureDate: "2027-03-01", price: 3_500_000 }),
+        departure({ id: 2, departureDate: "2026-12-01" }),
+        departure({ id: 3, departureDate: "2027-02-01", price: 2_000_000, totalSeats: 10, bookedSeats: 10 }),
+        departure({ id: 4, departureDate: "2027-02-15", price: 3_000_000 }),
+      ],
+      [],
+      TODAY,
+    );
+
+    expect(view.departures.map((d) => d.id)).toEqual([3, 4, 1]);
+    expect(view.departures[0].isSoldOut).toBe(true);
+    expect(view.priceFrom).toBe(3_000_000);
+    expect(view.nextDepartureDate).toBe("2027-02-15");
+    expect(view.shortDescription).toBe("Tour thử");
+  });
+
+  it("không còn chuyến nào thì danh sách rỗng và không có giá", () => {
+    const view = toTourDetailView(tour, destination, [], [], TODAY);
+    expect(view.departures).toEqual([]);
+    expect(view.priceFrom).toBeNull();
   });
 });

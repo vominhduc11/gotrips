@@ -1,13 +1,14 @@
+import { Suspense } from "react";
 import { AppLink } from "@/components/common/AppLink";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import { Container } from "@/components/common/Container";
+import { HeaderAuth, HeaderMobileNav } from "./HeaderAuth";
 import { Logo } from "./Logo";
 import { MobileNav } from "./MobileNav";
 import { NAV_ITEMS } from "./nav-items";
 
 /**
- * Header dính đầu trang. Server Component hoàn toàn (chỉ MobileNav là client).
+ * Header dính đầu trang. Server Component (MobileNav và UserMenu là client); phần tài khoản đọc phiên đăng nhập.
  * Chưa đánh dấu mục menu "đang chọn" vì cần `usePathname`, mà hook này ở layout buộc phải bọc `Suspense`
  * khi có route động chưa biết trước — để dành khi có nhiều trang hơn.
  */
@@ -39,16 +40,16 @@ export function Header() {
           </ul>
         </nav>
 
-        <div className="hidden items-center gap-2 lg:flex">
-          <Button asChild variant="ghost" size="sm"><AppLink href="/login">
-            Đăng nhập
-          </AppLink></Button>
-          <Button asChild variant="primary" size="sm"><AppLink href="/register">
-            Đăng ký
-          </AppLink></Button>
+        {/* Cookie phiên là dữ liệu theo yêu cầu → stream trong Suspense, phần còn lại của Header vẫn prerender. */}
+        <div className="hidden min-h-10 min-w-40 items-center justify-end gap-2 lg:flex">
+          <Suspense fallback={null}>
+            <HeaderAuth />
+          </Suspense>
         </div>
 
-        <MobileNav items={NAV_ITEMS} />
+        <Suspense fallback={<MobileNav items={NAV_ITEMS} user={null} />}>
+          <HeaderMobileNav />
+        </Suspense>
       </Container>
     </header>
   );

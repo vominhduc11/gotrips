@@ -29,6 +29,18 @@ export function formatDuration(days: number, nights: number): string {
 }
 
 /**
+ * Thời gian bay: 125 → "2 giờ 5 phút", 60 → "1 giờ", 45 → "45 phút". Viết đủ chữ (không "2g5p") để trình đọc màn
+ * hình đọc tự nhiên. Số phút âm/NaN coi như 0; số lẻ làm tròn.
+ */
+export function formatFlightDuration(totalMinutes: number): string {
+  const minutes = Number.isFinite(totalMinutes) ? Math.max(0, Math.round(totalMinutes)) : 0;
+  const hours = Math.floor(minutes / 60);
+  const rest = minutes % 60;
+  if (hours === 0) return `${rest} phút`;
+  return rest === 0 ? `${hours} giờ` : `${hours} giờ ${rest} phút`;
+}
+
+/**
  * Chuẩn hoá để so khớp tên điểm đến: bỏ dấu, bỏ phân biệt hoa/thường, gộp khoảng trắng.
  * "Đà  Lạt" / "da lat" / "da-lat" → "da lat"
  */

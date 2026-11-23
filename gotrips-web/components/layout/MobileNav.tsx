@@ -2,14 +2,18 @@
 
 import { useEffect, useRef, useState } from "react";
 import { AppLink } from "@/components/common/AppLink";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { X, Menu } from "lucide-react";
+import { getInitials, type SessionUser } from "@/lib/auth/user";
+import { LogOut, X, Menu } from "lucide-react";
 import type { NavItem } from "./nav-items";
+import { useLogout } from "./use-logout";
 
 /** Menu hamburger cho màn hình < lg. Đóng bằng Esc, bằng nút, hoặc khi chọn một liên kết. */
-export function MobileNav({ items }: { items: NavItem[] }) {
+export function MobileNav({ items, user }: { items: NavItem[]; user: SessionUser | null }) {
   const [open, setOpen] = useState(false);
+  const { logout, pending } = useLogout();
   const buttonRef = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
@@ -65,14 +69,30 @@ export function MobileNav({ items }: { items: NavItem[] }) {
                 )}
               </li>
             ))}
-            <li className="mt-2 grid grid-cols-2 gap-3 border-t border-line pt-4">
-              <Button asChild variant="outline"><AppLink href="/login" onClick={close}>
-                Đăng nhập
-              </AppLink></Button>
-              <Button asChild variant="primary"><AppLink href="/register" onClick={close}>
-                Đăng ký
-              </AppLink></Button>
-            </li>
+            {user ? (
+              <li className="mt-2 flex items-center gap-3 border-t border-line pt-4">
+                <Avatar size="lg">
+                  <AvatarFallback className="bg-primary-700 font-semibold text-white">{getInitials(user.name)}</AvatarFallback>
+                </Avatar>
+                <div className="min-w-0 flex-1">
+                  <p className="truncate text-sm font-semibold text-ink">Xin chào, {user.name}</p>
+                  <p className="truncate text-xs text-ink-muted">{user.email}</p>
+                </div>
+                <Button variant="outline" size="sm" disabled={pending} onClick={() => { close(); logout(); }}>
+                  <LogOut aria-hidden="true" />
+                  Đăng xuất
+                </Button>
+              </li>
+            ) : (
+              <li className="mt-2 grid grid-cols-2 gap-3 border-t border-line pt-4">
+                <Button asChild variant="outline"><AppLink href="/login" onClick={close}>
+                  Đăng nhập
+                </AppLink></Button>
+                <Button asChild variant="primary"><AppLink href="/register" onClick={close}>
+                  Đăng ký
+                </AppLink></Button>
+              </li>
+            )}
           </ul>
         </nav>
       ) : null}

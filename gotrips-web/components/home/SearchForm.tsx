@@ -46,7 +46,7 @@ function Field({
  * - Ô điểm đến là input + `<datalist>` gợi ý. Nếu chữ nhập khớp một điểm đến (không phân biệt hoa/thường/dấu)
  *   thì gửi `destination=<slug>` (cùng quy ước với thẻ "Điểm đến phổ biến"); nếu không khớp thì gửi `q=<chữ nhập>`
  *   để trang /tours sau này không nhận phải slug rác.
- * - Tham số trống thì bỏ khỏi URL. Chưa có trang /tours nên hiện sẽ ra trang 404 — đúng với phạm vi prototype.
+ * - Tham số trống thì bỏ khỏi URL. Trang /tours đọc các tham số này (schema ở `lib/schemas/tour-filters.ts`).
  */
 export function SearchForm({ destinations }: { destinations: DestinationOption[] }) {
   const router = useRouter();

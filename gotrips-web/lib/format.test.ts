@@ -1,5 +1,12 @@
 import { describe, expect, it } from "vitest";
-import { formatDate, formatDuration, formatRating, formatVND, normalizeSearchText } from "./format";
+import {
+  formatDate,
+  formatDuration,
+  formatFlightDuration,
+  formatRating,
+  formatVND,
+  normalizeSearchText,
+} from "./format";
 
 describe("formatVND", () => {
   it("dùng dấu chấm phân cách nghìn và ký hiệu ₫", () => {
@@ -28,6 +35,25 @@ describe("formatRating", () => {
 describe("formatDuration", () => {
   it("ghép số ngày và đêm", () => {
     expect(formatDuration(3, 2)).toBe("3N2Đ");
+  });
+});
+
+describe("formatFlightDuration", () => {
+  it("ghi giờ và phút bằng chữ đầy đủ", () => {
+    expect(formatFlightDuration(125)).toBe("2 giờ 5 phút");
+    expect(formatFlightDuration(85)).toBe("1 giờ 25 phút");
+  });
+
+  it("bỏ phần không có: tròn giờ thì không ghi phút, dưới 1 giờ thì không ghi giờ", () => {
+    expect(formatFlightDuration(60)).toBe("1 giờ");
+    expect(formatFlightDuration(120)).toBe("2 giờ");
+    expect(formatFlightDuration(55)).toBe("55 phút");
+  });
+
+  it("giá trị bất thường: số lẻ làm tròn, âm/NaN coi như 0", () => {
+    expect(formatFlightDuration(59.6)).toBe("1 giờ");
+    expect(formatFlightDuration(-5)).toBe("0 phút");
+    expect(formatFlightDuration(Number.NaN)).toBe("0 phút");
   });
 });
 
