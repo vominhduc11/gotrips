@@ -1,48 +1,61 @@
 "use server";
 
-import { DEMO_ACCOUNT } from "@/lib/auth/demo-account";
+import { login, register } from "@/lib/api/generated";
+import { ApiError } from "@/lib/api/http";
 import { createSession, destroySession } from "@/lib/auth/session";
+import { buildLoginHref, getSafeRedirectPath } from "@/lib/safe-redirect";
 import { loginSchema, registerSchema } from "@/lib/schemas/auth";
+import { fromApiFieldErrors, toFieldErrors } from "./field-errors";
+import { SERVICE_UNAVAILABLE_MESSAGE } from "./messages";
 
 /** Kết quả trả về form; lỗi theo field được form gắn lại vào đúng ô (khớp tên field trong schema). */
 export type AuthActionResult =
   | { ok: true; redirectTo: string }
   | { ok: false; message?: string; fieldErrors?: Record<string, string> };
 
-// PROTOTYPE: chưa nối backend/DB — không lưu tài khoản; đăng nhập đúng tài khoản demo thì đặt cookie phiên
-// (lib/auth/session.ts) để Header/trang chủ hiện theo người dùng. Đăng ký hợp lệ là coi như thành công.
-// Khi gotrips-api có `/auth/login` và `/auth/register`: thay đoạn so khớp bằng `apiFetch`
-// (lib/api/http.ts), lưu token API cấp vào cookie phiên, map `ApiError.errors` sang `fieldErrors`.
-// Giữ nguyên chữ ký và kiểu `AuthActionResult` để form không phải sửa.
+// Hai action này gọi gotrips-api (`POST /auth/login`, `POST /auth/register`) bằng client do Orval sinh
+// (lib/api/generated). Giữ nguyên chữ ký và kiểu `AuthActionResult` để form không phải đổi.
 
-/** Độ trễ giả lập thời gian gọi API để thấy được trạng thái đang tải của form. Xoá cùng đoạn demo khi nối API thật. */
-const DEMO_LATENCY_MS = 1200;
-const simulateLatency = () => new Promise<void>((resolve) => setTimeout(resolve, DEMO_LATENCY_MS));
+/** Tên field của form đăng nhập / đăng ký — lỗi API chỉ được gắn vào những ô này. */
+const LOGIN_FIELDS = ["email", "password"] as const;
+const REGISTER_FIELDS = ["fullName", "email", "password"] as const;
 
-/** Lấy lỗi đầu tiên của mỗi field từ kết quả `safeParse` thất bại. */
-function toFieldErrors(issues: { path: PropertyKey[]; message: string }[]): Record<string, string> {
-  const fieldErrors: Record<string, string> = {};
-  for (const issue of issues) {
-    const field = String(issue.path[0] ?? "");
-    if (field && !(field in fieldErrors)) fieldErrors[field] = issue.message;
+const WRONG_CREDENTIALS_MESSAGE = "Email hoặc mật khẩu không đúng. Bạn vui lòng kiểm tra lại nhé.";
+
+/** Lỗi 4xx mà API trả theo ProblemDetail → kết quả cho form; các lỗi còn lại (mạng, 5xx...) là sự cố hệ thống. */
+function toFailure(error: unknown, fields: readonly string[], action: string): AuthActionResult {
+  if (error instanceof ApiError && error.status >= 400 && error.status < 500) {
+    const fieldErrors = fromApiFieldErrors(error.errors, fields);
+    if (Object.keys(fieldErrors).length > 0) return { ok: false, fieldErrors };
+    return { ok: false, message: error.detail ?? error.title };
   }
-  return fieldErrors;
+  // Không ghi dữ liệu người dùng (email/mật khẩu) vào log, chỉ ghi nguyên nhân.
+  console.error(`[auth] ${action} thất bại:`, error instanceof Error ? error.message : error);
+  return { ok: false, message: SERVICE_UNAVAILABLE_MESSAGE };
 }
 
-export async function loginAction(values: unknown): Promise<AuthActionResult> {
+/**
+ * @param next đích quay lại sau khi đăng nhập (từ `/login?next=...`, ví dụ bước "Thông tin" của luồng đặt tour).
+ *             Dữ liệu từ URL nên được lọc bằng `getSafeRedirectPath` (chỉ đường dẫn nội bộ).
+ */
+export async function loginAction(values: unknown, next?: unknown): Promise<AuthActionResult> {
   // Kiểm lại ở server: Server Action là endpoint công khai, không tin dữ liệu từ trình duyệt.
   const parsed = loginSchema.safeParse(values);
   if (!parsed.success) return { ok: false, fieldErrors: toFieldErrors(parsed.error.issues) };
 
-  await simulateLatency();
-
-  // Thông báo chung cho cả "sai email" lẫn "sai mật khẩu" để không lộ email nào đã đăng ký.
-  const { email, password } = parsed.data;
-  if (email.toLowerCase() !== DEMO_ACCOUNT.email || password !== DEMO_ACCOUNT.password) {
-    return { ok: false, message: "Email hoặc mật khẩu không đúng. Bạn vui lòng kiểm tra lại nhé." };
+  let session: { accessToken: string; expiresIn: number };
+  try {
+    const { data } = await login(parsed.data);
+    session = data;
+  } catch (error) {
+    // Thông báo chung cho cả "sai email" lẫn "sai mật khẩu" (API cũng không phân biệt) để không lộ email nào đã đăng ký.
+    if (error instanceof ApiError && error.status === 401) return { ok: false, message: WRONG_CREDENTIALS_MESSAGE };
+    return toFailure(error, LOGIN_FIELDS, "Đăng nhập");
   }
-  await createSession(DEMO_ACCOUNT.email);
-  return { ok: true, redirectTo: "/" };
+
+  // Token chỉ được lưu vào cookie httpOnly; không trả về cho trình duyệt.
+  await createSession(session.accessToken, session.expiresIn);
+  return { ok: true, redirectTo: getSafeRedirectPath(next) };
 }
 
 /** Đăng xuất: xoá cookie phiên. Next tự làm mới giao diện vì cookie đổi trong Server Action. */
@@ -50,12 +63,20 @@ export async function logoutAction(): Promise<void> {
   await destroySession();
 }
 
-export async function registerAction(values: unknown): Promise<AuthActionResult> {
+/** @param next giữ nguyên đích quay lại khi khách đi từ `/login?next=...` sang đăng ký rồi quay về đăng nhập. */
+export async function registerAction(values: unknown, next?: unknown): Promise<AuthActionResult> {
   const parsed = registerSchema.safeParse(values);
   if (!parsed.success) return { ok: false, fieldErrors: toFieldErrors(parsed.error.issues) };
 
-  await simulateLatency();
+  // `confirmPassword` và `acceptTerms` chỉ để kiểm ở form, không gửi lên API.
+  const { fullName, email, password } = parsed.data;
+  try {
+    await register({ fullName, email, password });
+  } catch (error) {
+    // 409 (email đã đăng ký) và 400 (API kiểm lại luật) đều kèm `errors[]` theo field → hiện đúng ô.
+    return toFailure(error, REGISTER_FIELDS, "Đăng ký");
+  }
 
-  // Đăng ký xong chuyển sang đăng nhập (chưa lưu tài khoản nên chưa thể tự đăng nhập).
-  return { ok: true, redirectTo: "/login" };
+  // Đăng ký xong chuyển sang đăng nhập (chưa tự đăng nhập), giữ đích `next` nếu có.
+  return { ok: true, redirectTo: buildLoginHref(getSafeRedirectPath(next, "")) };
 }

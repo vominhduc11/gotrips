@@ -29,9 +29,11 @@ export function RegisterForm() {
   });
 
   async function onSubmit(values: RegisterFormValues) {
-    const result = await registerAction(values);
+    // Giữ đích quay lại khi khách đi từ `/login?next=...` sang đăng ký (đọc lúc submit, xem LoginForm).
+    const next = new URLSearchParams(window.location.search).get("next") ?? undefined;
+    const result = await registerAction(values, next);
     if (result.ok) {
-      toast.success("Tạo tài khoản thành công", { description: "Đây là bản thử nghiệm, chưa có tài khoản thật." });
+      toast.success("Tạo tài khoản thành công", { description: "Bạn hãy đăng nhập để bắt đầu đặt chỗ." });
       router.push(result.redirectTo);
       return;
     }

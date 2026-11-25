@@ -4,7 +4,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { TourCard } from "@/components/tour/TourCard";
 import { TourFilterBar } from "@/components/tour/TourFilterBar";
 import { TourPagination } from "@/components/tour/TourPagination";
-import { getPopularDestinations } from "@/lib/data/home";
+import { loadDestinations } from "@/lib/data/catalog-loaders";
 import { searchTours } from "@/lib/data/tours";
 import { parseTourFilters } from "@/lib/schemas/tour-filters";
 
@@ -18,7 +18,10 @@ export async function TourListing({
   searchParams: Promise<Record<string, string | string[] | undefined>>;
 }) {
   const filters = parseTourFilters(await searchParams);
-  const [destinations, result] = await Promise.all([getPopularDestinations(), searchTours(filters)]);
+  const [destinationList, result] = await Promise.all([loadDestinations(), searchTours(filters)]);
+  // Danh sách điểm đến (từ gotrips-api) chỉ để dựng ô lọc. API lỗi thì ô lọc thiếu lựa chọn điểm đến nhưng danh sách tour
+  // và các bộ lọc khác vẫn dùng được, nên không để cả trang vỡ (lỗi đã được ghi log trong `loadSection`).
+  const destinations = destinationList.ok ? destinationList.data : [];
 
   const heading = result.destination ? `Tour ${result.destination.name}` : "Tất cả tour";
   const hasFilters = Boolean(filters.destination || filters.q || filters.date || filters.guests);

@@ -10,6 +10,9 @@ import { cn } from "@/lib/cn"
  * - `discount`: giảm giá (nền cam đậm, chữ trắng — dùng được trên ảnh)
  * - `warning` : "Sắp hết chỗ" (nền đỏ đậm, chữ trắng — dùng được trên ảnh)
  * - `neutral` : nhãn trung tính (mặc định)
+ * - `info`    : trạng thái đang xử lý, ví dụ "Chờ xác nhận" (nền teal nhạt)
+ * - `success` : trạng thái hoàn tất, ví dụ "Đã xác nhận", "Đã thanh toán" (nền xanh lá nhạt)
+ * Các nhãn nền nhạt đều dùng chữ ≥ 700 để đạt tương phản AA.
  */
 const badgeVariants = cva(
   "inline-flex items-center whitespace-nowrap rounded-pill px-2.5 py-0.5 text-xs font-semibold leading-5",
@@ -20,6 +23,8 @@ const badgeVariants = cva(
         discount: "bg-accent-700 text-white",
         warning: "bg-danger-700 text-white",
         neutral: "bg-neutral-100 text-neutral-700",
+        info: "bg-primary-50 text-primary-800",
+        success: "bg-success-100 text-success-700",
       },
     },
     defaultVariants: {

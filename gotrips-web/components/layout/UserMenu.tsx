@@ -1,6 +1,7 @@
 "use client";
 
-import { ChevronDown, LogOut } from "lucide-react";
+import { ChevronDown, ClipboardList, LogOut } from "lucide-react";
+import { AppLink } from "@/components/common/AppLink";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import {
   DropdownMenu,
@@ -13,7 +14,7 @@ import {
 import { getInitials, type SessionUser } from "@/lib/auth/user";
 import { useLogout } from "./use-logout";
 
-/** Menu người dùng ở Header (desktop): avatar + tên, mở ra email và nút đăng xuất. */
+/** Menu người dùng ở Header (desktop): avatar + tên, mở ra email, liên kết tới đơn đặt tour và nút đăng xuất. */
 export function UserMenu({ user }: { user: SessionUser }) {
   const { logout, pending } = useLogout();
 
@@ -37,6 +38,12 @@ export function UserMenu({ user }: { user: SessionUser }) {
           <span className="truncate text-xs font-normal text-ink-muted">{user.email}</span>
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
+        <DropdownMenuItem asChild className="min-h-10 cursor-pointer">
+          <AppLink href="/bookings">
+            <ClipboardList aria-hidden="true" />
+            Đơn đặt chỗ của tôi
+          </AppLink>
+        </DropdownMenuItem>
         <DropdownMenuItem disabled={pending} onSelect={logout} className="min-h-10 cursor-pointer">
           <LogOut aria-hidden="true" />
           Đăng xuất

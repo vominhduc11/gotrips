@@ -6,7 +6,7 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { getInitials, type SessionUser } from "@/lib/auth/user";
-import { LogOut, X, Menu } from "lucide-react";
+import { ClipboardList, LogOut, X, Menu } from "lucide-react";
 import type { NavItem } from "./nav-items";
 import { useLogout } from "./use-logout";
 
@@ -69,6 +69,18 @@ export function MobileNav({ items, user }: { items: NavItem[]; user: SessionUser
                 )}
               </li>
             ))}
+            {user ? (
+              <li>
+                <AppLink
+                  href="/bookings"
+                  onClick={close}
+                  className="flex min-h-12 items-center gap-2 rounded-control px-3 text-base font-medium text-ink hover:bg-primary-50"
+                >
+                  <ClipboardList aria-hidden="true" className="size-5 text-primary-700" />
+                  Đơn đặt chỗ của tôi
+                </AppLink>
+              </li>
+            ) : null}
             {user ? (
               <li className="mt-2 flex items-center gap-3 border-t border-line pt-4">
                 <Avatar size="lg">

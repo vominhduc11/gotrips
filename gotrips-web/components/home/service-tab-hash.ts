@@ -1,8 +1,8 @@
 /**
  * Ánh xạ DUY NHẤT giữa tab dịch vụ của ô tìm kiếm Trang chủ và hash trên URL.
  *
- * Menu Header (`nav-items.ts`), điểm đặt id cuộn (`HeroSearch`) và `ServiceTabs` đều lấy từ đây, để đổi một
- * hash chỉ phải sửa một chỗ. File này không có "use client" và không đụng tới `window` nên Server Component
+ * Điểm đặt id cuộn (`HeroSearch`), `ServiceTabs` và các thẻ ở thân Trang chủ đều lấy từ đây, để đổi một hash chỉ phải
+ * sửa một chỗ. Menu Header/Footer KHÔNG dùng các hash này: mỗi mục menu là một trang riêng. File này không có "use client" và không đụng tới `window` nên Server Component
  * cũng import được.
  */
 
@@ -20,8 +20,8 @@ export const SERVICE_TAB_HASH: Record<ServiceTab, string> = {
 };
 
 /**
- * `href` tới ô tìm kiếm Trang chủ với tab đó được chọn sẵn (`/#tim-khach-san`...). Menu Header, Footer và các thẻ
- * "Khách sạn nổi bật"/"Chặng bay phổ biến" đều dùng hàm này, nên chuỗi hash chỉ tồn tại ở file này.
+ * `href` tới ô tìm kiếm Trang chủ với tab đó được chọn sẵn (`/#tim-khach-san`...). Các thẻ "Khách sạn nổi bật"/
+ * "Chặng bay phổ biến" ở Trang chủ dùng hàm này, nên chuỗi hash chỉ tồn tại ở file này.
  */
 export function serviceTabHref(tab: ServiceTab): string {
   return `/#${SERVICE_TAB_HASH[tab]}`;

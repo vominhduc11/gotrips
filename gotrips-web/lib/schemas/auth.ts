@@ -2,19 +2,25 @@ import { z } from "zod";
 
 // Dùng chung cho form (React Hook Form) và Server Action: client báo lỗi sớm, server kiểm lại vì không tin dữ liệu từ trình duyệt.
 
-const email = z
+export const emailSchema = z
   .string()
   .trim()
   .min(1, "Vui lòng nhập địa chỉ email.")
   .pipe(z.email("Địa chỉ email chưa đúng định dạng, ví dụ: ban@example.com."));
 
-/** Giới hạn trên để chặn mật khẩu khổng lồ (tốn CPU khi băm ở backend); bcrypt cũng chỉ đọc 72 byte. */
+/**
+ * Giới hạn trên để chặn mật khẩu khổng lồ (tốn CPU khi băm ở backend). BCrypt chỉ đọc 72 **byte** (không phải ký tự)
+ * và gotrips-api từ chối mật khẩu vượt quá, nên chữ có dấu (3 byte/ký tự trong UTF-8) phải được đếm theo byte.
+ */
 export const PASSWORD_MIN_LENGTH = 8;
 export const PASSWORD_MAX_LENGTH = 72;
+export const PASSWORD_MAX_BYTES = 72;
+
+const utf8Encoder = new TextEncoder();
 
 /** Đăng nhập: chỉ kiểm tra "có nhập", không áp luật độ mạnh để không lộ chính sách mật khẩu cho người lạ. */
 export const loginSchema = z.object({
-  email,
+  email: emailSchema,
   password: z.string().min(1, "Vui lòng nhập mật khẩu."),
 });
 
@@ -29,12 +35,16 @@ export const registerSchema = z
       .min(1, "Vui lòng nhập họ và tên.")
       .min(2, "Họ và tên cần có ít nhất 2 ký tự.")
       .max(100, "Họ và tên không được quá 100 ký tự."),
-    email,
+    email: emailSchema,
     password: z
       .string()
       .min(1, "Vui lòng nhập mật khẩu.")
       .min(PASSWORD_MIN_LENGTH, `Mật khẩu cần có ít nhất ${PASSWORD_MIN_LENGTH} ký tự.`)
       .max(PASSWORD_MAX_LENGTH, `Mật khẩu không được quá ${PASSWORD_MAX_LENGTH} ký tự.`)
+      .refine(
+        (value) => utf8Encoder.encode(value).length <= PASSWORD_MAX_BYTES,
+        `Mật khẩu quá dài (tối đa ${PASSWORD_MAX_BYTES} byte; chữ có dấu chiếm nhiều byte hơn chữ không dấu).`,
+      )
       .regex(/\p{L}/u, "Mật khẩu cần có ít nhất một chữ cái.")
       .regex(/\d/, "Mật khẩu cần có ít nhất một chữ số."),
     confirmPassword: z.string().min(1, "Vui lòng nhập lại mật khẩu."),

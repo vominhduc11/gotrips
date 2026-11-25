@@ -9,7 +9,6 @@ import { Button } from "@/components/ui/button";
 import { Field, FieldError, FieldGroup, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { loginAction } from "@/lib/actions/auth";
-import { DEMO_ACCOUNT } from "@/lib/auth/demo-account";
 import { loginSchema, type LoginFormValues } from "@/lib/schemas/auth";
 import { FormError } from "./FormError";
 import { PasswordInput } from "./PasswordInput";
@@ -28,9 +27,12 @@ export function LoginForm() {
   });
 
   async function onSubmit(values: LoginFormValues) {
-    const result = await loginAction(values);
+    // `?next=` (đích quay lại, vd bước "Thông tin" của luồng đặt tour) đọc lúc submit chứ không lúc render: đọc lúc
+    // render phải dùng `useSearchParams` + `<Suspense>`, làm trang /login mất phần prerender. Server lọc lại `next`.
+    const next = new URLSearchParams(window.location.search).get("next") ?? undefined;
+    const result = await loginAction(values, next);
     if (result.ok) {
-      toast.success("Đăng nhập thành công", { description: "Đây là bản thử nghiệm, chưa có tài khoản thật." });
+      toast.success("Đăng nhập thành công");
       router.push(result.redirectTo);
       router.refresh(); // đảm bảo Header đọc lại cookie phiên vừa đặt
       return;
@@ -45,11 +47,6 @@ export function LoginForm() {
   return (
     <form onSubmit={handleSubmit(onSubmit)} noValidate>
       <FieldGroup>
-        {/* Gợi ý tài khoản demo cho prototype; bỏ khối này khi có đăng nhập thật. */}
-        <p className="rounded-control bg-primary-50 px-4 py-3 text-sm text-primary-900">
-          <strong className="font-semibold">Tài khoản thử nghiệm:</strong> {DEMO_ACCOUNT.email} / {DEMO_ACCOUNT.password}
-        </p>
-
         <FormError message={errors.root?.server?.message} />
 
         <Field data-invalid={errors.email ? true : undefined}>

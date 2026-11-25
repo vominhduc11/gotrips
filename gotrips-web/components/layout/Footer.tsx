@@ -1,7 +1,6 @@
 import { AppLink } from "@/components/common/AppLink";
 import { Badge } from "@/components/ui/badge";
 import { Container } from "@/components/common/Container";
-import { serviceTabHref } from "@/components/home/service-tab-hash";
 import { Mail, MapPin, Phone } from "lucide-react";
 import { Logo } from "./Logo";
 
@@ -34,9 +33,8 @@ const COLUMNS: Array<{ title: string; links: FooterLink[] }> = [
     title: "Dịch vụ",
     links: [
       { label: "Tour du lịch", href: "/tours" },
-      // Chưa có trang /hotels, /flights: đưa về ô tìm kiếm Trang chủ với tab tương ứng (giống menu Header).
-      { label: "Khách sạn", href: serviceTabHref("hotel") },
-      { label: "Vé máy bay", href: serviceTabHref("flight") },
+      { label: "Khách sạn", href: "/hotels" },
+      { label: "Vé máy bay", href: "/flights" },
     ],
   },
 ];

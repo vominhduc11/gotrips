@@ -1,9 +1,12 @@
 import { describe, expect, it } from "vitest";
 import {
   buildFlightSearchParams,
+  cabinLabel,
   createFlightPrefillSchema,
   createFlightSearchSchema,
   FLIGHT_MAX_PASSENGERS,
+  hasFlightSearchParams,
+  parseFlightSearchParams,
   type FlightSearchValues,
 } from "./flight-search";
 
@@ -195,5 +198,50 @@ describe("createFlightPrefillSchema", () => {
       expect(prefillSchema.safeParse(payload).success, JSON.stringify(payload)).toBe(false);
     }
     expect(prefillSchema.safeParse({ from: "__proto__", to: "HAN" }).success).toBe(false);
+  });
+});
+
+describe("parseFlightSearchParams", () => {
+  const roundTrip: FlightSearchValues = {
+    tripType: "roundTrip",
+    from: "SGN",
+    to: "HAN",
+    departDate: "2026-12-10",
+    returnDate: "2026-12-15",
+    adults: 2,
+    children: 1,
+    infants: 0,
+    cabin: "business",
+  };
+  const url = Object.fromEntries(buildFlightSearchParams(roundTrip));
+
+  it("đọc lại đúng lượt tìm từ URL do form dựng", () => {
+    expect(parseFlightSearchParams(url, TODAY)).toEqual(roundTrip);
+  });
+
+  it("một chiều: bỏ returnDate còn sót trên URL", () => {
+    expect(parseFlightSearchParams({ ...url, tripType: "oneWay" }, TODAY)?.returnDate).toBe("");
+  });
+
+  it("thiếu trẻ em / em bé trên URL coi như 0; thiếu hạng ghế coi như Phổ thông", () => {
+    const { children, infants, cabin, ...rest } = url;
+    void children;
+    void infants;
+    void cabin;
+    expect(parseFlightSearchParams(rest, TODAY)).toMatchObject({ children: 0, infants: 0, cabin: "economy" });
+  });
+
+  it("sai hoặc thiếu → null", () => {
+    expect(parseFlightSearchParams({}, TODAY)).toBeNull();
+    expect(parseFlightSearchParams({ ...url, to: "SGN" }, TODAY)).toBeNull();
+    expect(parseFlightSearchParams({ ...url, adults: "0" }, TODAY)).toBeNull();
+    expect(parseFlightSearchParams({ ...url, cabin: "vip" }, TODAY)).toBeNull();
+    expect(parseFlightSearchParams(url, "2026-12-11")).toBeNull(); // ngày đi đã qua
+  });
+
+  it("hasFlightSearchParams và cabinLabel", () => {
+    expect(hasFlightSearchParams({})).toBe(false);
+    expect(hasFlightSearchParams({ from: "SGN" })).toBe(true);
+    expect(cabinLabel("premiumEconomy")).toBe("Phổ thông đặc biệt");
   });
 });

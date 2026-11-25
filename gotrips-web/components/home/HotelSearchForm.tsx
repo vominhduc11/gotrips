@@ -2,13 +2,13 @@
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { CalendarDays, MapPin, Search, Users } from "lucide-react";
+import { useRouter } from "next/navigation";
 import { useId, useMemo } from "react";
 import { useForm, useWatch, type Path, type PathValue, type Resolver } from "react-hook-form";
-import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Field, FieldError, FieldLabel } from "@/components/ui/field";
 import {
-  createHotelPrefillSchema,
+  buildHotelSearchParams,
   createHotelSearchSchema,
   HOTEL_MAX_GUESTS,
   HOTEL_MAX_ROOMS,
@@ -21,23 +21,28 @@ import { focusFirstError } from "./focus-first-error";
 import { OptionCombobox, type ComboboxOption } from "./OptionCombobox";
 import { fieldLabelClass, fieldLabelIconClass } from "./search-field-styles";
 import type { DestinationOption } from "./SearchForm";
-import { useSearchPrefill } from "./use-search-prefill";
+
+const EMPTY_VALUES: HotelSearchValues = { destination: "", checkIn: "", checkOut: "", guests: 2, rooms: 1 };
 
 /**
- * Form tìm khách sạn (tab "Khách sạn" của ô tìm kiếm ở Trang chủ).
+ * Form tìm khách sạn: tab "Khách sạn" của ô tìm kiếm ở Trang chủ, và ô tìm kiếm ở đầu trang `/hotels`.
+ * Submit hợp lệ → `/hotels?destination&checkIn&checkOut&guests&rooms` (hợp đồng URL ở `lib/schemas/hotel-search.ts`).
  *
- * Trang `/hotels` CHƯA tồn tại nên submit không điều hướng, chỉ hiện toast "Tính năng đang phát triển".
- * Khi có trang, thay thân `onValid` bằng `router.push(`/hotels?${buildHotelSearchParams(values)}`)` —
- * hợp đồng URL đã có sẵn ở `lib/schemas/hotel-search.ts`.
+ * `initialValues`: lượt tìm đang hiển thị ở `/hotels` (trang đọc từ URL rồi truyền xuống). Form chỉ đọc giá trị này lúc
+ * mount, nên trang phải đặt `key` theo lượt tìm để form dựng lại khi URL đổi (Next dùng lại component khi chỉ search
+ * params đổi).
  *
  * Các ô là nút mở Popover chứ không phải `<input>`, nên giá trị đọc bằng `useWatch` và ghi bằng `setValue`
  * (không dùng `register`); lỗi lấy từ `formState.errors` do resolver Zod điền.
- *
- * Điền sẵn: thẻ ở section "Khách sạn nổi bật" gửi `{ destination: <slug> }` qua sự kiện hash (`useSearchPrefill`),
- * form chỉ ghi đè ô "Điểm đến" — ngày, số khách, số phòng khách đã nhập vẫn giữ nguyên. Slug phải là một điểm đến
- * có trong `destinations` của form này, sai thì bỏ qua.
  */
-export function HotelSearchForm({ destinations }: { destinations: DestinationOption[] }) {
+export function HotelSearchForm({
+  destinations,
+  initialValues,
+}: {
+  destinations: DestinationOption[];
+  initialValues?: HotelSearchValues;
+}) {
+  const router = useRouter();
   const uid = useId();
   const id = (name: string) => `${uid}-${name}`;
 
@@ -51,7 +56,7 @@ export function HotelSearchForm({ destinations }: { destinations: DestinationOpt
     // Dựng schema MỖI LẦN validate (không phải lúc import) để "hôm nay" luôn đúng kể cả khi trang mở qua nửa đêm.
     resolver: ((values, context, options) =>
       zodResolver(createHotelSearchSchema())(values, context, options)) as Resolver<HotelSearchValues>,
-    defaultValues: { destination: "", checkIn: "", checkOut: "", guests: 2, rooms: 1 },
+    defaultValues: initialValues ?? EMPTY_VALUES,
   });
 
   const [destination, checkIn, checkOut, guests, rooms] = useWatch({
@@ -76,26 +81,14 @@ export function HotelSearchForm({ destinations }: { destinations: DestinationOpt
     [destinations],
   );
 
-  const prefillSchema = useMemo(
-    () => createHotelPrefillSchema(destinations.map((destination) => destination.slug)),
-    [destinations],
-  );
-  useSearchPrefill({
-    tab: "hotel",
-    schema: prefillSchema,
-    apply: ({ destination: slug }) => update("destination", slug),
-  });
-
   // Một ô lịch chung cho cả ngày nhận và ngày trả nên gom lỗi của cả hai.
   const dateErrors = [errors.checkIn, errors.checkOut];
   const hasDateError = dateErrors.some(Boolean);
   const guestErrors = [errors.guests, errors.rooms];
   const hasGuestError = guestErrors.some(Boolean);
 
-  function onValid() {
-    toast("Tính năng đang phát triển", {
-      description: "Tìm khách sạn sẽ sớm ra mắt. Bạn vui lòng quay lại sau nhé.",
-    });
+  function onValid(values: HotelSearchValues) {
+    router.push(`/hotels?${buildHotelSearchParams(values)}`);
   }
 
   return (

@@ -47,6 +47,18 @@ describe("registerSchema", () => {
     expect(result.error?.issues.map((issue) => issue.message)).toContain(message);
   });
 
+  it("đếm độ dài mật khẩu theo byte: 29 chữ 'ế' + 1 chữ số chỉ 30 ký tự nhưng 90 byte nên bị từ chối", () => {
+    const password = "ế".repeat(29) + "1";
+    const result = registerSchema.safeParse({ ...validRegister, password, confirmPassword: password });
+    const issue = result.error?.issues.find((item) => item.message.startsWith("Mật khẩu quá dài"));
+    expect(issue?.path).toEqual(["password"]);
+  });
+
+  it("chấp nhận mật khẩu đúng 72 byte", () => {
+    const password = "a".repeat(71) + "1";
+    expect(registerSchema.safeParse({ ...validRegister, password, confirmPassword: password }).success).toBe(true);
+  });
+
   it("báo lỗi ở ô nhập lại khi hai mật khẩu không khớp", () => {
     const result = registerSchema.safeParse({ ...validRegister, confirmPassword: "khac12345" });
     const issue = result.error?.issues.find((item) => item.message === "Mật khẩu nhập lại chưa khớp.");

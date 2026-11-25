@@ -2,17 +2,18 @@ import { expect, type Locator, type Page } from "@playwright/test";
 
 /**
  * Hàm dùng chung cho các spec kiểm tra ô tìm kiếm Trang chủ (3 tab) và việc cuộn/chọn tab theo hash:
- * `service-nav.spec.ts` (menu Header) và `home-services.spec.ts` (thẻ khách sạn/chặng bay, Footer).
+ * `service-nav.spec.ts` (menu Header, hash chọn tab), `home-services.spec.ts` (thẻ khách sạn/chặng bay, Footer) và
+ * `service-pages.spec.ts` (trang /destinations, /hotels, /flights).
  * Không có đuôi `.spec` nên Playwright không coi đây là file test.
  */
 
 /** Chiều cao header dính (h-16). */
 export const HEADER_HEIGHT = 64;
 
-/** Mở Trang chủ và đợi hydrate xong (cùng dấu hiệu với e2e/home.spec.ts: ô "Số khách" được RHF điền "2"). */
+/** Mở Trang chủ và đợi hydrate xong (cùng dấu hiệu với e2e/home.spec.ts: ô ẩn `guests` của form tìm tour được RHF điền "2"). */
 export async function gotoHome(page: Page, path = "/") {
   await page.goto(path);
-  await expect(page.locator("#tim-so-khach")).toHaveValue("2");
+  await expect(page.locator('form[aria-label="Tìm tour"] input[name="guests"]')).toHaveValue("2");
 }
 
 /**

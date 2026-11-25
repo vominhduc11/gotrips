@@ -44,6 +44,11 @@ services:
       SPRING_DATASOURCE_USERNAME: ${POSTGRES_USER}
       SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD}
       SERVER_PORT: 8080
+      # Khoá ký JWT: bắt buộc, API không khởi động nếu thiếu (xem .env.example)
+      GOTRIPS_JWT_SECRET: "${GOTRIPS_JWT_SECRET:?Chưa đặt GOTRIPS_JWT_SECRET trong .env, tạo bằng lệnh openssl rand -base64 48}"
+      # Profile `seed` nạp dữ liệu mẫu danh mục (db/seed). Mặc định BẬT cho dev/Docker; môi trường thật đặt
+      # SPRING_PROFILES_ACTIVE= (rỗng) trong .env. Dấu `-` (không phải `:-`) để giá trị rỗng được tôn trọng.
+      SPRING_PROFILES_ACTIVE: ${SPRING_PROFILES_ACTIVE-seed}
 
     depends_on:
       gotrips-db:
@@ -89,6 +94,10 @@ services:
 
     ports:
       - "3000:3000"
+
+    environment:
+      # Địa chỉ API mà web gọi từ phía server (Server Component / Server Action), đọc lúc chạy chứ không nhúng lúc build
+      API_URL: http://gotrips-api:8080
 
     depends_on:
       gotrips-api:

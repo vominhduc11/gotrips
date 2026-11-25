@@ -1,0 +1,9 @@
+# Profile `seed`: nạp dữ liệu mẫu catalog (điểm đến, tour, khách sạn, chặng bay...) cho dev/Docker.
+# KHÔNG bật ở production: mặc định (không có profile) Flyway không thấy thư mục db/seed.
+#
+# Bật bằng SPRING_PROFILES_ACTIVE=seed (docker-compose đã đặt sẵn) hoặc khi chạy local:
+#   ./mvnw spring-boot:run -Dspring-boot.run.profiles=seed
+spring:
+  flyway:
+    # Migration lặp lại R__*.sql ở db/seed luôn chạy SAU mọi migration schema (V1, V2...).
+    locations: classpath:db/migration,classpath:db/seed

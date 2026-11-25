@@ -1,9 +1,11 @@
 import { describe, expect, it } from "vitest";
 import {
   formatDate,
+  formatDateTime,
   formatDuration,
   formatFlightDuration,
   formatRating,
+  formatSeatsLeft,
   formatVND,
   normalizeSearchText,
 } from "./format";
@@ -62,5 +64,21 @@ describe("normalizeSearchText", () => {
     expect(normalizeSearchText("Đà  Lạt")).toBe("da lat");
     expect(normalizeSearchText("da-lat")).toBe("da lat");
     expect(normalizeSearchText("  NHA TRANG ")).toBe("nha trang");
+  });
+});
+
+describe("formatDateTime", () => {
+  it("hiện theo giờ Việt Nam (UTC+7), không phụ thuộc múi giờ máy", () => {
+    expect(formatDateTime("2026-11-23T03:05:00.000Z")).toBe("10:05 23/11/2026");
+    // 17:30 UTC = 00:30 hôm sau ở Việt Nam
+    expect(formatDateTime("2026-12-31T17:30:00Z")).toBe("00:30 01/01/2027");
+  });
+});
+
+describe("formatSeatsLeft", () => {
+  it("hết chỗ / sắp hết / còn nhiều", () => {
+    expect(formatSeatsLeft({ seatsLeft: 0, isSoldOut: true, isAlmostFull: false })).toBe("Hết chỗ");
+    expect(formatSeatsLeft({ seatsLeft: 4, isSoldOut: false, isAlmostFull: true })).toBe("Chỉ còn 4 chỗ");
+    expect(formatSeatsLeft({ seatsLeft: 14, isSoldOut: false, isAlmostFull: false })).toBe("Còn 14 chỗ");
   });
 });

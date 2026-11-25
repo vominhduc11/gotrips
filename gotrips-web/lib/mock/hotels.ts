@@ -2,12 +2,12 @@ import type { Hotel } from "@/lib/types";
 import { unsplash } from "./images";
 
 /**
- * Bảng `hotels` — dữ liệu THỬ NGHIỆM cho section "Khách sạn nổi bật" (chưa có trang /hotels, chưa đặt phòng được).
+ * Bảng `hotels` — dữ liệu mock cho Trang chủ, trang `/hotels` và trang chi tiết khách sạn.
  * `destinationId` trỏ tới `destinations.ts`. Tên khách sạn là tên giả. Ảnh là ảnh tạm (khu nghỉ dưỡng chung chung,
  * không phải ảnh thật của khách sạn hay địa danh) — thay bằng ảnh có bản quyền trước khi ra mắt; `imageAlt` mô tả
  * đúng nội dung ảnh hiện có.
  *
- * Có một khách sạn `HIDDEN` (id 8) để kiểm tra luật "khách sạn bị ẩn không được hiển thị".
+ * Có một khách sạn `HIDDEN` (id 8) để kiểm tra luật "khách sạn bị ẩn không được hiển thị, không tìm thấy, không đặt được".
  */
 export const hotels: Hotel[] = [
   {
@@ -22,6 +22,11 @@ export const hotels: Hotel[] = [
     status: "ACTIVE",
     rating: 4.6,
     reviewCount: 1280,
+    description:
+      "Khách sạn nằm trên đồi thông yên tĩnh, cách chợ Đà Lạt khoảng 10 phút đi xe. Phòng hướng đồi, sáng sớm nhìn thấy sương mù phủ thung lũng.",
+    amenities: ["Hồ bơi nước ấm", "Bữa sáng buffet", "Wi-Fi miễn phí", "Bãi đỗ xe", "Đưa đón sân bay (có phí)"],
+    checkInTime: "14:00",
+    checkOutTime: "12:00",
   },
   {
     id: 2,
@@ -35,6 +40,11 @@ export const hotels: Hotel[] = [
     status: "ACTIVE",
     rating: 4.3,
     reviewCount: 640,
+    description:
+      "Biệt thự kiểu Pháp nhỏ xinh giữa rừng thông, phù hợp cho cặp đôi và nhóm bạn muốn không gian riêng, gần hồ Tuyền Lâm.",
+    amenities: ["Vườn và sân nướng BBQ", "Bữa sáng", "Wi-Fi miễn phí", "Cho thuê xe máy"],
+    checkInTime: "14:00",
+    checkOutTime: "11:00",
   },
   {
     id: 3,
@@ -48,6 +58,11 @@ export const hotels: Hotel[] = [
     status: "ACTIVE",
     rating: 4.8,
     reviewCount: 2150,
+    description:
+      "Khu nghỉ dưỡng sát bãi Sao — một trong những bãi cát trắng đẹp nhất Phú Quốc. Có biệt thự hồ bơi riêng cho gia đình.",
+    amenities: ["Bãi biển riêng", "Hồ bơi vô cực", "Spa", "Nhà hàng hải sản", "Câu lạc bộ trẻ em"],
+    checkInTime: "15:00",
+    checkOutTime: "12:00",
   },
   {
     id: 4,
@@ -61,6 +76,11 @@ export const hotels: Hotel[] = [
     status: "ACTIVE",
     rating: 4.5,
     reviewCount: 930,
+    description:
+      "Khách sạn ở trung tâm Dương Đông, đi bộ ra chợ đêm Phú Quốc, ngắm hoàng hôn trên biển từ quầy bar sân thượng.",
+    amenities: ["Hồ bơi sân thượng", "Quầy bar", "Bữa sáng", "Wi-Fi miễn phí"],
+    checkInTime: "14:00",
+    checkOutTime: "12:00",
   },
   {
     id: 5,
@@ -74,6 +94,11 @@ export const hotels: Hotel[] = [
     status: "ACTIVE",
     rating: 4.4,
     reviewCount: 780,
+    description:
+      "Khách sạn ở Bãi Cháy, nhìn ra vịnh Hạ Long, gần bến tàu du thuyền và cầu Bãi Cháy.",
+    amenities: ["Hồ bơi", "Phòng gym", "Nhà hàng", "Đặt tour du thuyền"],
+    checkInTime: "14:00",
+    checkOutTime: "12:00",
   },
   {
     id: 6,
@@ -87,6 +112,11 @@ export const hotels: Hotel[] = [
     status: "ACTIVE",
     rating: 4.2,
     reviewCount: 410,
+    description:
+      "Khách sạn trên sườn núi ở trung tâm thị xã Sa Pa, phòng có cửa kính lớn nhìn thung lũng Mường Hoa.",
+    amenities: ["Lò sưởi", "Nhà hàng món vùng cao", "Wi-Fi miễn phí", "Hỗ trợ đặt trekking"],
+    checkInTime: "14:00",
+    checkOutTime: "12:00",
   },
   {
     id: 7,
@@ -100,6 +130,11 @@ export const hotels: Hotel[] = [
     status: "ACTIVE",
     rating: 4.7,
     reviewCount: 1560,
+    description:
+      "Khách sạn mang phong cách phố cổ, cách Chùa Cầu vài bước chân, có lớp học làm đèn lồng cho khách.",
+    amenities: ["Hồ bơi", "Xe đạp miễn phí", "Bữa sáng", "Lớp làm đèn lồng"],
+    checkInTime: "14:00",
+    checkOutTime: "12:00",
   },
   {
     id: 8,
@@ -114,5 +149,10 @@ export const hotels: Hotel[] = [
     status: "HIDDEN",
     rating: 4.9,
     reviewCount: 3020,
+    description:
+      "Resort trên đường Trần Phú nhìn thẳng ra vịnh Nha Trang.",
+    amenities: ["Bãi biển", "Hồ bơi", "Spa"],
+    checkInTime: "14:00",
+    checkOutTime: "12:00",
   },
 ];

@@ -1,10 +1,11 @@
 /**
- * Lớp truy cập dữ liệu sân bay cho ô tìm vé máy bay. Cùng quy ước với `lib/data/home.ts`: component chỉ import
- * từ `lib/data/*`; khi nối API thật chỉ đổi thân hàm, giữ nguyên chữ ký và các directive cache.
+ * Lớp truy cập dữ liệu sân bay cho ô tìm vé máy bay (lấy từ gotrips-api). Cùng quy ước với `lib/data/home.ts`: component
+ * chỉ import từ `lib/data/*`, hàm không bắt lỗi (API lỗi thì ném, không cache), gọi sau `await io()` (xem `loadSection`).
  */
 import { cacheLife, cacheTag } from "next/cache";
-import { airports } from "@/lib/mock/airports";
+import { listAirports } from "@/lib/api/generated";
 import type { Airport } from "@/lib/types";
+import { catalogRequestInit } from "./catalog-request";
 
 export async function getAirports(): Promise<Airport[]> {
   "use cache";
@@ -12,5 +13,7 @@ export async function getAirports(): Promise<Airport[]> {
   cacheLife("days");
   cacheTag("airports");
 
-  return airports;
+  // API trả theo thứ tự gợi ý (các đầu mối lớn trước).
+  const { data } = await listAirports(catalogRequestInit());
+  return data;
 }

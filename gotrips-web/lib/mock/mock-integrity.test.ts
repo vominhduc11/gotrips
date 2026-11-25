@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import { airports } from "./airports";
 import { destinations } from "./destinations";
 import { flightRoutes } from "./flight-routes";
+import { airlines, flightSchedules } from "./flights";
 import { hotelRoomTypes } from "./hotel-room-types";
 import { hotels } from "./hotels";
 
@@ -24,6 +25,15 @@ describe("mock khách sạn", () => {
     const destinationIds = new Set(destinations.map((d) => d.id));
     for (const hotel of hotels) {
       expect(destinationIds.has(hotel.destinationId), `khách sạn ${hotel.id} có destinationId lạ`).toBe(true);
+    }
+  });
+
+  it("khách sạn có giới thiệu, tiện ích và giờ nhận/trả phòng dạng HH:mm", () => {
+    for (const hotel of hotels) {
+      expect(hotel.description.trim(), hotel.slug).not.toBe("");
+      expect(hotel.amenities.length, hotel.slug).toBeGreaterThan(0);
+      expect(hotel.checkInTime).toMatch(/^\d{2}:\d{2}$/);
+      expect(hotel.checkOutTime).toMatch(/^\d{2}:\d{2}$/);
     }
   });
 
@@ -106,6 +116,40 @@ describe("mock chặng bay", () => {
       expect(new URL(route.imageUrl).pathname).toMatch(/^\/photo-/);
       expect(route.imageAlt.trim()).not.toBe("");
     }
+  });
+});
+
+describe("mock lịch bay", () => {
+  const airportCodes = new Set(airports.map((a) => a.code));
+  const airlineCodes = new Set(airlines.map((a) => a.code));
+
+  it("id lịch bay và số hiệu chuyến là duy nhất; số hiệu bắt đầu bằng mã hãng", () => {
+    expect(unique(flightSchedules.map((s) => s.id))).toBe(true);
+    expect(unique(flightSchedules.map((s) => s.flightNumber))).toBe(true);
+    for (const s of flightSchedules) expect(s.flightNumber.startsWith(s.airlineCode), s.flightNumber).toBe(true);
+  });
+
+  it("hãng bay và sân bay hai đầu có thật, điểm đi khác điểm đến", () => {
+    for (const s of flightSchedules) {
+      expect(airlineCodes.has(s.airlineCode), `lịch bay ${s.id}`).toBe(true);
+      expect(airportCodes.has(s.fromCode), `lịch bay ${s.id}`).toBe(true);
+      expect(airportCodes.has(s.toCode), `lịch bay ${s.id}`).toBe(true);
+      expect(s.fromCode, `lịch bay ${s.id}`).not.toBe(s.toCode);
+    }
+  });
+
+  it("giờ cất cánh dạng HH:mm, thời gian bay và giá dương", () => {
+    for (const s of flightSchedules) {
+      expect(s.departTime).toMatch(/^([01]\d|2[0-3]):[0-5]\d$/);
+      expect(s.durationMinutes).toBeGreaterThan(0);
+      expect(s.economyFare).toBeGreaterThan(0);
+    }
+  });
+
+  it("chặng nào cũng bay được cả hai chiều (để tìm khứ hồi), kể cả các chặng phổ biến ở Trang chủ", () => {
+    const pairs = new Set(flightSchedules.map((s) => `${s.fromCode}-${s.toCode}`));
+    for (const s of flightSchedules) expect(pairs.has(`${s.toCode}-${s.fromCode}`), `${s.fromCode}-${s.toCode}`).toBe(true);
+    for (const r of flightRoutes) expect(pairs.has(`${r.fromCode}-${r.toCode}`), `chặng ${r.id}`).toBe(true);
   });
 });
 

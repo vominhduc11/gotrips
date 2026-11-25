@@ -1,33 +1,23 @@
 /**
  * Lớp truy cập dữ liệu cho Trang chủ. Component CHỈ import từ `lib/data/*`, không import `lib/mock/*`.
  *
- * Hiện các hàm trả về dữ liệu mock. Để chuyển sang API thật chỉ cần đổi PHẦN THÂN hàm thành
- * `fetch(...)` (+ map response sang các kiểu trong `lib/types`), giữ nguyên chữ ký và các
- * directive `"use cache"` / `cacheLife` / `cacheTag`:
+ * Điểm đến, tour nổi bật và đánh giá lấy từ gotrips-api (client do Orval sinh ở `lib/api/generated`). Chữ ký hàm và các
+ * directive `"use cache"` / `cacheLife` / `cacheTag` giữ nguyên từ thời còn mock. Banner Hero vẫn là dữ liệu tĩnh.
  *
- *  - `cacheComponents` đang bật, và "hôm nay" (dùng để lọc ngày khởi hành) là dữ liệu phụ thuộc
- *    thời điểm — phải nằm trong phạm vi `"use cache"` thì Trang chủ mới prerender được thành static shell.
- *  - `cacheLife("hours")`: làm mới tối đa mỗi giờ nên danh sách "ngày còn chỗ" không bị cũ quá lâu.
- *  - `cacheTag(...)`: sau này gọi `revalidateTag("tours")` khi admin đổi tour/lịch khởi hành.
+ *  - Mọi trường suy ra (`tourCount`, `priceFrom`, `nextDepartureDate`, `seatsLeft`, giảm giá...) do API tính sẵn,
+ *    kèm luật bỏ tour HIDDEN; web không tải lịch khởi hành để tự tính nữa. Response của API khớp kiểu "View" trong
+ *    `lib/types.ts` nên gán thẳng; TypeScript báo lỗi nếu API đổi hình dạng.
+ *  - `cacheLife`: "hours" cho dữ liệu phụ thuộc "hôm nay" (ngày khởi hành còn đặt được) để không bị cũ quá một giờ.
+ *    Khi admin đổi dữ liệu thì gọi `revalidateTag(tag, ...)` theo các tag bên dưới.
+ *  - Hàm KHÔNG bắt lỗi: API lỗi thì lỗi được ném ra và Next không cache kết quả đó. Nuốt lỗi rồi trả `[]` sẽ khiến
+ *    Trang chủ rỗng suốt thời gian cache. Nơi gọi (`loadSection`) mới quyết định hiện gì khi lỗi.
+ *  - Các hàm này chỉ được gọi sau `await io()` (trong `loadSection`) để `next build` không phải gọi API.
  */
 import { cacheLife, cacheTag } from "next/cache";
-import { destinations } from "@/lib/mock/destinations";
-import { departures } from "@/lib/mock/departures";
+import { listDestinations, listFeaturedTours, listTestimonials } from "@/lib/api/generated";
 import { heroBanner } from "@/lib/mock/site";
-import { testimonials } from "@/lib/mock/testimonials";
-import { tours } from "@/lib/mock/tours";
-import type {
-  DestinationCardView,
-  HeroBanner,
-  TestimonialView,
-  TourCardView,
-} from "@/lib/types";
-import { getTodayInVietnam, toTourCardView } from "./tour-view";
-
-/** Tour khách được phép thấy: bỏ tour HIDDEN. */
-function getVisibleTours() {
-  return tours.filter((tour) => tour.status === "ACTIVE");
-}
+import type { DestinationCardView, HeroBanner, TestimonialView, TourCardView } from "@/lib/types";
+import { catalogRequestInit } from "./catalog-request";
 
 export async function getHeroBanner(): Promise<HeroBanner> {
   "use cache";
@@ -42,12 +32,9 @@ export async function getPopularDestinations(): Promise<DestinationCardView[]> {
   cacheLife("hours");
   cacheTag("destinations", "tours");
 
-  const visibleTours = getVisibleTours();
-  return destinations.map((destination) => ({
-    ...destination,
-    // Suy ra từ tour ACTIVE — tour HIDDEN không được đếm.
-    tourCount: visibleTours.filter((tour) => tour.destinationId === destination.id).length,
-  }));
+  // API chỉ đếm tour ACTIVE vào `tourCount` (tour HIDDEN không được đếm).
+  const { data } = await listDestinations(catalogRequestInit());
+  return data;
 }
 
 export async function getFeaturedTours(limit = 8): Promise<TourCardView[]> {
@@ -55,25 +42,9 @@ export async function getFeaturedTours(limit = 8): Promise<TourCardView[]> {
   cacheLife("hours");
   cacheTag("tours", "departures");
 
-  const today = getTodayInVietnam();
-  const views: TourCardView[] = [];
-
-  for (const tour of getVisibleTours()) {
-    if (!tour.isFeatured) continue;
-    const destination = destinations.find((d) => d.id === tour.destinationId);
-    if (!destination) continue;
-
-    const view = toTourCardView(
-      tour,
-      destination,
-      departures.filter((d) => d.tourId === tour.id),
-      today,
-    );
-    // Tour không còn chuyến nào đặt được thì không đưa lên Trang chủ.
-    if (view.nextDepartureDate !== null) views.push(view);
-  }
-
-  return views.slice(0, limit);
+  // API chỉ trả tour ACTIVE + nổi bật còn ít nhất một chuyến đặt được (tính theo "hôm nay" giờ Việt Nam).
+  const { data } = await listFeaturedTours({ limit }, catalogRequestInit());
+  return data;
 }
 
 export async function getTestimonials(): Promise<TestimonialView[]> {
@@ -81,8 +52,7 @@ export async function getTestimonials(): Promise<TestimonialView[]> {
   cacheLife("days");
   cacheTag("testimonials");
 
-  return testimonials.flatMap((testimonial) => {
-    const tour = tours.find((t) => t.id === testimonial.tourId);
-    return tour ? [{ ...testimonial, tourTitle: tour.title }] : [];
-  });
+  // API không trả đánh giá của tour HIDDEN (kèm tên tour) — mock cũ không lọc điểm này.
+  const { data } = await listTestimonials(catalogRequestInit());
+  return data;
 }

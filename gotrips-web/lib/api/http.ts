@@ -97,11 +97,25 @@ async function toApiError(response: Response): Promise<ApiError> {
   return new ApiError({ status: response.status, title: fallbackTitle });
 }
 
-function buildInit({ json, timeoutMs = DEFAULT_TIMEOUT_MS, headers, signal, ...rest }: ApiRequestInit): RequestInit {
+/**
+ * Tham số của `buildInit`: `apiFetch` truyền `json`, còn client do Orval sinh (qua `customFetch`) truyền sẵn `body`
+ * đã `JSON.stringify` cùng header Content-Type. Cả hai đường đều phải giữ được body.
+ */
+type BuildInitInput = ApiRequestInit & { body?: RequestInit["body"] };
+
+function buildInit({
+  json,
+  timeoutMs = DEFAULT_TIMEOUT_MS,
+  headers,
+  signal,
+  body: rawBody,
+  ...rest
+}: BuildInitInput): RequestInit {
   const merged = new Headers(headers);
   if (!merged.has("Accept")) merged.set("Accept", "application/json, application/problem+json");
 
-  let body: string | undefined;
+  // Mặc định giữ nguyên body do nơi gọi truyền vào; chỉ khi có `json` mới tự tạo body.
+  let body = rawBody;
   if (json !== undefined) {
     body = JSON.stringify(json);
     if (!merged.has("Content-Type")) merged.set("Content-Type", "application/json");

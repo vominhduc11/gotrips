@@ -1,5 +1,5 @@
 /**
- * Class dùng chung cho các ô trong form tìm Khách sạn / Vé máy bay, để chúng trông giống ô nhập của form tìm tour
+ * Class dùng chung cho các ô trong form tìm Tour / Khách sạn / Vé máy bay, để ba tab trông đồng nhất
  * (cao 48px, viền neutral-500 đạt tương phản ≥ 3:1, hover đậm viền).
  *
  * Các ô này là nút mở Popover (không phải `<input>`), nên dùng `Button` + class này. Trạng thái lỗi đọc từ

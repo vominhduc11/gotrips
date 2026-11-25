@@ -1,24 +1,19 @@
 import { Suspense } from "react";
 import { Container } from "@/components/common/Container";
 import { CoverImage } from "@/components/common/CoverImage";
-import { getAirports } from "@/lib/data/airports";
-import { getHeroBanner, getPopularDestinations } from "@/lib/data/home";
-import { FlightSearchForm } from "./FlightSearchForm";
+import { getHeroBanner } from "@/lib/data/home";
 import { HeroGreeting, HeroGreetingFallback } from "./HeroGreeting";
-import { HotelSearchForm } from "./HotelSearchForm";
-import { SearchForm } from "./SearchForm";
+import { FlightSearchSlot, HotelSearchSlot, TourSearchSlot } from "./SearchPanels";
 import { ServiceTabs } from "./ServiceTabs";
 import { SERVICE_TAB_HASH, SERVICE_TABS } from "./service-tab-hash";
 
-/** Hero: ảnh nền + tiêu đề `h1` duy nhất của trang + ô tìm kiếm (3 tab: Tour, Khách sạn, Vé máy bay). */
+/**
+ * Hero: ảnh nền + tiêu đề `h1` duy nhất của trang + ô tìm kiếm (3 tab: Tour, Khách sạn, Vé máy bay).
+ * Ảnh nền, `h1`, thanh tab và các điểm cuộn là tĩnh (static shell). Ba form cần dữ liệu từ API nên stream vào từng panel
+ * (xem `SearchPanels.tsx`): API lỗi thì chỉ form bị ảnh hưởng, Hero vẫn đầy đủ.
+ */
 export async function HeroSearch() {
-  const [banner, destinations, airports] = await Promise.all([
-    getHeroBanner(),
-    getPopularDestinations(),
-    getAirports(),
-  ]);
-  // Chỉ truyền xuống client những trường form cần, không đẩy cả object điểm đến (ảnh, số tour...) vào payload.
-  const destinationOptions = destinations.map(({ slug, name, region }) => ({ slug, name, region }));
+  const banner = await getHeroBanner();
 
   return (
     <section aria-labelledby="hero-heading" className="relative isolate">
@@ -51,7 +46,8 @@ export async function HeroSearch() {
 
         <div className="mt-8 rounded-card bg-surface text-ink shadow-search sm:mt-10">
           {/*
-            Đích cuộn của các liên kết `/#tim-tour`, `/#tim-khach-san`, `/#tim-ve-may-bay` (menu Header).
+            Đích cuộn của các liên kết `/#tim-tour`, `/#tim-khach-san`, `/#tim-ve-may-bay` (thẻ ở thân Trang chủ,
+            hoặc mở thẳng đường dẫn có hash).
             Next và trình duyệt cuộn tới phần tử có `id` BẰNG hash; nếu không có thì Next coi như đã xử lý và
             không cuộn gì cả. Vì mỗi tab có một hash riêng nên cần đủ ba điểm ở đầu ô tìm kiếm, chiều cao 0, không
             ảnh hưởng bố cục. Đặt ở đây (không đặt trên panel của tab) vì panel tab không chọn bị `display: none`.
@@ -60,11 +56,7 @@ export async function HeroSearch() {
           {SERVICE_TABS.map((tab) => (
             <span key={tab} id={SERVICE_TAB_HASH[tab]} className="block h-0 scroll-mt-20" />
           ))}
-          <ServiceTabs
-            tourForm={<SearchForm destinations={destinationOptions} />}
-            hotelForm={<HotelSearchForm destinations={destinationOptions} />}
-            flightForm={<FlightSearchForm airports={airports} />}
-          />
+          <ServiceTabs tourForm={<TourSearchSlot />} hotelForm={<HotelSearchSlot />} flightForm={<FlightSearchSlot />} />
         </div>
       </Container>
     </section>

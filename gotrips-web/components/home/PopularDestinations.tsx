@@ -1,14 +1,20 @@
+import { ArrowRight } from "lucide-react";
+import { Suspense, type ReactNode } from "react";
 import { AppLink } from "@/components/common/AppLink";
 import { Container } from "@/components/common/Container";
-import { CoverImage } from "@/components/common/CoverImage";
 import { SectionHeading } from "@/components/common/SectionHeading";
-import { getPopularDestinations } from "@/lib/data/home";
+import { SectionUnavailable } from "@/components/common/SectionUnavailable";
+import { DestinationCard } from "@/components/destination/DestinationCard";
+import { Button } from "@/components/ui/button";
+import { loadDestinations } from "@/lib/data/catalog-loaders";
+import { CardGridSkeleton } from "./HomeSkeletons";
 
-export async function PopularDestinations() {
-  const destinations = await getPopularDestinations();
+const GRID_CLASS = "grid grid-cols-2 gap-3 sm:gap-5 md:grid-cols-3";
 
+/** Khung section (tiêu đề + nút "Xem tất cả" luôn có; phần thân là dữ liệu từ API nên thay đổi theo trạng thái). */
+function PopularDestinationsFrame({ children }: { children: ReactNode }) {
   return (
-    // id="diem-den": đích của menu "Điểm đến"; scroll-mt chừa chỗ cho header dính.
+    // id="diem-den": giữ để liên kết cũ `/#diem-den` vẫn cuộn tới đây; scroll-mt chừa chỗ cho header dính.
     <section id="diem-den" aria-labelledby="diem-den-heading" className="scroll-mt-20 py-14 sm:py-20">
       <Container>
         <SectionHeading
@@ -18,37 +24,59 @@ export async function PopularDestinations() {
           description="Chọn một điểm đến để xem các tour đang mở bán và ngày khởi hành còn chỗ."
         />
 
-        <ul className="mt-8 grid grid-cols-2 gap-3 sm:gap-5 md:grid-cols-3">
-          {destinations.map((destination) => (
+        {children}
+
+        <div className="mt-10 text-center">
+          <Button asChild variant="outline" size="lg">
+            <AppLink href="/destinations">
+              Xem tất cả điểm đến
+              <ArrowRight aria-hidden="true" className="size-5" />
+            </AppLink>
+          </Button>
+        </div>
+      </Container>
+    </section>
+  );
+}
+
+/**
+ * Section "Điểm đến phổ biến" (dữ liệu từ gotrips-api). Tiêu đề nằm trong static shell, danh sách stream sau `await io()`
+ * (xem `loadSection`). Lỗi API: giữ khung section và hiện thông báo thay cho danh sách.
+ */
+export function PopularDestinations() {
+  return (
+    <Suspense
+      fallback={
+        <PopularDestinationsFrame>
+          <CardGridSkeleton count={6} className={GRID_CLASS} cardClassName="aspect-4/5 sm:aspect-4/3" />
+        </PopularDestinationsFrame>
+      }
+    >
+      <PopularDestinationsList />
+    </Suspense>
+  );
+}
+
+async function PopularDestinationsList() {
+  const result = await loadDestinations();
+
+  return (
+    <PopularDestinationsFrame>
+      {!result.ok ? (
+        <SectionUnavailable what="danh sách điểm đến" className="mt-8 bg-surface-muted" />
+      ) : result.data.length > 0 ? (
+        <ul className={`mt-8 ${GRID_CLASS}`}>
+          {result.data.map((destination) => (
             <li key={destination.id}>
-              <AppLink
-                href={`/tours?destination=${destination.slug}`}
-                className="group relative block aspect-4/5 overflow-hidden rounded-card shadow-card transition-shadow hover:shadow-card-hover sm:aspect-4/3"
-              >
-                <CoverImage
-                  src={destination.imageUrl}
-                  alt={destination.imageAlt}
-                  sizes="(min-width: 1280px) 400px, (min-width: 768px) 33vw, 50vw"
-                  imageClassName="transition-transform duration-500 group-hover:scale-105 motion-reduce:transition-none"
-                />
-                <div
-                  aria-hidden="true"
-                  className="absolute inset-0 bg-linear-to-t from-neutral-950/80 via-neutral-950/15 to-transparent"
-                />
-                <div className="absolute inset-x-0 bottom-0 p-4 text-white sm:p-5">
-                  <span className="block text-xs font-medium uppercase tracking-wide text-neutral-100">
-                    {destination.region}
-                  </span>
-                  <span className="mt-0.5 block text-lg font-bold sm:text-xl">{destination.name}</span>
-                  <span className="mt-0.5 block text-sm text-neutral-100">
-                    {destination.tourCount > 0 ? `${destination.tourCount} tour` : "Sắp có tour"}
-                  </span>
-                </div>
-              </AppLink>
+              <DestinationCard destination={destination} />
             </li>
           ))}
         </ul>
-      </Container>
-    </section>
+      ) : (
+        <p className="mt-8 rounded-card bg-surface-muted p-8 text-center text-ink-muted">
+          Hiện chưa có điểm đến nào. Vui lòng quay lại sau.
+        </p>
+      )}
+    </PopularDestinationsFrame>
   );
 }

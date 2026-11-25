@@ -2,7 +2,8 @@ import type { FlightRoute } from "@/lib/types";
 import { unsplash } from "./images";
 
 /**
- * Bảng `flight_routes` — dữ liệu THỬ NGHIỆM cho section "Chặng bay phổ biến" (chưa có trang /flights, chưa đặt vé được).
+ * Bảng `flight_routes` — dữ liệu mock cho "Chặng bay phổ biến" (Trang chủ, `/flights`). Giá bán thật nằm ở
+ * lịch bay (`flights.ts`); ảnh ở đây cũng làm ảnh minh hoạ cho đơn vé có cùng điểm đến.
  * `fromCode`/`toCode` là mã IATA, phải có trong `airports.ts` (có test kiểm tra). `referencePrice` chỉ là giá tham
  * khảo minh hoạ, không phải giá bán. Ảnh là ảnh tạm minh hoạ nơi đến — thay bằng ảnh có bản quyền trước khi ra mắt.
  */

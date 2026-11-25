@@ -32,7 +32,7 @@ const AIRPORT_CODE = /^[A-Z]{3}$/;
 const passengerCount = z.number({ error: COUNT_MESSAGE }).int(COUNT_MESSAGE).min(0, COUNT_MESSAGE);
 
 /**
- * Schema form tìm vé máy bay ở Trang chủ. Nhận `today` (`YYYY-MM-DD`) để lấy "hôm nay" lúc validate
+ * Schema form tìm vé máy bay (Trang chủ và trang `/flights`). Nhận `today` (`YYYY-MM-DD`) để lấy "hôm nay" lúc validate
  * và để test không phụ thuộc đồng hồ máy (cùng cách với `createHotelSearchSchema`).
  *
  * Luật:
@@ -117,7 +117,8 @@ export function createFlightPrefillSchema(validAirportCodes: readonly string[]) 
 export type FlightSearchPrefill = z.infer<ReturnType<typeof createFlightPrefillSchema>>;
 
 /**
- * "Hợp đồng URL" của trang `/flights` (chưa có trang — làm sau):
+ * "Hợp đồng URL" của kết quả tìm chuyến bay ở trang `/flights` (form submit bằng hàm này, trang đọc bằng
+ * `parseFlightSearchParams`):
  * `/flights?tripType=&from=&to=&departDate=&returnDate=&adults=&children=&infants=&cabin=`.
  * `returnDate` chỉ xuất hiện khi khứ hồi. Hàm thuần, nhận giá trị đã validate; thứ tự tham số cố định.
  */
@@ -133,4 +134,45 @@ export function buildFlightSearchParams(values: FlightSearchValues): URLSearchPa
   params.set("infants", String(values.infants));
   params.set("cabin", values.cabin);
   return params;
+}
+
+/** Nhãn tiếng Việt của hạng ghế. */
+export function cabinLabel(cabin: CabinClass): string {
+  return CABIN_OPTIONS.find((option) => option.value === cabin)?.label ?? cabin;
+}
+
+const first = (value: string | string[] | undefined) => (Array.isArray(value) ? value[0] : value);
+
+/** Tham số tìm vé có mặt trên URL (dù hợp lệ hay không) — để trang biết khách đã thử tìm. */
+export function hasFlightSearchParams(raw: Record<string, string | string[] | undefined>): boolean {
+  return ["tripType", "from", "to", "departDate", "returnDate", "adults", "cabin"].some((key) => raw[key] !== undefined);
+}
+
+/**
+ * Đọc tham số URL của trang `/flights` (và trang đặt vé) bằng đúng schema của form. Thiếu hoặc sai bất kỳ tham số
+ * nào → `null`. Một chiều thì `returnDate` luôn là chuỗi rỗng, dù URL còn sót giá trị.
+ */
+export function parseFlightSearchParams(
+  raw: Record<string, string | string[] | undefined>,
+  today: string = getTodayInVietnam(),
+): FlightSearchValues | null {
+  const number = (key: string, fallback?: number) => {
+    const value = first(raw[key]);
+    if (value === undefined || value === "") return fallback ?? Number.NaN;
+    return Number(value);
+  };
+  const tripType = first(raw.tripType);
+  const parsed = createFlightSearchSchema(today).safeParse({
+    tripType,
+    from: first(raw.from) ?? "",
+    to: first(raw.to) ?? "",
+    departDate: first(raw.departDate) ?? "",
+    returnDate: tripType === "roundTrip" ? (first(raw.returnDate) ?? "") : "",
+    adults: number("adults"),
+    // Trẻ em / em bé vắng mặt trên URL = 0 (URL gõ tay thường bỏ hai tham số này).
+    children: number("children", 0),
+    infants: number("infants", 0),
+    cabin: first(raw.cabin) ?? "economy",
+  });
+  return parsed.success ? parsed.data : null;
 }

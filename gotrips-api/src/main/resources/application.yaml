@@ -37,6 +37,14 @@ gotrips:
   cors:
     allowed-origins: ${GOTRIPS_CORS_ORIGINS:http://localhost:8081,http://localhost:5173}
 
+  # JWT cho đăng nhập. KHÔNG có giá trị mặc định cho secret (xem JwtProperties): đặt GOTRIPS_JWT_SECRET
+  # trong .env (Docker) hoặc biến môi trường khi chạy bằng IDE/mvnw. Tạo khoá: openssl rand -base64 48
+  jwt:
+    secret: ${GOTRIPS_JWT_SECRET:}
+    # Cùng thời hạn với cookie phiên của gotrips-web (7 ngày). Chưa có refresh token.
+    expiration: ${GOTRIPS_JWT_EXPIRATION:7d}
+    issuer: gotrips-api
+
 # Actuator: chỉ expose health + info, không lộ endpoint nhạy cảm
 management:
   endpoints:

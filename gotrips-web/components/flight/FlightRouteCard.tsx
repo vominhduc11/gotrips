@@ -8,15 +8,21 @@ import type { FlightSearchPrefill } from "@/lib/schemas/flight-search";
 import type { FlightRouteCardView } from "@/lib/types";
 
 /**
- * Thẻ chặng bay ở Trang chủ (bản THỬ NGHIỆM: chưa có trang chuyến bay, chưa đặt vé được).
- * Bấm thẻ đưa khách về ô tìm kiếm ở đầu Trang chủ: mở tab Vé máy bay và điền sẵn "Điểm đi"/"Điểm đến" bằng mã
- * sân bay của chặng (`hashPayload`, xem `lib/hash-navigation.ts` và `use-search-prefill.ts`); loại hành trình, ngày,
- * hành khách khách đã chọn được giữ nguyên. Vì vậy nút ghi "Tìm chuyến bay …" chứ không ghi "Đặt vé", và giá ghi
- * "Giá tham khảo từ …" (giá minh hoạ, không phải giá bán).
+ * Thẻ chặng bay ở Trang chủ và trang `/flights`. Chặng bay chưa có ngày nên thẻ không mở thẳng kết quả: bấm thẻ đưa khách lên ô tìm vé của trang đang xem (`searchHref`; mặc định là tab Vé máy bay ở Trang chủ) và điền
+ * sẵn "Điểm đi"/"Điểm đến" bằng mã sân bay của chặng (`hashPayload`, xem `lib/hash-navigation.ts` và
+ * `use-search-prefill.ts`); loại hành trình, ngày, hành khách khách đã chọn được giữ nguyên. Vì vậy nút ghi
+ * "Tìm chuyến bay …" chứ không ghi "Đặt vé", và giá ghi "Giá tham khảo từ …" (giá thật tuỳ ngày và hạng ghế).
  *
  * Kiểu thẻ đồng bộ `TourCard`: cả thẻ bấm được qua MỘT liên kết (`after:absolute after:inset-0`).
  */
-export function FlightRouteCard({ route }: { route: FlightRouteCardView }) {
+export function FlightRouteCard({
+  route,
+  searchHref = serviceTabHref("flight"),
+}: {
+  route: FlightRouteCardView;
+  /** Liên kết tới ô tìm kiếm sẽ được điền sẵn; hash của nó phải trùng `prefillHash` của `FlightSearchForm` đích. */
+  searchHref?: string;
+}) {
   const prefill: FlightSearchPrefill = { from: route.from.code, to: route.to.code };
 
   return (
@@ -58,7 +64,7 @@ export function FlightRouteCard({ route }: { route: FlightRouteCardView }) {
           </div>
 
           <Button asChild variant="outline" size="md" className="mt-3 w-full after:absolute after:inset-0">
-            <AppLink href={serviceTabHref("flight")} hashPayload={prefill}>
+            <AppLink href={searchHref} hashPayload={prefill}>
               <Search aria-hidden="true" className="size-5" />
               Tìm chuyến bay {route.from.code}
               <ArrowRight aria-hidden="true" className="size-4" />

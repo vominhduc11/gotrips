@@ -5,9 +5,13 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.crypto.factory.PasswordEncoderFactories;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
@@ -17,7 +21,8 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 public class SecurityConfig {
 
     @Bean
-    SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+    SecurityFilterChain securityFilterChain(HttpSecurity http, JwtAuthenticationConverter jwtAuthenticationConverter)
+            throws Exception {
         http
             // Dùng bean corsConfigurationSource bên dưới. Phải khai báo trước authorize:
             // request preflight (OPTIONS) không mang token, nếu bị chặn trước sẽ trả 401.
@@ -25,15 +30,36 @@ public class SecurityConfig {
             .csrf(csrf -> csrf.disable())
             .sessionManagement(s -> s.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests(auth -> auth
-                // Chỉ mở health để Docker/monitoring kiểm tra; mọi thứ khác cần xác thực
+                // Chỉ mở health để Docker/monitoring kiểm tra
                 .requestMatchers("/actuator/health", "/actuator/health/**").permitAll()
-                // Spec OpenAPI và Swagger UI để Orval sinh client cho admin.
+                // Spec OpenAPI và Swagger UI để Orval sinh client cho web/admin.
                 // Tắt hẳn bằng SPRINGDOC_ENABLED=false (khi đó các path này không còn tồn tại).
                 .requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll()
+                // Đăng ký / đăng nhập là công khai (chưa có token). /auth/me cần token nên không liệt kê ở đây.
+                .requestMatchers(HttpMethod.POST, "/auth/register", "/auth/login").permitAll()
+                // Dữ liệu công khai cho Trang chủ của website. Liệt kê đúng từng đường dẫn, KHÔNG dùng
+                // "/tours/**" hay "/hotels/**": các endpoint khác của tour/khách sạn (chi tiết, đặt chỗ...) sau
+                // này không được vô tình thành công khai.
+                .requestMatchers(HttpMethod.GET, "/destinations", "/airports", "/tours/featured", "/hotels/featured",
+                        "/flight-routes/popular", "/testimonials").permitAll()
+                // Đăng ký nhận ưu đãi (form ở Trang chủ, khách chưa đăng nhập).
+                .requestMatchers(HttpMethod.POST, "/newsletter/subscriptions").permitAll()
+                // Còn lại mặc định cần xác thực; khi thêm endpoint công khai cho website phải mở rõ ràng ở đây.
                 .anyRequest().authenticated())
-            // API-only: không có form login, chưa xác thực thì trả 401 thay vì redirect
-            .httpBasic(Customizer.withDefaults());
+            // API-only: xác thực bằng JWT ở header "Authorization: Bearer ...". Không có form login/Basic,
+            // chưa xác thực thì trả 401 (kèm WWW-Authenticate: Bearer) thay vì redirect.
+            .oauth2ResourceServer(oauth2 -> oauth2
+                .jwt(jwt -> jwt.jwtAuthenticationConverter(jwtAuthenticationConverter)));
         return http.build();
+    }
+
+    /**
+     * Băm mật khẩu bằng {@code DelegatingPasswordEncoder}: hiện dùng bcrypt, chuỗi lưu có tiền tố
+     * ({@code {bcrypt}...}) nên sau này đổi thuật toán mà không làm hỏng mật khẩu cũ.
+     */
+    @Bean
+    PasswordEncoder passwordEncoder() {
+        return PasswordEncoderFactories.createDelegatingPasswordEncoder();
     }
 
     /**

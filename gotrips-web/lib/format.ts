@@ -18,6 +18,27 @@ export function formatDate(isoDate: string): string {
   return `${day}/${month}/${year}`;
 }
 
+const dateTimeFormatter = new Intl.DateTimeFormat("vi-VN", {
+  timeZone: "Asia/Ho_Chi_Minh",
+  hour: "2-digit",
+  minute: "2-digit",
+  day: "2-digit",
+  month: "2-digit",
+  year: "numeric",
+  hourCycle: "h23",
+});
+
+/**
+ * Mốc thời gian ISO 8601 (thời điểm đặt đơn, thanh toán...) → "14:05 23/11/2026", luôn theo GIỜ VIỆT NAM để server
+ * và trình duyệt ở múi giờ khác vẫn hiện như nhau. Ghép từ `formatToParts` cho định dạng không đổi theo phiên bản ICU.
+ */
+export function formatDateTime(isoDateTime: string): string {
+  const parts = Object.fromEntries(
+    dateTimeFormatter.formatToParts(new Date(isoDateTime)).map((part) => [part.type, part.value]),
+  );
+  return `${parts.hour}:${parts.minute} ${parts.day}/${parts.month}/${parts.year}`;
+}
+
 /** 4.8 → "4,8" (dấu phẩy thập phân theo vi-VN) */
 export function formatRating(rating: number): string {
   return rating.toLocaleString("vi-VN", { minimumFractionDigits: 1, maximumFractionDigits: 1 });
@@ -52,4 +73,13 @@ export function normalizeSearchText(value: string): string {
     .replace(/đ/g, "d")
     .replace(/[-_\s]+/g, " ")
     .trim();
+}
+
+/**
+ * Nhãn số chỗ của một chuyến khởi hành: "Hết chỗ" / "Chỉ còn N chỗ" (sắp hết, nơi hiển thị tô đỏ) / "Còn N chỗ".
+ * Một chỗ duy nhất cho lịch khởi hành và ô chọn ngày, để hai nơi không lệch chữ.
+ */
+export function formatSeatsLeft(departure: { seatsLeft: number; isSoldOut: boolean; isAlmostFull: boolean }): string {
+  if (departure.isSoldOut) return "Hết chỗ";
+  return `${departure.isAlmostFull ? "Chỉ còn" : "Còn"} ${departure.seatsLeft} chỗ`;
 }

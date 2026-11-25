@@ -13,7 +13,7 @@ import { getTodayInVietnam } from "@/lib/data/tour-view";
 import { fieldTriggerClass, placeholderClass } from "./search-field-styles";
 
 /**
- * Bộ chọn ngày cho form Khách sạn / Vé máy bay: nút mở `Popover` chứa `Calendar` của shadcn (react-day-picker).
+ * Bộ chọn ngày cho form Tour / Khách sạn / Vé máy bay: nút mở `Popover` chứa `Calendar` của shadcn (react-day-picker).
  * Giá trị vào/ra là chuỗi `YYYY-MM-DD` (không múi giờ), khớp với schema Zod.
  *
  * LƯU Ý về `cacheComponents`: Trang chủ được prerender, mà đọc "hôm nay" (`new Date()`) trong lúc prerender sẽ làm

@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { diffInDays, fromIsoDate, isIsoDate, toIsoDate } from "./iso-date";
+import { addDaysToIsoDate, ageInYears, diffInDays, fromIsoDate, isIsoDate, toIsoDate } from "./iso-date";
 
 describe("isIsoDate", () => {
   it("chấp nhận ngày hợp lệ, kể cả 29/2 năm nhuận", () => {
@@ -38,5 +38,24 @@ describe("toIsoDate / fromIsoDate", () => {
   it("fromIsoDate trả undefined với giá trị trống/sai", () => {
     expect(fromIsoDate("")).toBeUndefined();
     expect(fromIsoDate("abc")).toBeUndefined();
+  });
+});
+
+describe("ageInYears", () => {
+  it("tuổi tròn: chưa tới sinh nhật thì chưa thêm tuổi", () => {
+    expect(ageInYears("2015-01-10", "2027-01-09")).toBe(11);
+    expect(ageInYears("2015-01-10", "2027-01-10")).toBe(12);
+  });
+
+  it("sinh 29/2 tính theo ngày lịch", () => {
+    expect(ageInYears("2024-02-29", "2026-02-28")).toBe(1);
+    expect(ageInYears("2024-02-29", "2026-03-01")).toBe(2);
+  });
+});
+
+describe("addDaysToIsoDate", () => {
+  it("cộng ngày qua tháng / năm", () => {
+    expect(addDaysToIsoDate("2026-12-31", 1)).toBe("2027-01-01");
+    expect(addDaysToIsoDate("2027-03-01", -1)).toBe("2027-02-28");
   });
 });

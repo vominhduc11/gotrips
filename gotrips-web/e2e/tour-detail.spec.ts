@@ -17,9 +17,15 @@ test("trang chi tiết hiện giá từ, lịch khởi hành, đánh giá và br
   const departures = page.getByRole("region", { name: "Lịch khởi hành" }).getByRole("listitem");
   expect(await departures.count()).toBeGreaterThanOrEqual(3);
 
+  // Thẻ "Đặt tour": chọn ngày + số khách ngay tại đây, chuyến gần nhất còn chỗ được chọn sẵn kèm tiền tạm tính.
   const priceCard = page.getByRole("complementary", { name: "Giá và đặt tour" });
   await expect(priceCard).toContainText("Giá từ");
-  await expect(priceCard.getByRole("button", { name: "Đặt tour" })).toBeDisabled();
+  await expect(priceCard.getByRole("combobox", { name: "Ngày khởi hành" })).toContainText("14/01/2027");
+  await expect(priceCard).toContainText("Tạm tính");
+  await expect(priceCard.getByRole("button", { name: "Đặt tour" })).toBeEnabled();
+  // Chuyến còn chỗ có nút chọn nhanh (chọn chuyến trong thẻ); chuyến đang chọn hiện "Đã chọn".
+  await expect(page.getByRole("button", { name: "Đã chọn (14/01/2027)" })).toBeVisible();
+  await expect(page.getByRole("button", { name: /^Chọn ngày này/ })).toHaveCount(2);
 
   await expect(page.getByRole("heading", { level: 2, name: "Khách hàng nói gì" })).toBeVisible();
 
@@ -42,6 +48,8 @@ test("slug không tồn tại hoặc tour bị ẩn hiện 404 tiếng Việt v�
     // (xem docs Next: loading.md > Status codes); Next tự chèn meta noindex để công cụ tìm kiếm bỏ qua.
     await page.goto(`/tours/${slug}`);
     await expect(page.getByRole("heading", { level: 1, name: "Không tìm thấy trang bạn cần" })).toBeVisible();
-    await expect(page.locator('meta[name="robots"]')).toHaveAttribute("content", /noindex/);
+    // `notFound()` ném trong <Suspense> nên Next có thể ghi 2 thẻ robots giống nhau (head + thẻ chèn thêm): dùng
+    // `.first()` để không phụ thuộc đúng 1 thẻ; điều cần đảm bảo chỉ là trang không được lập chỉ mục.
+    await expect(page.locator('meta[name="robots"]').first()).toHaveAttribute("content", /noindex/);
   }
 });

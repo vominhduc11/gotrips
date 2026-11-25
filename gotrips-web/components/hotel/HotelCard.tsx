@@ -1,26 +1,19 @@
-import { MapPin, Search, Star } from "lucide-react";
+import { MapPin, Star } from "lucide-react";
 import { AppLink } from "@/components/common/AppLink";
 import { CoverImage } from "@/components/common/CoverImage";
 import { StarRating } from "@/components/common/StarRating";
-import { serviceTabHref } from "@/components/home/service-tab-hash";
 import { Button } from "@/components/ui/button";
 import { formatRating, formatVND } from "@/lib/format";
-import type { HotelSearchPrefill } from "@/lib/schemas/hotel-search";
 import type { HotelCardView } from "@/lib/types";
 
 /**
- * Thẻ khách sạn ở Trang chủ (bản THỬ NGHIỆM: chưa có trang khách sạn, chưa đặt phòng được).
- * Bấm thẻ KHÔNG dẫn tới trang khách sạn mà đưa khách về ô tìm kiếm ở đầu Trang chủ: mở tab Khách sạn và điền sẵn
- * ô "Điểm đến" bằng điểm đến của khách sạn (`hashPayload`, xem `lib/hash-navigation.ts` và `use-search-prefill.ts`).
- * Vì vậy nút ghi "Tìm khách sạn ở …" chứ không ghi "Đặt phòng", và giá ghi "Giá từ … / đêm".
+ * Thẻ khách sạn ở Trang chủ ("Khách sạn nổi bật") và phần gợi ý của trang `/hotels`: bấm thẻ mở trang chi tiết khách
+ * sạn, nơi chọn loại phòng, ngày và đặt phòng. Giá ghi "Giá từ … / đêm" (giá một phòng rẻ nhất).
  *
  * Kiểu thẻ đồng bộ `TourCard`: cả thẻ bấm được qua MỘT liên kết (`after:absolute after:inset-0` phủ kín thẻ) → chỉ
  * một điểm dừng Tab cho mỗi khách sạn.
  */
 export function HotelCard({ hotel }: { hotel: HotelCardView }) {
-  // Gói điền sẵn: chỉ điểm đến. Ngày, số khách, số phòng để khách tự nhập.
-  const prefill: HotelSearchPrefill = { destination: hotel.destinationSlug };
-
   return (
     <article className="group relative flex h-full flex-col overflow-hidden rounded-card bg-surface shadow-card transition-shadow hover:shadow-card-hover">
       <div className="relative aspect-4/3">
@@ -60,15 +53,9 @@ export function HotelCard({ hotel }: { hotel: HotelCardView }) {
             </p>
           </div>
 
-          <Button asChild variant="outline" size="md" className="mt-3 w-full after:absolute after:inset-0">
-            <AppLink
-              href={serviceTabHref("hotel")}
-              hashPayload={prefill}
-              // Nhiều khách sạn cùng điểm đến nên chữ trên nút trùng nhau: thêm tên khách sạn cho trình đọc màn hình.
-              aria-label={`Tìm khách sạn ở ${hotel.destinationName} (gợi ý từ ${hotel.name})`}
-            >
-              <Search aria-hidden="true" className="size-5" />
-              Tìm khách sạn ở {hotel.destinationName}
+          <Button asChild variant="primary" size="md" className="mt-3 w-full after:absolute after:inset-0">
+            <AppLink href={`/hotels/${hotel.slug}`} aria-label={`Xem phòng ${hotel.name}`}>
+              Xem phòng
             </AppLink>
           </Button>
         </div>

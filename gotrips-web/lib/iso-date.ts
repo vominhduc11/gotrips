@@ -1,4 +1,4 @@
-import { differenceInCalendarDays, format, isValid, parseISO } from "date-fns";
+import { addDays, differenceInCalendarDays, differenceInYears, format, isValid, parseISO } from "date-fns";
 
 /**
  * Tiện ích cho ngày dạng chuỗi `YYYY-MM-DD` (kiểu DATE, không múi giờ) — dùng chung cho schema và bộ chọn ngày.
@@ -25,4 +25,14 @@ export function toIsoDate(date: Date): string {
 /** `YYYY-MM-DD` → `Date` lúc 00:00 giờ địa phương; chuỗi trống/không hợp lệ → `undefined`. */
 export function fromIsoDate(value: string): Date | undefined {
   return isIsoDate(value) ? parseISO(value) : undefined;
+}
+
+/** Tuổi tròn (số năm đủ) của người sinh ngày `dateOfBirth` tính tới ngày `onDate`. Cả hai đã qua `isIsoDate`. */
+export function ageInYears(dateOfBirth: string, onDate: string): number {
+  return differenceInYears(parseISO(onDate), parseISO(dateOfBirth));
+}
+
+/** `YYYY-MM-DD` cộng `days` ngày lịch. */
+export function addDaysToIsoDate(value: string, days: number): string {
+  return toIsoDate(addDays(parseISO(value), days));
 }

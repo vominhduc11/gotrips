@@ -11,16 +11,18 @@ import {
   Search,
   Users,
 } from "lucide-react";
+import { useRouter } from "next/navigation";
 import { useId, useMemo } from "react";
 import { useForm, useWatch, type Path, type PathValue, type Resolver } from "react-hook-form";
-import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Field, FieldError, FieldLabel } from "@/components/ui/field";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { cn } from "@/lib/cn";
+import { summarizePassengers } from "@/lib/data/flight-view";
 import {
+  buildFlightSearchParams,
   CABIN_OPTIONS,
   createFlightPrefillSchema,
   createFlightSearchSchema,
@@ -37,33 +39,50 @@ import { DatePicker } from "./DatePickers";
 import { focusFirstError } from "./focus-first-error";
 import { OptionCombobox, type ComboboxOption } from "./OptionCombobox";
 import { fieldLabelClass, fieldLabelIconClass, fieldTriggerClass } from "./search-field-styles";
+import { SERVICE_TAB_HASH } from "./service-tab-hash";
 import { useSearchPrefill } from "./use-search-prefill";
 
 /** Bề rộng của một ô trong hàng "ngày – hành khách – hạng ghế": 2 ô/hàng ở md, chia đều một hàng ở lg. */
 const cellClass = "gap-1.5 md:basis-[calc(50%-0.5rem)] lg:flex-1 lg:basis-0";
 
-/** Chữ tóm tắt hành khách trên nút: "2 người lớn, 1 trẻ em, 1 em bé" (bỏ nhóm bằng 0). */
-function summarizePassengers(adults: number, children: number, infants: number) {
-  return [`${adults} người lớn`, children > 0 && `${children} trẻ em`, infants > 0 && `${infants} em bé`]
-    .filter(Boolean)
-    .join(", ");
-}
+const EMPTY_VALUES: FlightSearchValues = {
+  tripType: "oneWay",
+  from: "",
+  to: "",
+  departDate: "",
+  returnDate: "",
+  adults: 1,
+  children: 0,
+  infants: 0,
+  cabin: "economy",
+};
 
 /**
- * Form tìm vé máy bay (tab "Vé máy bay" của ô tìm kiếm ở Trang chủ).
+ * Form tìm vé máy bay: tab "Vé máy bay" của ô tìm kiếm ở Trang chủ, và ô tìm kiếm ở đầu trang `/flights`.
+ * Submit hợp lệ → `/flights?tripType&from&to&departDate&returnDate&adults&children&infants&cabin` (hợp đồng URL ở
+ * `lib/schemas/flight-search.ts`).
  *
- * Trang `/flights` CHƯA tồn tại nên submit không điều hướng, chỉ hiện toast "Tính năng đang phát triển".
- * Khi có trang, thay thân `onValid` bằng `router.push(`/flights?${buildFlightSearchParams(values)}`)` —
- * hợp đồng URL đã có sẵn ở `lib/schemas/flight-search.ts`.
+ * `initialValues`: lượt tìm đang hiển thị ở `/flights` (trang đọc từ URL). Form chỉ đọc lúc mount nên trang đặt `key`
+ * theo lượt tìm để form dựng lại khi URL đổi.
  *
  * Các ô là nút mở Popover chứ không phải `<input>`, nên giá trị đọc bằng `useWatch` và ghi bằng `setValue`
  * (không dùng `register`); lỗi lấy từ `formState.errors` do resolver Zod điền.
  *
- * Điền sẵn: thẻ ở section "Chặng bay phổ biến" gửi `{ from, to }` (mã IATA) qua sự kiện hash (`useSearchPrefill`),
+ * Điền sẵn: thẻ chặng bay gửi `{ from, to }` (mã IATA) qua sự kiện hash tới `prefillHash` (`useSearchPrefill`),
  * form chỉ ghi đè hai ô "Điểm đi"/"Điểm đến" — loại hành trình, ngày, hành khách, hạng ghế khách đã chọn vẫn giữ
  * nguyên. Hai mã phải có trong `airports` của form này và khác nhau, sai thì bỏ cả gói.
  */
-export function FlightSearchForm({ airports }: { airports: Airport[] }) {
+export function FlightSearchForm({
+  airports,
+  prefillHash = SERVICE_TAB_HASH.flight,
+  initialValues,
+}: {
+  airports: Airport[];
+  /** Hash (không kèm `#`) mà thẻ chặng bay gửi gói điền sẵn tới. Mặc định: tab Vé máy bay ở Trang chủ. */
+  prefillHash?: string;
+  initialValues?: FlightSearchValues;
+}) {
+  const router = useRouter();
   const uid = useId();
   const id = (name: string) => `${uid}-${name}`;
 
@@ -77,17 +96,7 @@ export function FlightSearchForm({ airports }: { airports: Airport[] }) {
     // Dựng schema MỖI LẦN validate để "hôm nay" luôn đúng kể cả khi trang mở qua nửa đêm.
     resolver: ((values, context, options) =>
       zodResolver(createFlightSearchSchema())(values, context, options)) as Resolver<FlightSearchValues>,
-    defaultValues: {
-      tripType: "oneWay",
-      from: "",
-      to: "",
-      departDate: "",
-      returnDate: "",
-      adults: 1,
-      children: 0,
-      infants: 0,
-      cabin: "economy",
-    },
+    defaultValues: initialValues ?? EMPTY_VALUES,
   });
 
   const [tripType, from, to, departDate, returnDate, adults, children, infants, cabin] = useWatch({
@@ -115,7 +124,7 @@ export function FlightSearchForm({ airports }: { airports: Airport[] }) {
 
   const prefillSchema = useMemo(() => createFlightPrefillSchema(airports.map((airport) => airport.code)), [airports]);
   useSearchPrefill({
-    tab: "flight",
+    hash: prefillHash,
     schema: prefillSchema,
     apply: ({ from: fromCode, to: toCode }) => {
       setValue("from", fromCode, { shouldDirty: true });
@@ -128,10 +137,8 @@ export function FlightSearchForm({ airports }: { airports: Airport[] }) {
     update("to", from);
   }
 
-  function onValid() {
-    toast("Tính năng đang phát triển", {
-      description: "Tìm vé máy bay sẽ sớm ra mắt. Bạn vui lòng quay lại sau nhé.",
-    });
+  function onValid(values: FlightSearchValues) {
+    router.push(`/flights?${buildFlightSearchParams(values)}`);
   }
 
   // Các nút −/+ đã chặn tổ hợp vô lý (em bé ≤ người lớn, tổng ≤ 9); lỗi dưới đây là lớp bảo vệ của schema.

@@ -1,10 +1,12 @@
 import { describe, expect, it } from "vitest";
 import {
   buildHotelSearchParams,
-  createHotelPrefillSchema,
   createHotelSearchSchema,
+  hasHotelSearchParams,
   HOTEL_MAX_GUESTS,
+  HOTEL_MAX_NIGHTS,
   HOTEL_MAX_ROOMS,
+  parseHotelSearchParams,
   type HotelSearchValues,
 } from "./hotel-search";
 
@@ -111,38 +113,38 @@ describe("buildHotelSearchParams", () => {
   });
 });
 
-describe("createHotelPrefillSchema", () => {
-  const prefillSchema = createHotelPrefillSchema(["da-lat", "phu-quoc"]);
+describe("số đêm tối đa", () => {
+  it(`đúng ${HOTEL_MAX_NIGHTS} đêm là hợp lệ, thêm 1 đêm thì bị từ chối (báo ở ngày trả)`, () => {
+    expect(schema.safeParse({ ...valid, checkIn: "2026-12-10", checkOut: "2027-01-09" }).success).toBe(true);
+    expect(errorsOf({ ...valid, checkIn: "2026-12-10", checkOut: "2027-01-10" })?.checkOut).toEqual([
+      `Mỗi lần đặt tối đa ${HOTEL_MAX_NIGHTS} đêm.`,
+    ]);
+  });
+});
 
-  it("nhận slug điểm đến có trong danh sách", () => {
-    expect(prefillSchema.safeParse({ destination: "da-lat" }).data).toEqual({ destination: "da-lat" });
+describe("parseHotelSearchParams", () => {
+  const url = Object.fromEntries(buildHotelSearchParams(valid));
+
+  it("đọc lại đúng lượt tìm từ URL do form dựng", () => {
+    expect(parseHotelSearchParams(url, TODAY)).toEqual(valid);
   });
 
-  it("chỉ giữ destination: các khoá khác (ngày, số khách...) bị bỏ, không được điền sẵn", () => {
-    const parsed = prefillSchema.safeParse({ destination: "phu-quoc", checkIn: "2026-12-10", guests: 9 });
-    expect(parsed.data).toEqual({ destination: "phu-quoc" });
+  it("lấy giá trị đầu khi tham số bị lặp", () => {
+    expect(parseHotelSearchParams({ ...url, guests: ["3", "9"] }, TODAY)?.guests).toBe(3);
   });
 
-  it("từ chối slug không có trong danh sách, kể cả tên hiển thị hay khác hoa/thường", () => {
-    expect(prefillSchema.safeParse({ destination: "ha-long" }).success).toBe(false);
-    expect(prefillSchema.safeParse({ destination: "Đà Lạt" }).success).toBe(false);
-    expect(prefillSchema.safeParse({ destination: "DA-LAT" }).success).toBe(false);
-    expect(prefillSchema.safeParse({ destination: "" }).success).toBe(false);
+  it("thiếu hoặc sai bất kỳ tham số nào → null (không làm trang lỗi)", () => {
+    expect(parseHotelSearchParams({}, TODAY)).toBeNull();
+    expect(parseHotelSearchParams({ ...url, guests: undefined }, TODAY)).toBeNull();
+    expect(parseHotelSearchParams({ ...url, guests: "hai" }, TODAY)).toBeNull();
+    expect(parseHotelSearchParams({ ...url, rooms: "3", guests: "2" }, TODAY)).toBeNull();
+    // Ngày nhận phòng đã qua so với "hôm nay".
+    expect(parseHotelSearchParams(url, "2026-12-11")).toBeNull();
   });
 
-  it("từ chối chuỗi lạ và tên thuộc tính có sẵn của Object", () => {
-    for (const destination of ["<script>alert(1)</script>", "__proto__", "constructor", "toString"]) {
-      expect(prefillSchema.safeParse({ destination }).success, destination).toBe(false);
-    }
-  });
-
-  it("từ chối payload sai kiểu hoặc thiếu khoá", () => {
-    for (const payload of [undefined, null, "da-lat", 42, ["da-lat"], {}, { destination: 1 }, { destination: null }]) {
-      expect(prefillSchema.safeParse(payload).success, JSON.stringify(payload)).toBe(false);
-    }
-  });
-
-  it("danh sách điểm đến rỗng thì không nhận gì", () => {
-    expect(createHotelPrefillSchema([]).safeParse({ destination: "da-lat" }).success).toBe(false);
+  it("hasHotelSearchParams: biết khách đã thử tìm dù tham số sai", () => {
+    expect(hasHotelSearchParams({})).toBe(false);
+    expect(hasHotelSearchParams({ q: "x" })).toBe(false);
+    expect(hasHotelSearchParams({ checkIn: "hôm qua" })).toBe(true);
   });
 });

@@ -1,10 +1,12 @@
 import { Badge } from "@/components/ui/badge";
-import { formatDate, formatVND } from "@/lib/format";
+import { formatDate, formatSeatsLeft, formatVND } from "@/lib/format";
 import type { TourDepartureView } from "@/lib/types";
+import { SelectDepartureButton } from "./SelectDepartureButton";
 
 /**
  * Lịch khởi hành của một tour. Dùng danh sách (không phải bảng) để xếp lại gọn trên màn hình hẹp.
  * Chuyến đã đầy vẫn hiện để khách thấy lịch, nhưng mờ đi và ghi rõ "Hết chỗ".
+ * Chuyến còn chỗ có nút "Chọn ngày này": chọn chuyến đó trong thẻ "Đặt tour" (cần nằm trong `TourBookingProvider`).
  */
 export function DepartureList({ departures }: { departures: TourDepartureView[] }) {
   if (departures.length === 0) {
@@ -26,14 +28,8 @@ export function DepartureList({ departures }: { departures: TourDepartureView[] 
             <p className="font-semibold text-ink">
               <time dateTime={departure.departureDate}>{formatDate(departure.departureDate)}</time>
             </p>
-            <p className="mt-1 text-sm">
-              {departure.isSoldOut ? (
-                <span className="font-semibold">Hết chỗ</span>
-              ) : departure.isAlmostFull ? (
-                <span className="font-semibold text-danger-700">Chỉ còn {departure.seatsLeft} chỗ</span>
-              ) : (
-                <span>Còn {departure.seatsLeft} chỗ</span>
-              )}
+            <p className={departure.isSoldOut || departure.isAlmostFull ? "mt-1 text-sm font-semibold" : "mt-1 text-sm"}>
+              <span className={departure.isAlmostFull ? "text-danger-700" : undefined}>{formatSeatsLeft(departure)}</span>
             </p>
           </div>
 
@@ -57,6 +53,9 @@ export function DepartureList({ departures }: { departures: TourDepartureView[] 
                 <span className="text-sm font-medium text-ink-muted">/khách</span>
               </p>
             </div>
+            {departure.isSoldOut ? null : (
+              <SelectDepartureButton departureId={departure.id} dateLabel={formatDate(departure.departureDate)} />
+            )}
           </div>
         </li>
       ))}

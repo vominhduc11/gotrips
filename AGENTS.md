@@ -1,0 +1,272 @@
+# AGENTS.md
+
+Ngữ cảnh đầu vào cho Codex khi làm việc trong repo **GoTrips** — nền tảng đặt tour du lịch trực tuyến (MVP). Trả lời và viết comment bằng **tiếng Việt**, trừ khi người dùng yêu cầu khác.
+
+## Tổng quan monorepo
+
+| Thư mục | Vai trò | Công nghệ | Cổng (Docker) |
+|---|---|---|---|
+| `gotrips-api/` | Backend REST API | Spring Boot 4.1 (Maven), Java 25, JPA, Flyway, PostgreSQL, Spring Security, Actuator, springdoc-openapi | 8080 |
+| `gotrips-admin/` | Trang quản trị (SPA) | React 19 + Vite 8 + TypeScript, phục vụ bằng nginx | 8081 → 80 |
+| `gotrips-web/` | Website khách hàng | Next.js 16 (App Router) + React 19 + Tailwind CSS 4 + TypeScript | 3000 |
+| (gốc) `docker-compose.yml` | PostgreSQL 17 + 3 service trên | | DB 127.0.0.1:5432 |
+
+Tài liệu nghiệp vụ ở gốc repo (`.docx`): `GoTrips_Phan_tich_chuc_nang_va_MVP.docx` (phân tích chức năng & MVP) — đọc khi cần hiểu phạm vi MVP.
+
+### Trạng thái hiện tại
+- `gotrips-api`: mới có **xác thực**: migration `V1__create_users_and_roles.sql` (bảng `users`, `roles`, `user_roles`), `POST /auth/register`, `POST /auth/login`, `GET /auth/me`, JWT HS256 bằng OAuth2 Resource Server (chi tiết ở mục "gotrips-api"). Nghiệp vụ còn lại (tour, booking...) **chưa có** entity/controller/migration; thư viện nền (validation, MapStruct, Testcontainers, CORS, ProblemDetail) đã dùng thật.
+- `gotrips-admin`: đã dọn template Vite, cài và cấu hình đủ thư viện; mới có Dashboard tạm và trang 404, chưa gọi API (xem mục "gotrips-admin" bên dưới).
+- `gotrips-web`: Trang chủ, tour (`/tours`), **khách sạn** (`/hotels`, `/hotels/[slug]`, `/hotels/[slug]/book`) và **vé máy bay** (`/flights`, `/flights/book`) đã dựng xong bằng **dữ liệu mock** (chưa gọi API thật); cả ba dịch vụ đều tìm → xem → đặt được (xem mục "Khách sạn" và "Vé máy bay" bên dưới). `/tours` lọc/sắp xếp/phân trang hoàn toàn bằng URL search params (`destination`, `q`, `date`, `guests`, `sort`, `page`; parse bằng `lib/schemas/tour-filters.ts`, logic thuần ở `lib/data/tour-search.ts`, cache ở `lib/data/tours.ts`), partial prerender: tiêu đề tĩnh, danh sách stream trong `<Suspense>`. Trang chi tiết `/tours/[slug]` đã có (`generateStaticParams` từ `getTourSlugs`, `generateMetadata`, JSON-LD `TouristTrip`; gồm giới thiệu, lịch khởi hành, đánh giá, thẻ giá). **Luồng đặt tour là PROTOTYPE, chưa nối BE/DB** (dữ liệu tour vẫn là mock):
+- **Chọn chuyến ở trang chi tiết** (không còn bước "Chọn lịch"): thẻ `TourBookingCard` (dính bên phải) có ô chọn ngày (`Select` shadcn) + số khách + tiền tạm tính + nút "Đặt tour"; chuyến gần nhất còn chỗ được chọn sẵn. Nút "Chọn ngày này" (`SelectDepartureButton`) ở `DepartureList` chỉ **chọn chuyến trong thẻ** rồi focus ô ngày (chuyến đang chọn hiện "Đã chọn"), không mở trang đặt tour. Tour hết chỗ thì nút "Đặt tour" bị khoá.
+  - Form chọn chuyến nằm ở `TourBookingProvider` (client, bọc cả cột nội dung lẫn thẻ; nội dung vẫn là Server Component qua `children`). Ô ngày + số khách là `TripSelectionFields`, tiền tạm tính là `TripPriceBreakdown` (dùng chung với trang đặt tour). Luật đổi chuyến/hạ số khách: `changeTripDeparture`, chọn mặc định: `resolveTripSelection` (`lib/booking/steps.ts`, có test).
+  - Lựa chọn đồng bộ với URL trang chi tiết (`?departure&guests`) **không dùng `useSearchParams`** (để giữ static shell): đọc `window.location` trong `useLayoutEffect` sau mount, ghi bằng `replaceState` qua `form.subscribe` (không dùng `watch(callback)` vì React Compiler bỏ qua). Nhờ vậy Back từ trang đặt tour và liên kết `buildTourBookingHref` (`/tours/[slug]?departure&guests#dat-tour`) điền sẵn được.
+  - "Đặt tour" gọi Server Action `startBookingAction`: server kiểm phiên rồi `redirect()` tới `/book?departure&guests` hoặc `/login?next=…`. **Không** điều hướng client tới `/book` để `BookingGate` chuyển sang đăng nhập: Next (`cacheComponents`) giữ cây `/book` vừa ghé trong `<Activity>` kèm lệnh chuyển hướng, đăng nhập xong quay lại `/book` thì bị đẩy về `/login` lần nữa (có e2e).
+- **Trang đặt tour 2 bước, lưu trên URL:** `?departure&guests&step=thong-tin|xac-nhan`, parse/build bằng `lib/schemas/booking.ts` (`step=chon-lich` cũ rơi về `thong-tin`). `BookingWizard` (client) dùng **một** form RHF cho cả 2 bước.
+  - `BookingGate` (server): URL thiếu chuyến / chuyến hết chỗ → `redirect` về thẻ "Đặt tour" ở trang chi tiết (giữ số khách); chưa đăng nhập → `/login?next=<URL đang mở>`.
+  - Đổi ngày / số khách ngay tại trang bằng hộp thoại `ChangeTripDialog` (nút "Thay đổi" ở `BookingSummaryCard`, "Sửa lịch" ở bước Xác nhận): form nháp riêng, "Áp dụng" mới ghi vào đơn, thông tin đã nhập được giữ. Hộp thoại phải nằm **ngoài** `<form>` của wizard (sự kiện React nổi bọt qua portal). Lỗi server về chuyến/số khách hiện thành lỗi chung ở đầu form.
+  - Chuyển bước bằng `window.history.pushState`, không dùng `router.push`, vì `router.push` làm page segment mount lại và mất state form.
+  - Thông tin cá nhân không đưa lên URL. Vì vậy URL đòi "Xác nhận" khi thông tin chưa hợp lệ thì `resolveBookingStep` (`lib/booking/steps.ts`, có test) đưa về "Thông tin" rồi `replaceState`.
+  - Nhấn Enter ở bước "Thông tin" chỉ là "Tiếp tục", chưa tạo đơn.
+  - **URL là nguồn sự thật của chuyến + số khách**, đã chuẩn hoá bằng `normalizeBookingSelection` (`lib/booking/steps.ts`). Khi điều hướng client-side tới cùng route với search params khác (ví dụ quay lại trang chi tiết rồi bấm "Đặt tour" với ngày khác), Next **dùng lại** `BookingWizard` đang có, nên `useForm` không đọc lại `defaultValues`.
+    - Vì thế wizard có effect đồng bộ form theo URL, khai báo trước effect sửa URL.
+    - Form nào khởi tạo từ URL cũng phải đồng bộ theo URL như vậy, không chỉ đọc URL lúc mount (có e2e).
+- **Đăng nhập:** `next` được lọc bằng `getSafeRedirectPath` (`lib/safe-redirect.ts`, chống open redirect); đăng nhập xong quay lại đúng URL trang đặt tour.
+  - `LoginForm`/`RegisterForm` đọc `next` trong `onSubmit` chứ không lúc render, để `/login` vẫn tĩnh.
+- **Tạo đơn:** `createBookingAction` (`lib/actions/booking.ts`) kiểm đăng nhập, kiểm lại schema, **tự tính giá** từ departure (không có trường giá từ client), kiểm ngày khởi hành > hôm nay và đủ chỗ. Sau đó sinh mã `GT` + 6 ký tự (`lib/booking/booking-code.ts`) và lưu đơn `PENDING` với thanh toán `UNPAID`; trạng thái thanh toán là trường riêng `payment`.
+- **Nơi lưu:** cookie httpOnly `gotrips_bookings` (`lib/booking/demo-store.ts`; JSON base64url ≤ 3.800 byte, vượt thì bỏ đơn cũ nhất; đọc qua Zod, cookie hỏng thì coi như rỗng). Chung một cookie cho **mọi loại đơn**: `Booking` (`lib/types.ts`) là union theo `kind` (`TourBooking | HotelBooking | FlightBooking`), schema cookie là `z.discriminatedUnion("kind")`; đơn cũ không có `kind` được đọc là đơn tour. Đơn mới tạo qua `addStoredBooking(build)` (sinh mã không trùng + ghi cookie). Mỗi trình duyệt chỉ thấy đơn của mình, và **số chỗ / phòng / ghế mock không giảm**.
+- **Trang `/bookings` và `/bookings/[code]`** ("Đơn đặt chỗ của tôi", chung cho tour/khách sạn/vé): Server Component, phần đọc cookie nằm trong `<Suspense>`. Phần khác nhau theo loại được quy về view chung ở `lib/data/booking-view.ts` (`highlights`, `priceLines`, `people`, `flightSegments`; có test), nên `BookingHistory`/`BookingDetail` không rẽ nhánh theo loại. Chưa đăng nhập thì chuyển tới `/login?next=`. Mã sai hoặc đơn của người khác thì 404.
+  - Trang chi tiết có hướng dẫn chuyển khoản (tài khoản demo ở `lib/mock/site.ts`, nội dung chuyển khoản = mã đơn) và khối **"Mô phỏng nhân viên"** (`BookingSimulator` + `simulateBookingAction`): đánh dấu đã thanh toán → xác nhận (bắt buộc PAID trước) → huỷ.
+  - Luật chuyển trạng thái nằm ở `lib/booking/transitions.ts` (có test, generic cho mọi loại đơn). Khi có gotrips-admin thì xoá khối này.
+- **Không dùng TanStack Query cho đơn:** cookie chỉ server đọc được, nên đơn được đọc bằng Server Component.
+- **Khách sạn** (PROTOTYPE, cùng khuôn với tour): mock `lib/mock/hotels.ts` (có giới thiệu, tiện ích, giờ nhận/trả phòng) + `hotel-room-types.ts` (giá **một phòng một đêm**, `maxGuests` mỗi phòng, giường, diện tích); logic thuần ở `lib/data/hotel-view.ts` (`countNights`, `computeStayTotal`, `searchHotels`, `findHotelDetail`; có test).
+  - `/hotels`: phần đọc URL (`HotelSearchSection`) nằm trong `<Suspense>`. Lượt tìm hợp lệ (`parseHotelSearchParams`) → form điền sẵn (đặt `key` theo lượt tìm để form dựng lại khi URL đổi) + kết quả `HotelResultCard` (phòng rẻ nhất đủ chỗ, tổng tiền cả kỳ, sắp theo tổng tiền); không có/sai → khách sạn gợi ý (`HotelCard` → trang chi tiết). Submit form (Trang chủ hoặc `/hotels`) → `router.push(/hotels?${buildHotelSearchParams})`; tối đa 30 đêm.
+  - `/hotels/[slug]`: `HotelBookingProvider` + `HotelBookingCard` (loại phòng, khoảng ngày, số khách/số phòng, tạm tính) + nút "Chọn phòng này" (`SelectRoomButton`), đồng bộ URL `?room&checkIn&checkOut&guests&rooms` y như `TourBookingProvider` (đọc `window.location` sau mount, ghi `replaceState`). Nút −/+ tự giữ tổ hợp hợp lệ với sức chứa (`lib/booking/hotel-stay.ts`: `changeHotelGuests`, `changeHotelRoom`, `normalizeHotelStay`; có test). "Đặt phòng" → `startHotelBookingAction` (redirect, cùng lý do với tour).
+  - `/hotels/[slug]/book`: `HotelBookingGate` (lựa chọn không đặt được → về `#dat-phong` ở trang chi tiết; chưa đăng nhập → `/login?next=`), `HotelBookingWizard` 2 bước (người liên hệ, **người nhận phòng**, ghi chú). Lựa chọn lưu trú đến từ **props** (server đọc URL), không nằm trong form, nên khi Next dùng lại wizard với URL mới thì không cần effect đồng bộ. "Thay đổi" là liên kết về trang chi tiết. `createHotelBookingAction` (`lib/actions/hotel-booking.ts`) kiểm lại theo loại phòng của khách sạn và tự tính giá.
+- **Vé máy bay** (PROTOTYPE): mock `lib/mock/flights.ts` (3 hãng **tên giả**, lịch bay chạy mỗi ngày, cả hai chiều; giá Phổ thông cho 1 người lớn); logic `lib/data/flight-view.ts` (hệ số hạng ghế, trẻ em 75% / em bé 10%, giờ hạ cánh "+1 ngày", `buildFareLines`; có test), dữ liệu `lib/data/flights.ts` (`cacheTag("flights", "airports")`).
+  - `/flights`: `FlightSearchSection` trong `<Suspense>`. Một chiều: nút "Chọn" (`SelectFlightButton` → `startFlightBookingAction`). Khứ hồi: "Chọn chuyến đi" là liên kết ghi `out=<id lịch bay>` lên URL (`#chieu-ve`), rồi "Chọn chuyến về" gọi action với cả hai. Bay **ngay hôm nay** thì khoá nút (đặt trực tuyến chỉ từ ngày mai, action kiểm lại). Không có lượt tìm → chặng bay phổ biến (thẻ điền sẵn điểm đi/đến vào ô ở `#o-tim-ve-may-bay`, khác hash tab Trang chủ).
+  - `/flights/book?<lượt tìm>&out&ret&step` (`lib/schemas/flight-booking.ts`): `FlightBookingGate` (chưa đủ chuyến / chuyến không đúng chiều → về trang kết quả), `FlightBookingWizard` 2 bước: hành khách theo đúng số người lớn → trẻ em → em bé của lượt tìm (`passengerTypesFor`); trẻ em/em bé **bắt buộc ngày sinh**, tuổi kiểm theo **ngày bay chiều đi** (`ageInYears` ở `lib/iso-date.ts`). Lượt tìm đổi số hành khách thì wizard tự khớp lại danh sách. `createFlightBookingAction` kiểm chiều bay của từng id, số hành khách từng loại, và lưu giá vé đã chốt vào từng chặng.
+- **Dùng chung giữa 3 luồng đặt:** `ContactFields`/`NoteField` (`components/booking/ContactFields.tsx`), `ReviewSection`/`ContactReview`, `BookingSteps` (nhận `label`), hook `use-booking-step.ts` (bước trên URL + `pushState` + focus tiêu đề; wizard tour vẫn tự làm vì còn đồng bộ form theo URL), `TrialNotice` (nay ở `components/common/`, bắt buộc truyền nội dung), schema `contactSchema`/`personNameSchema`/`noteSchema` ở `lib/schemas/booking.ts`.
+- **Khi có API thật:** thay thân `createBookingAction`/`simulateBookingAction`, `createHotelBookingAction`/`startHotelBookingAction`, `createFlightBookingAction`/`startFlightBookingAction` và `lib/data/bookings.ts`, xoá `demo-store.ts`/`cookie-codec.ts`/`BookingSimulator`. Slug không tồn tại/tour HIDDEN → `notFound()` → `app/not-found.tsx` (tiếng Việt); với Cache Components mã HTTP vẫn là 200 (Next tự chèn `noindex`), không phải lỗi. **Đăng nhập / đăng ký đã nối gotrips-api thật** (tour, khách sạn, vé, đơn vẫn là mock). Client do Orval sinh nằm ở `lib/api/generated/` (`login`, `register`, `getMe`; chạy `npm run api:gen` khi API đổi, API phải đang chạy); mọi request đi qua `customFetch` ở `lib/api/http.ts` (lỗi HTTP → `ApiError`). Trang `/login` và `/register` là form React Hook Form + Zod + Server Action (`lib/actions/auth.ts`):
+  - `loginAction` gọi `POST /auth/login`. 401 → "Email hoặc mật khẩu không đúng" (chung cho sai email lẫn sai mật khẩu, API cũng không phân biệt). Thành công → lưu `accessToken` (JWT do API cấp) vào **cookie phiên** `gotrips_session` (httpOnly, `sameSite=lax`, hạn = `expiresIn` của token; token **không** trả về trình duyệt) rồi toast + về `/` (hoặc `?next=` nếu có và an toàn). Email gõ hoa/thừa khoảng trắng vẫn đăng nhập được (API chuẩn hoá).
+  - `registerAction` gọi `POST /auth/register` (chỉ gửi `fullName`/`email`/`password`; `confirmPassword`, `acceptTerms` chỉ kiểm ở form). 409 (email đã đăng ký) và 400 đều kèm `errors[]` theo field → `fromApiFieldErrors` (`lib/actions/field-errors.ts`) gắn lại đúng ô. Thành công → `/login` (chưa tự đăng nhập).
+  - Lỗi mạng/timeout/5xx → "Hệ thống đang bận…"; log chỉ ghi nguyên nhân, **không** ghi email/mật khẩu/token.
+  - Luật mật khẩu (8–72 ký tự, có chữ và số, **tối đa 72 byte** vì BCrypt từ chối quá 72 byte) có ở cả `lib/schemas/auth.ts` lẫn API (`RegisterRequest`): đổi một nơi phải đổi nơi kia.
+  - `getCurrentUser` (`lib/auth/session.ts`) đọc cookie rồi gọi `getMe()` (`GET /auth/me`, `cache: "no-store"`), bọc `cache()` của React để Header, lời chào, trang đặt chỗ... trong cùng một lượt render chỉ tốn một request tới API. 401 (hết hạn, sai chữ ký, tài khoản đã xoá, hay cookie cũ của bản demo) → coi như khách; API sập/lỗi 5xx → log rồi coi như khách. **Phải gọi `unstable_rethrow(error)` trước khi nuốt lỗi**, nếu không lượt prerender/prefetch bị Next ngắt giữa chừng ("fetch() rejects when the prerender is complete") sẽ coi người đã đăng nhập là khách. Đăng xuất = xoá cookie (JWT không lưu trạng thái ở API nên token cũ vẫn hợp lệ tới khi hết hạn; chưa có refresh token hay thu hồi).
+  - Nhờ phiên này, Header (`HeaderAuth`: avatar + menu có Đăng xuất; `MobileNav` có chào + Đăng xuất) và dòng nhãn trên `h1` Hero (`HeroGreeting`: "Xin chào, <họ tên>…") đổi theo người dùng; cả hai đọc cookie nên bọc trong `<Suspense>` để phần còn lại vẫn prerender.
+  - **Chưa có:** chống dò mật khẩu (rate limit/khoá tài khoản), xác minh email, quên mật khẩu, trang điều khoản — nên form không đặt liên kết tới đó.
+  - Độ trễ giả lập 1,2 giây (`DEMO_LATENCY_MS` trong `lib/actions/demo-latency.ts`) chỉ còn ở action đặt tour/khách sạn/vé; đăng nhập/đăng ký dùng độ trễ thật của API.
+  - Ô tìm kiếm Trang chủ có **3 tab dịch vụ** (`components/home/ServiceTabs.tsx`, `Tabs` của shadcn/Radix: có sẵn phím mũi tên + ARIA): **Tour** (`SearchForm`, điều hướng tới `/tours?destination&date&guests`; dùng cùng bộ ô với hai tab kia: `OptionCombobox` lưu slug, `DatePicker`, `CounterPopover` — không còn `<datalist>`/input date/number gốc, nên không còn gõ tự do `q` từ Trang chủ; 3 `<input type="hidden">` đăng ký RHF mang tên tham số URL để submit trước khi hydrate vẫn tới `/tours`, và là dấu hiệu hydrate của e2e: `form[aria-label="Tìm tour"] input[name="guests"]` = "2"), **Khách sạn** (`HotelSearchForm`: điểm đến, khoảng ngày nhận–trả phòng, khách + phòng) và **Vé máy bay** (`FlightSearchForm`: một chiều/khứ hồi, sân bay đi/đến có nút đổi chiều, ngày đi/về, hành khách, hạng ghế). Tab đang chọn là state client (`Tabs` ở dạng controlled) và người dùng tự bấm tab thì **không ghi hash lên URL**; ngược lại **hash chọn tab**: `#tim-tour`, `#tim-khach-san`, `#tim-ve-may-bay` (ánh xạ hash ↔ tab nằm một chỗ ở `components/home/service-tab-hash.ts`, có test). `ServiceTabs` đọc hash **sau khi mount** (`useLayoutEffect`, không đọc lúc render, không dùng `searchParams`/`useSearchParams` vì sẽ làm Trang chủ mất static shell), chọn tab rồi chuyển focus tới tab đó; hash không khớp thì giữ nguyên tab (mặc định Tour). `HeroSearch` vẫn là Server Component, dựng sẵn 3 form rồi truyền vào `ServiceTabs`, đồng thời đặt 3 điểm đích cuộn rỗng (`<span id=hash class="scroll-mt-20">`) ở đầu ô tìm kiếm — **bắt buộc có phần tử `id` đúng bằng hash**, nếu không Next coi như đã xử lý và không cuộn. **Menu Header/MobileNav và Footer** dẫn tới trang riêng `/hotels`, `/flights` (không dùng hash tab). Vì `next/link` điều hướng bằng `pushState` nên **không phát `hashchange`**: `AppLink` (nay là Client Component) dùng `onNavigate` phát sự kiện kèm hash (`lib/hash-navigation.ts`, có test) và `ServiceTabs` nghe sự kiện đó cùng `hashchange` gốc. Sự kiện có thể kèm `payload` (`AppLink` nhận prop `hashPayload`, `announceHashNavigation(hash, payload?)`; `listener` chỉ nhận đối số thứ hai khi có payload). **Next chỉ cuộn tới hash khi hash ĐỔI so với URL hiện tại** (`onlyHashChange` trong `app-router-state.js`): bấm liên kết có đúng hash đang nằm trên URL (thẻ thứ hai cùng loại, Footer sau khi đã ở `/#tim-khach-san`) thì Next không cuộn, nên `AppLink` tự gọi `scrollToHashTarget` trong trường hợp đó (có e2e). Khi quay về Trang chủ từ trang khác, Next (do `cacheComponents`) chỉ **ẩn** Trang chủ bằng `<Activity>` rồi hiện lại — state và dữ liệu đã nhập được giữ, effect chạy lại nên hash được đọc lại. Cả ba tab đều chạy thật (không còn badge "Sắp ra mắt" hay dòng báo thử nghiệm). **Thân Trang chủ có 2 section bằng dữ liệu mock** (thứ tự: Hero → Điểm đến → Tour nổi bật → **Khách sạn nổi bật** → **Chặng bay phổ biến** → Vì sao chọn GoTrips → Đánh giá → Ưu đãi; nền xen kẽ trắng/`bg-surface-muted`, không để hai section liền nhau cùng nền): `FeaturedHotels` + `HotelCard` (`getFeaturedHotels`: bỏ khách sạn HIDDEN và khách sạn không có loại phòng, "Giá từ … / đêm"; bấm thẻ → **trang chi tiết khách sạn**) và `PopularFlightRoutes` + `FlightRouteCard` (`getPopularFlightRoutes`, "Giá tham khảo từ …"). **Bấm thẻ chặng bay** = `AppLink` tới `serviceTabHref("flight")` kèm `hashPayload`: `ServiceTabs` chọn tab + focus, còn việc điền sẵn là của form (hook `components/home/use-search-prefill.ts` nghe cùng sự kiện hash). Payload đi trong **sự kiện**, KHÔNG nhét vào hash/URL (hash phải khớp `id` điểm cuộn, và Trang chủ không dùng `searchParams`); nó là dữ liệu không tin cậy nên phải qua Zod: `createFlightPrefillSchema(codes)` chỉ nhận `{ from, to }` là mã IATA có trong danh sách sân bay và khác nhau; sai thì bỏ qua (tab vẫn được chọn). Chỉ ghi đè đúng hai ô đó, ô khách đã nhập giữ nguyên. (Thẻ khách sạn không còn điền sẵn nên `createHotelPrefillSchema` đã bị xoá.) Sân bay là dữ liệu mock (`lib/mock/airports.ts`, 12 sân bay nội địa) lấy qua `lib/data/airports.ts` (`"use cache"` + `cacheTag("airports")`).
+- **Combo thư viện đã chốt** (22/11/2026) — xem mục "Quy tắc dùng thư viện". Muốn biết thư viện nào **đã cài thật** thì xem `package.json` / `pom.xml`, không suy ra từ file này.
+
+## Lệnh thường dùng
+
+Chạy toàn bộ stack (cần Docker, file `.env` copy từ `.env.example`):
+```bash
+docker compose up --build
+```
+
+Chạy từng phần khi phát triển (chạy DB bằng `docker compose up gotrips-db` trước):
+```bash
+# API (từ gotrips-api/) — mặc định nối DB localhost:5432
+./mvnw spring-boot:run   # cần biến môi trường GOTRIPS_JWT_SECRET (xem bảng biến môi trường)
+./mvnw test              # cần Docker (Testcontainers) + JDK 25; máy chưa có JDK 25 thì thêm -Djava.version=24 để chạy thử
+
+# Admin (từ gotrips-admin/)
+npm run dev        # vite
+npm run build      # tsc -b && vite build
+npm run lint
+
+# Web (từ gotrips-web/)
+npm run dev
+npm run build
+npm run lint
+
+# Web + admin
+npm test           # vitest run (web: 349 test đơn vị; test:watch để chạy chế độ theo dõi)
+npm run api:gen    # orval: sinh client/type từ http://localhost:8080/v3/api-docs (API phải đang chạy)
+
+# Chỉ web
+npm run test:e2e   # playwright (thư mục e2e/): tự build rồi chạy next start trên cổng 3100.
+                   # CẦN gotrips-api + DB đang chạy (docker compose up -d gotrips-db gotrips-api): các spec đăng nhập
+                   # tạo tài khoản thật qua API (e2e/fixtures.ts). Web gọi API ở API_URL (mặc định http://localhost:8080)
+```
+
+### Lưu ý môi trường (máy dev Windows của người dùng)
+- **Cổng 3000 do Docker chiếm** (container `gotrips-web`). Khi chạy dev server riêng hãy dùng cổng khác, ví dụ `next dev -p 3100`.
+- Test E2E của dự án dùng `@playwright/test` trong `gotrips-web` (nếu đã cài). Chỉ khi cần kiểm tra giao diện nhanh, ngoài bộ test, mới dùng `playwright-core` đặt trong thư mục scratchpad, và không cài thêm vào repo.
+- Shell chính là PowerShell; Bash (Git Bash) cũng dùng được. **Riêng `vitest` hãy chạy bằng PowerShell**: trong Git Bash mọi file test đều lỗi `Cannot read properties of undefined (reading 'config')` dù code đúng.
+
+## Quy ước chung
+- **Không commit** `.env`, `.env.*` (trừ `.env.example`) hay bí mật. Mật khẩu DB chỉ nằm trong `.env`.
+- **Biến môi trường kết nối API** (mẫu ở `.env.example` của từng dự án và ở gốc repo; `docker-compose.yml` đã truyền `API_URL` cho web và `GOTRIPS_JWT_SECRET` cho api):
+
+  | Dự án | Biến | Ý nghĩa |
+  |---|---|---|
+  | web | `API_URL` | Địa chỉ API mà web gọi từ phía server. Mặc định `http://localhost:8080`; trong Docker là `http://gotrips-api:8080` |
+  | admin | `VITE_API_URL` | Địa chỉ API mà trình duyệt gọi. Vite nhúng giá trị lúc **build** nên trong Docker phải là build arg |
+  | api | `GOTRIPS_CORS_ORIGINS` | Các origin được gọi API từ trình duyệt (admin), cách nhau bằng dấu phẩy. Mặc định `http://localhost:8081,http://localhost:5173` |
+  | api | `SPRINGDOC_ENABLED` | `false` để tắt `/v3/api-docs` (mặc định `true`) |
+  | api | `GOTRIPS_JWT_SECRET` | **Bắt buộc**, khoá ký JWT (HS256), tối thiểu 32 byte; không có mặc định có chủ đích (khoá lộ = giả mạo được token, kể cả ADMIN) nên thiếu thì API không khởi động. Đặt trong `.env` ở gốc repo (compose bắt buộc), tạo bằng `openssl rand -base64 48`. Mỗi môi trường một khoá riêng |
+  | api | `GOTRIPS_JWT_EXPIRATION` | Thời hạn access token, dạng Duration của Spring (`7d`, `12h`...). Mặc định `7d`, khớp hạn cookie phiên của web |
+- Ngôn ngữ giao diện: **tiếng Việt** (`<html lang="vi">`). Định dạng số/ngày theo `vi-VN` (xem `gotrips-web/lib/format.ts`: `formatVND`, `formatDate`, `formatDuration`...).
+- Comment trong code viết bằng tiếng Việt, giải thích *vì sao* chứ không chỉ *làm gì*.
+- Chỉ commit / push khi người dùng yêu cầu.
+- Khi một thay đổi làm sai lệch nội dung trong file này (trạng thái dự án, cấu trúc thư mục, lệnh, số test, quy tắc), cập nhật AGENTS.md trong cùng lần làm việc và nói rõ trong báo cáo. Chỉ sửa phần bị ảnh hưởng, không viết lại cả file.
+
+## Quy tắc dùng thư viện (BẮT BUỘC, áp dụng cho cả 3 dự án)
+
+Mục tiêu: session nào cũng dùng đúng thư viện đã chốt, **không "code chay"** lại thứ thư viện đã làm được, và cũng **không dùng thư viện sai chỗ**.
+
+1. **Đọc manifest trước khi viết code.** Mở `package.json` (web, admin) hoặc `pom.xml` (api) của dự án đang sửa và đối chiếu với các bảng bên dưới.
+2. **Thư viện đã cài thì bắt buộc dùng.** Không tự viết lại chức năng mà thư viện đã cài cung cấp: quản lý form, validation, fetch/cache phía client, component UI, icon, toast, xử lý ngày, bảng dữ liệu, map DTO, test.
+3. **Thư viện có trong bảng nhưng chưa cài:** không viết tạm bằng code tay, cũng không tự chọn thư viện khác thay thế. Dừng lại, báo người dùng và đề xuất lệnh cài đúng thư viện trong bảng.
+4. **Thư viện ngoài bảng:** không tự thêm. Phải hỏi người dùng trước. Khi được duyệt thì cập nhật bảng trong file này cùng lúc với việc cài.
+5. **Đúng phạm vi.** "Dùng triệt để" nghĩa là dùng thư viện cho đúng việc ghi ở cột "Dùng cho". Không đưa thư viện vào những chỗ ghi ở cột "Không dùng cho".
+6. **Code viết tay có từ trước** (SVG icon tự vẽ, Button tự viết, form validate bằng `useState`…): không viết thêm code mới theo kiểu cũ. Khi sửa vào file đó thì chuyển nó sang thư viện tương ứng.
+7. **Dùng API theo đúng phiên bản đã cài, không theo trí nhớ.** Nhiều thư viện vừa có bản lớn mới: Next 16, React Router 8, Zod 4, TanStack Table 9, Tailwind 4, Spring Boot 4, Testcontainers 2. Hãy đọc docs đi kèm package hoặc docs chính thức của đúng phiên bản.
+
+### gotrips-web
+
+| Việc | Dùng cho | Không dùng cho / lưu ý |
+|---|---|---|
+| Đọc dữ liệu hiển thị trang (danh mục, chi tiết, SEO) | Server Component → `lib/data/*` → `lib/api/http.ts` (native `fetch`) + `"use cache"` / `cacheLife` / `cacheTag` | Không dùng TanStack Query, không dùng `useEffect` + fetch |
+| Ghi dữ liệu (đăng nhập, tạo booking, gửi form) | Server Action + `revalidateTag`. Form phía client dùng React Hook Form | Không gọi API trực tiếp từ trình duyệt khi Server Action làm được |
+| Dữ liệu phía client, riêng từng người dùng, thay đổi liên tục (trạng thái thanh toán cần polling, kiểm tra phòng trống khi đổi ngày) | TanStack Query (`queryOptions`, `useMutation`). Provider đặt ở `app/providers.tsx` | Không cache cùng một dữ liệu ở cả `"use cache"` lẫn TanStack Query mà không phối hợp invalidate. Lịch sử/chi tiết đơn đặt tour hiện đọc bằng Server Component (token/cookie chỉ server đọc được); chỉ chuyển sang TanStack Query qua Route Handler proxy khi thật sự cần polling |
+| HTTP | native `fetch`, chỉ gọi qua `lib/api/http.ts` | Không dùng Axios, không gọi `fetch` rải rác trong component |
+| Form | React Hook Form + `@hookform/resolvers/zod` + component `field`/`form` của shadcn | Không quản lý form bằng nhiều `useState` |
+| Validation | Zod. Schema dùng chung đặt ở `lib/schemas/*`, dùng cho cả client lẫn Server Action | Không validate bằng regex hoặc if-else rải rác |
+| UI primitive (button, input, dialog, select, sheet, popover, tabs…) | shadcn/ui trong `components/ui/` (Radix) | Không tự viết lại các primitive này; không thêm thư viện UI thứ hai |
+| Component riêng của GoTrips | `components/common/`, `components/<tính năng>/` | Không đặt vào `components/ui/` (thư mục này chỉ dành cho shadcn) |
+| Icon | `lucide-react` | Không tự vẽ SVG icon |
+| Toast / thông báo | Sonner (`toast()`, `<Toaster />` trong providers) | Không tự làm toast bằng state |
+| Ngày | Tính toán: `date-fns` trên chuỗi `YYYY-MM-DD`. Hiển thị: `lib/format.ts`. Chọn ngày: `Calendar` của shadcn (react-day-picker). "Hôm nay": `getTodayInVietnam()` | Không gọi `new Date()` rải rác; không chuyển ngày `DATE` sang có múi giờ |
+| Lọc / sắp xếp / phân trang / bước booking | URL search params | Không lưu các giá trị này vào state toàn cục |
+| Ghép class | `cn()` trong `lib/cn.ts`, là hàm `cn` **duy nhất** (alias `utils` của shadcn trỏ về đây). Dùng `tailwind-merge` nên gộp được class chồng nhau | Không tạo thêm `lib/utils.ts` |
+| Kiểu DTO của API | Sinh bằng Orval vào `lib/api/generated/` (`npm run api:gen`). Kiểu "View" vẫn nằm ở `lib/types.ts` | Không viết tay DTO mà Orval đã sinh; không sửa file trong `generated/` |
+| SEO | Metadata API, `generateMetadata`, `sitemap.ts`, `robots.ts`, JSON-LD | Không thêm thư viện SEO |
+| Unit test | Vitest, file `*.test.ts` đặt cạnh file nguồn | Không test async Server Component bằng Vitest (dùng Playwright) |
+| E2E | Playwright, thư mục `e2e/`, cổng 3100 | |
+
+### gotrips-admin
+
+| Việc | Dùng cho | Không dùng cho / lưu ý |
+|---|---|---|
+| Định tuyến | React Router, data mode (`createBrowserRouter` + `RouterProvider`) | Không tự xử lý `window.location` |
+| Dữ liệu server (đọc và ghi) | TanStack Query: `queryOptions` theo từng tính năng, `useMutation`, invalidate query sau khi mutation | Không dùng `useEffect` + fetch; không copy dữ liệu server sang `useState` hoặc store |
+| Bảng dữ liệu (tour, booking, khách hàng) | TanStack Table + `Table` của shadcn | Không tự viết logic sort / filter / phân trang cho bảng |
+| HTTP | native `fetch` qua `src/lib/api/http.ts` (`credentials: "include"`), hoặc client do Orval sinh | Không dùng Axios |
+| Form / validation | React Hook Form + Zod (+ `field`/`form` của shadcn) | |
+| UI / icon / toast / biểu đồ | shadcn/ui, `lucide-react`, Sonner, `Chart` của shadcn (Recharts) | Không thêm thư viện UI hoặc thư viện biểu đồ khác |
+| Ngày | `date-fns` + `Calendar` của shadcn | |
+| API client | Orval (`client: "react-query"`), sinh vào `src/lib/api/generated/` | Không viết tay hook hoặc DTO mà Orval đã sinh |
+| Test | Vitest + Testing Library (jsdom) | |
+
+### gotrips-api
+
+| Việc | Dùng cho | Không dùng cho / lưu ý |
+|---|---|---|
+| Validate request | `spring-boot-starter-validation`: `@Valid` + annotation `jakarta.validation` trên DTO | Không kiểm tra thủ công bằng if-else trong controller |
+| Entity ↔ DTO | MapStruct, `@Mapper(config = MapStructConfig.class)` | Không map tay từng field; không trả entity ra controller |
+| Code lặp (boilerplate) | Lombok (`@Getter`, `@Setter`, `@RequiredArgsConstructor`, `@Builder`). DTO ưu tiên dùng `record` | Entity JPA không dùng `@Data` (vì `equals`/`hashCode` và lazy-load) |
+| Truy cập DB | Spring Data JPA repository (+ `@Query` khi cần) | Không viết JDBC thủ công nếu không có lý do rõ ràng |
+| Thay đổi schema | Flyway migration `V{n}__*.sql` | Không đổi `ddl-auto` sang giá trị khác `validate` |
+| Định dạng lỗi API | `ProblemDetail` + `@RestControllerAdvice` dùng chung | Không tự đặt ra format lỗi khác |
+| Xác thực | Spring Security + OAuth2 Resource Server (JWT bằng Nimbus) | Không thêm jjwt hay thư viện JWT khác |
+| Gọi HTTP ra ngoài (cổng thanh toán…) | `RestClient` của Spring | Không thêm OkHttp, Feign, Apache HttpClient |
+| Email / realtime | `spring-boot-starter-mail` + template Thymeleaf; `spring-boot-starter-websocket` | |
+| Tài liệu API | springdoc-openapi. Annotate controller và DTO đầy đủ để Orval sinh client chính xác | |
+| Test | JUnit 5 + các starter test + Testcontainers PostgreSQL (`@ServiceConnection`) | Không test repository bằng H2 |
+
+### Không dùng trong toàn repo (đã cân nhắc và loại)
+Zustand, MSW, Axios, next-intl, NextAuth/Auth.js, Prisma/Drizzle (hay bất kỳ ORM nào trong Next.js), thư viện UI thứ hai (MUI, Chakra, Ant…), jjwt, ModelMapper. Lý do: trùng vai trò với thư viện đã chọn (state đã phân vai, `lib/data` thay MSW, `fetch` đủ dùng, MVP chỉ tiếng Việt, Spring Security lo xác thực, Next không truy cập DB). Nếu thực sự cần thì hỏi người dùng trước.
+
+## gotrips-api (Spring Boot)
+
+- Package gốc: `com.gotrips.gotrips_api` (lưu ý dấu gạch dưới). Cấu hình ở `src/main/resources/application.yaml`.
+- **Schema do Flyway quản lý**, Hibernate chỉ `ddl-auto: validate` → mọi thay đổi bảng phải là file migration mới trong `src/main/resources/db/migration` (`V1__...sql`), không sửa migration đã áp dụng.
+- `open-in-view: false` → không lazy-load ngoài transaction; map sang DTO trong service.
+- Bảo mật (`config/SecurityConfig.java`): stateless, CSRF tắt, xác thực bằng **JWT Bearer** (OAuth2 Resource Server; không còn HTTP Basic). Công khai: `/actuator/health/**`, `/v3/api-docs/**`, `/swagger-ui/**` (để Orval đọc spec), `POST /auth/register`, `POST /auth/login`; còn lại cần token. Khi thêm endpoint công khai cho website (danh sách tour...) phải mở rõ ràng trong cấu hình này. Đã có bean CORS (`gotrips.cors.allowed-origins`) cho admin; web gọi từ server nên không cần CORS.
+- **Xác thực** (package `auth/`, `user/`): bảng `users` (UUID, email luôn chữ thường — có `CHECK`, `password_hash`, `full_name`), `roles` (CUSTOMER/STAFF/ADMIN, seed ở V1), `user_roles`. Đăng ký công khai luôn là CUSTOMER (request không có trường vai trò). Mật khẩu băm bằng `DelegatingPasswordEncoder` (bcrypt, lưu dạng `{bcrypt}...`). `AuthService.login` luôn chạy một lần so khớp mật khẩu kể cả khi email không tồn tại (không lộ email nào đã đăng ký qua thời gian phản hồi) và trả cùng một thông báo cho sai email/sai mật khẩu. Email trùng → 409 kèm `errors[{field:"email"}]` (kiểm trước + ràng buộc UNIQUE của DB là chốt chặn khi hai request đồng thời).
+- **JWT** (`config/JwtConfig`, `JwtProperties`, `auth/JwtService`): HS256 bằng Nimbus, claim `sub` = id người dùng, `roles` = ["CUSTOMER"] (→ authority `ROLE_CUSTOMER`), `iss` = `gotrips-api` (decoder kiểm issuer + hạn). Token chỉ chứa thứ cần để phân quyền; email/tên lấy từ `GET /auth/me`. Chưa có refresh token/thu hồi. Mật khẩu tối đa **72 byte** (annotation `@MaxUtf8Bytes` ở `common/validation`): BCrypt ném `IllegalArgumentException` (→ 500) nếu vượt, mà `@Size` chỉ đếm ký tự nên không đủ cho chữ có dấu.
+- OpenAPI/Orval: controller chỉ khai báo kết quả **thành công** (lỗi mô tả trong `description` và trả theo `ProblemDetail`), vì mutator `customFetch` của web ném `ApiError` cho mọi mã lỗi — nhờ đó kiểu client sinh ra gọn (`{ data, status }`, không phải thu hẹp union). Response DTO đánh dấu `requiredMode = REQUIRED` để Orval không sinh field `?`.
+- Lỗi API: `common/error/GlobalExceptionHandler` trả `ProblemDetail`; lỗi `@Valid` là 400 và email trùng là 409, đều kèm `errors: [{field, message}]` (web/admin parse đúng format này trong `ApiError`); `UnauthorizedException` → 401 (+ `WWW-Authenticate: Bearer`). Map entity ↔ DTO dùng `@Mapper(config = MapStructConfig.class)` (`unmappedTargetPolicy = ERROR`: thiếu field thì lỗi lúc compile).
+- Test: `GotripsApiApplicationTests` và `auth/AuthControllerTests` (MockMvc + Spring Security thật: đăng ký/đăng nhập/`me`, token giả mạo, token hết hạn, mật khẩu >72 byte...) import `TestcontainersConfiguration` (PostgreSQL 17 qua `@ServiceConnection`) nên **cần Docker đang chạy** và **JDK 25** (`java.version` trong `pom.xml`). Khoá JWT cho test do `DynamicPropertyRegistrar` trong `TestcontainersConfiguration` cấp (application.yaml cố ý không có mặc định). Boot 4: `@AutoConfigureMockMvc` ở package `org.springframework.boot.webmvc.test.autoconfigure`.
+- Actuator chỉ expose `health,info`; Docker healthcheck phụ thuộc `/actuator/health` trả `UP` — **đừng làm hỏng**, vì `gotrips-admin` và `gotrips-web` đợi API healthy mới khởi động.
+- Lombok dùng qua `annotationProcessorPaths` trong `pom.xml`.
+- Tài liệu API: springdoc-openapi (Swagger UI).
+
+## gotrips-admin (React + Vite)
+- TypeScript, ESLint 10 flat config. Build production được nginx phục vụ với fallback SPA (`nginx.conf`: mọi route → `index.html`).
+- Stack đã chốt: React Router, TanStack Query/Table, React Hook Form + Zod, Tailwind v4 (`@tailwindcss/vite`) + shadcn/ui. Chi tiết ở bảng "gotrips-admin" thuộc mục Quy tắc dùng thư viện. Alias `@/*` → `src/*` (chỉ khai báo bằng `paths`; TypeScript 6 đã bỏ `baseUrl`).
+- Đã cài và cấu hình: Router data mode (`src/app/router.tsx`: `/` Dashboard tạm trong `AdminLayout` dùng `sidebar` shadcn, `*` trang 404), `src/app/providers.tsx` (QueryClientProvider + devtools chỉ khi dev + `<Toaster />`), `src/lib/api/http.ts` (`apiFetch`, `ApiError` có `errors: {field, message}[]` khớp `GlobalExceptionHandler`, `credentials: "include"`), Orval (`react-query` + `fetch`, mutator `apiFetch`, `includeHttpResponseReturnType: false` để kiểu sinh ra là dữ liệu thuần; **chưa chạy** `api:gen`), Vitest (cấu hình nằm trong `vite.config.ts`, `jsdom`, `src/test/setup.ts`).
+- Lệnh: `npm run dev|build|lint`, `npm test` (vitest run), `npm run api:gen`. Dev server dùng cổng 5173 (cổng 3000 do Docker chiếm).
+- shadcn ở admin: component trong `src/components/ui/`; dùng `field` + `Controller` của React Hook Form (registry hiện không có file `form`). Gói `shadcn` nằm ở devDependencies vì chỉ cần lúc build (`shadcn/tailwind.css`).
+- **`cn()` của admin (`src/lib/utils.ts`) tự viết, chưa gộp được class xung đột** vì chưa cài `clsx` + `tailwind-merge` (cần người dùng duyệt). Cho tới lúc đó đừng truyền class chồng nhóm (ví dụ `p-2` và `p-4`) cho component shadcn. Không cài package npm `cn` (preset `nova` của shadcn hay kéo nhầm gói này); `next-themes` cũng đã gỡ (chỉ chế độ sáng).
+- `jsdom` đang ở 29.x (bản 31 yêu cầu Node ≥ 24.15; máy dev đang Node 24.8).
+- `VITE_API_URL` được Vite nhúng lúc build: trong Docker phải là build arg (Dockerfile và `docker-compose.yml` hiện **chưa** có `ARG VITE_API_URL`), xem mục "Biến môi trường kết nối API".
+
+## gotrips-web (Next.js)
+
+> **Quan trọng:** đây là Next.js 16 với breaking changes so với kiến thức cũ. `gotrips-web/AGENTS.md` yêu cầu đọc tài liệu trong `gotrips-web/node_modules/next/dist/docs/` **trước khi viết code Next.js**. Chú ý các deprecation notice.
+
+### Cấu hình đáng chú ý (`next.config.ts`)
+- `output: "standalone"` (Docker chạy `node server.js`), `cacheComponents: true`, `partialPrefetching: true`.
+- Tailwind 4 chạy qua `@tailwindcss/turbopack` (khai báo trong `turbopack.rules`).
+- Ảnh remote chỉ cho phép `images.unsplash.com/photo-*`.
+
+### Cấu trúc
+```
+app/                 layout.tsx (Header + <main id="noi-dung-chinh"> + Footer), page.tsx (chỉ ghép section)
+components/home/     các section Trang chủ. Ô tìm kiếm: ServiceTabs (client, 3 tab, chọn tab theo hash) + service-tab-hash.ts (ánh xạ hash ↔ tab, dùng cả ở nav-items và HeroSearch), SearchForm (tour), HotelSearchForm, FlightSearchForm; phần dùng chung: DatePickers (Popover + Calendar), OptionCombobox (Popover + Command, tìm không phân biệt dấu), CounterPopover + CounterRow (chỉnh số lượng), focus-first-error.ts, search-field-styles.ts. Thân trang: FeaturedHotels, PopularFlightRoutes (async, thử nghiệm); TrialNotice (dòng báo "Bản thử nghiệm" ở đầu panel Khách sạn/Vé máy bay); use-search-prefill.ts (hook client: form nhận dữ liệu điền sẵn từ sự kiện hash, kiểm bằng Zod)
+components/layout/   Header, HeaderAuth (async, đọc phiên), UserMenu (client), use-logout, Footer, MobileNav, Logo, nav-items
+components/tour/     TourCard; trang /tours: TourListing (async, đọc searchParams), TourFilterBar, TourSortSelect (client), TourPagination; trang chi tiết: TourBookingProvider (client, form chọn chuyến dùng chung), TourBookingCard (thẻ "Đặt tour": chọn ngày + số khách), DepartureList + SelectDepartureButton (nút "Chọn ngày này" chọn chuyến trong thẻ)
+components/booking/  luồng đặt tour: BookingGate (async, đọc cookie + searchParams, thiếu chuyến → về trang chi tiết, chưa đăng nhập → đăng nhập), BookingWizard (client, 2 bước), StepDetails/StepReview, BookingSteps, BirthDatePicker, BookingSummaryCard (nút "Thay đổi"), ChangeTripDialog; dùng chung với trang chi tiết: TripSelectionFields (ô ngày `Select` + số khách), TripPriceBreakdown (tạm tính); đơn: BookingHistory, BookingDetail (async), BookingStatusBadges, BankTransferInfo + CopyButton, BookingSimulator (thử nghiệm), BookingSkeletons
+app/tours/[slug]/book, app/bookings, app/bookings/[code]   trang đặt tour, lịch sử đơn, chi tiết đơn (noindex)
+components/hotel/    HotelCard (thẻ gợi ý → trang chi tiết), HotelResultCard (kết quả tìm), HotelSearchSection (async, phần đọc URL của /hotels), HotelBookingProvider + HotelBookingCard + SelectRoomButton (trang chi tiết), StayPriceBreakdown, HotelBookingGate (async) + HotelBookingWizard + HotelBookingSummaryCard (trang đặt phòng)
+components/flight/   FlightRouteCard (thẻ chặng bay phổ biến; bấm → điền sẵn điểm đi/đến), FlightSearchSection (async, phần đọc URL của /flights: kết quả hoặc gợi ý), FlightOptionCard, SelectFlightButton (client, gọi startFlightBookingAction), FlightBookingGate (async) + FlightBookingWizard + FlightBookingSummaryCard (trang đặt vé)
+components/ui/       CHỈ primitive của shadcn (button, badge, input, dialog, calendar, field, sonner...). Tên file chữ thường
+components/common/   component riêng dùng chung: Container, CoverImage, AppLink (client: `next/link` + `prefetch={false}` mặc định + phát hash khi điều hướng), SectionHeading, StarRating (có `label` tuỳ chọn, vd "Khách sạn 4 sao")
+app/(auth)/          /login, /register (route group, không đổi URL). Metadata `robots: { index: false }`
+components/auth/     LoginForm, RegisterForm (client, RHF + zodResolver), AuthShell, PasswordInput (nút hiện/ẩn), FormError
+app/providers.tsx    "use client": QueryClientProvider (staleTime 60s) + devtools (chỉ dev) + <Toaster /> của Sonner
+lib/actions/         Server Action ("use server"). auth.ts: loginAction / registerAction trả `AuthActionResult` (ok + redirectTo, hoặc fieldErrors + message), logoutAction xoá cookie phiên; cả hai gọi API qua client Orval. booking.ts: startBookingAction (nút "Đặt tour": kiểm phiên rồi redirect) / createBookingAction / simulateBookingAction. Hàm dùng chung (không "use server"): demo-latency.ts (chỉ còn cho luồng đặt chỗ), field-errors.ts (`toFieldErrors` cho lỗi Zod, khoá dạng `travelers.0.fullName`; `fromApiFieldErrors` cho `errors[]` của API; có test)
+lib/booking/         đơn đặt tour bản demo: booking-code.ts, transitions.ts, steps.ts, cookie-codec.ts (thuần, có test), demo-store.ts (server-only: cookie `gotrips_bookings`), test-fixtures.ts (chỉ cho test)
+lib/auth/            session.ts (server-only: cookie phiên chứa JWT; `createSession`, `destroySession`, `getSessionToken`, `getCurrentUser` gọi `/auth/me`), user.ts (`SessionUser`, `getInitials` — có test)
+lib/types.ts         kiểu dữ liệu: nhóm "bảng" (khớp DB MVP) + nhóm "View" (suy ra cho UI)
+lib/data/            lớp truy cập dữ liệu — component CHỈ import từ đây (home.ts, tours.ts, airports.ts, hotels.ts, flight-routes.ts, bookings.ts — server-only, đọc cookie theo request nên không "use cache"; tour-view.ts/tour-search.ts/hotel-view.ts/flight-route-view.ts/booking-view.ts là hàm thuần có test)
+lib/mock/            dữ liệu giả (destinations, tours, departures, testimonials, images, site, airports, hotels, hotel-room-types, flight-routes; `mock-integrity.test.ts` kiểm khoá ngoại: destinationId, hotelId, mã sân bay, from ≠ to, có khách sạn HIDDEN)
+lib/api/http.ts      lớp HTTP duy nhất gọi gotrips-api (server-only): apiFetch, ApiError, customFetch (mutator của Orval)
+lib/api/generated/   do Orval sinh từ spec của API (hiện có `login`, `register`, `getMe`); chạy `npm run api:gen` khi API đổi (API phải đang chạy). Commit cùng thay đổi API. Không sửa tay
+lib/schemas/         schema Zod dùng chung cho client + Server Action (search, newsletter, auth — export `emailSchema` dùng chung, tour-filters, hotel-search, flight-search, booking — tham số URL các bước, `tripSelectionSchema` (chuyến + số khách), `buildTourBookingHref`, `createBookingFormSchema(today)`/`createBookingRequestSchema(today)`, schema bản ghi trong cookie). Schema khách sạn/vé máy bay là hàm `createXxxSearchSchema(today)` (lấy "hôm nay" lúc validate, test truyền `today` cố định) và đi kèm hàm dựng URLSearchParams, cùng `createHotelPrefillSchema(slugs)`/`createFlightPrefillSchema(codes)` kiểm gói điền sẵn từ thẻ ở thân Trang chủ
+lib/format.ts, cn.ts, iso-date.ts, hash-navigation.ts, safe-redirect.ts tiện ích (format.ts có `formatDateTime` theo giờ Việt Nam; safe-redirect: lọc `?next=`) (iso-date: ngày `YYYY-MM-DD` bằng date-fns; hash-navigation: phát/nghe điều hướng hash (kèm payload tuỳ chọn) vì `Link` không có `hashchange`, và `scrollToHashTarget`; format.ts có `formatFlightDuration`); file *.test.ts đặt cạnh file nguồn
+e2e/                 test Playwright (cần gotrips-api đang chạy; `fixtures.ts`: fixture `user` tạo tài khoản thật qua `POST /auth/register` cho từng test + `loginAs`/`submitLoginForm` — chọn ô bằng id `#login-email`/`#login-password` vì Next giữ trang `/register` đã ẩn trong DOM; `auth.spec.ts`: đăng nhập/đăng ký thật, email trùng, cookie httpOnly, cookie hỏng; `search-tab-helpers.ts` là hàm dùng chung, không phải spec; `home-services.spec.ts`: khách sạn/chặng bay/Footer; `booking.spec.ts`: chọn chuyến ở trang chi tiết rồi đặt tour 2 bước, đăng nhập giữa chừng rồi quay lại, đổi chuyến bằng hộp thoại, mở `/book` thiếu chuyến, mô phỏng nhân viên, 404 đơn)
+```
+
+### Cài / thêm shadcn trên Windows (các lỗi đã gặp)
+- Windows không phân biệt hoa/thường: tên file trong `components/ui/` phải chữ thường (`button.tsx`). Nếu từng có `Button.tsx`, git index (`core.ignorecase=true`) sẽ giữ tên cũ — kiểm tra `git ls-files components/ui` trước khi commit.
+- `shadcn add` sinh `import { cn } from "cn"` (npm package `cn`, không dùng). Sau mỗi lần add phải sửa thành `@/lib/cn`, và không cài package `cn`.
+- `shadcn add` các component phụ thuộc `button` sẽ hỏi ghi đè `button.tsx`/`badge.tsx` (đã tuỳ biến theo GoTrips). Sao lưu trước, hoặc trả lời "không"; nếu dùng `-o` thì khôi phục lại hai file này.
+- `button.tsx` chỉ có size `sm|md|lg|icon|icon-sm|icon-lg` và variant `primary|accent|outline|ghost`. Component shadcn dùng `size="default"` hay variant khác (`secondary`, `destructive`, `link`) sẽ lỗi tsc: đổi sang giá trị có sẵn hoặc thêm vào `button.tsx` cho đúng token.
+- `next-themes` không dùng (chỉ chế độ sáng): `sonner.tsx` cố định `theme="light"`.
+- Vitest 5 (rolldown) trên Windows có thể báo "Cannot find native binding": chạy `npm install @rolldown/binding-win32-x64-msvc --no-save` (lỗi optional-deps của npm, không ghi vào package.json).
+Alias import: `@/*` → thư mục gốc `gotrips-web/`.
+
+### Quy tắc kiến trúc dữ liệu
+- Component **không** import `lib/mock/*`; chỉ import `lib/data/*`. Khi chuyển sang API thật, chỉ đổi *thân hàm* trong `lib/data/*` thành `fetch(...)` và map sang kiểu trong `lib/types.ts`; giữ nguyên chữ ký và các directive `"use cache"` / `cacheLife` / `cacheTag`.
+- Vì `cacheComponents` bật và logic "ngày còn chỗ" phụ thuộc thời điểm hiện tại, các hàm data phải nằm trong phạm vi `"use cache"` để trang prerender được thành static shell. Dùng `getTodayInVietnam()` (`lib/data/tour-view.ts`), không dùng `new Date()` rải rác. **Client Component cũng không được đọc "hôm nay" lúc render** (client component vẫn prerender trên server, build sẽ lỗi): chỉ tính trong panel lịch (chỉ render khi mở Popover) hoặc trong hàm validate/submit, như `DatePickers.tsx` và `createHotelSearchSchema()`. E2E Trang chủ phải đợi hydrate xong (`gotoHome` trong `e2e/home.spec.ts`), nếu không bấm "Tìm" sớm sẽ submit form kiểu HTML thuần.
+- Dữ liệu "View" (tourCount, giá thấp nhất, ngày khởi hành gần nhất...) được **tính** trong `lib/data/*`, không lưu trong mock. Tour và khách sạn trạng thái `HIDDEN` không được hiển thị/đếm; khách sạn không có loại phòng nào cũng không hiện (không có "giá từ").
+- Sau này admin đổi tour/lịch khởi hành → gọi `revalidateTag("tours")` (các tag đang dùng: `site`, `destinations`, `tours`, `hotels`, `flight-routes`, `flights`, `airports`; `getFeaturedHotels` gắn thêm `destinations` vì thẻ hiện tên điểm đến, `getPopularFlightRoutes` gắn `airports` vì thẻ hiện tên sân bay/thành phố).
+
+### Giao diện / design tokens
+- Nguồn duy nhất của màu, bo góc, đổ bóng, font là khối `@theme` trong `app/globals.css`. Bảng màu mặc định của Tailwind **đã bị xoá** (`--color-*: initial`) → chỉ dùng token: `primary-*` (teal), `accent-*` (cam, cho giá/CTA), `neutral-*`, `danger/success`, alias `surface`, `ink`, `ink-muted`, `line`; `rounded-control|card|pill`; `shadow-card|card-hover|search|header`. **Không hard-code mã màu.**
+- Chỉ có chế độ sáng. Chữ trắng chỉ đặt trên `primary-700+` / `accent-700+` để đạt tương phản AA.
+- Font: Be Vietnam Pro (subset `vietnamese` + `latin`, khai báo weight).
+- `cn()` (`lib/cn.ts`) = `clsx` + `tailwind-merge` (`extendTailwindMerge`): gộp class xung đột, class sau thắng. Đã khai báo token riêng `rounded-control|card|pill`, `shadow-card|card-hover|search|header`, `max-w-page`. **Thêm token mới vào `@theme` thì phải khai báo thêm ở `lib/cn.ts`**, nếu không không gộp được (có test ở `lib/cn.test.ts`).
+- **Khi dùng shadcn:** biến `--accent` của shadcn là **nền khi hover** (được gán sang `primary-50`). Nó khác với dải màu cam `accent-*` của GoTrips dùng cho giá và CTA. Cần màu cam thì dùng `accent-700`; không dùng `bg-accent` với ý là màu cam.
+- Accessibility: giữ skip-link "Bỏ qua điều hướng", `id="noi-dung-chinh"`, focus ring theo token `focus`.
+- **Ảnh hiện tại là ảnh mock Unsplash** (placeholder, không phải ảnh thật của địa danh) — phải thay bằng ảnh thật/có bản quyền trước khi ra mắt (`lib/mock/images.ts`).
+
+## Docker
+- Cả 3 Dockerfile là multi-stage trên `node:24-alpine` (web, admin) và build Maven (api). Web chạy non-root.
+- Thứ tự khởi động: `gotrips-db` (healthy) → `gotrips-api` (healthy) → `gotrips-admin` & `gotrips-web`.
+- Cổng DB chỉ bind `127.0.0.1:5432` để chạy API bằng IDE/mvnw, không lộ ra mạng ngoài.

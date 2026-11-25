@@ -1,16 +1,8 @@
 import type { Metadata } from "next";
 import { Suspense } from "react";
-import { AppLink } from "@/components/common/AppLink";
 import { Container } from "@/components/common/Container";
+import { PageHeader } from "@/components/common/PageHeader";
 import { TourListing, TourListingSkeleton } from "@/components/tour/TourListing";
-import {
-  Breadcrumb,
-  BreadcrumbItem,
-  BreadcrumbLink,
-  BreadcrumbList,
-  BreadcrumbPage,
-  BreadcrumbSeparator,
-} from "@/components/ui/breadcrumb";
 
 // Metadata tĩnh: đọc `searchParams` trong `generateMetadata` sẽ khiến cả trang phải render theo request.
 export const metadata: Metadata = {
@@ -28,25 +20,10 @@ export default function ToursPage({ searchParams }: PageProps<"/tours">) {
   return (
     <div className="py-8 sm:py-12">
       <Container>
-        <Breadcrumb className="mb-4">
-          <BreadcrumbList>
-            <BreadcrumbItem>
-              <BreadcrumbLink asChild>
-                <AppLink href="/">Trang chủ</AppLink>
-              </BreadcrumbLink>
-            </BreadcrumbItem>
-            <BreadcrumbSeparator />
-            <BreadcrumbItem>
-              <BreadcrumbPage>Tour du lịch</BreadcrumbPage>
-            </BreadcrumbItem>
-          </BreadcrumbList>
-        </Breadcrumb>
-
-        <h1 className="text-3xl font-bold tracking-tight text-ink sm:text-4xl">Tour du lịch</h1>
-        <p className="mt-3 max-w-2xl text-base leading-7 text-ink-muted">
-          Chọn điểm đến, ngày khởi hành và số khách để tìm hành trình phù hợp. Giá hiển thị là giá thấp nhất cho
-          mỗi khách.
-        </p>
+        <PageHeader
+          title="Tour du lịch"
+          description="Chọn điểm đến, ngày khởi hành và số khách để tìm hành trình phù hợp. Giá hiển thị là giá thấp nhất cho mỗi khách."
+        />
 
         <div className="mt-8">
           <Suspense fallback={<TourListingSkeleton />}>
