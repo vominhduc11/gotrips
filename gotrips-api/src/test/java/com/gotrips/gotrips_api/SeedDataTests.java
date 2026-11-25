@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.nullValue;
+import static org.hamcrest.Matchers.startsWith;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -118,6 +119,65 @@ class SeedDataTests {
                 .andExpect(jsonPath("$[0].destinationSlug").value("phu-quoc"))
                 .andExpect(jsonPath("$[0].starRating").value(5))
                 .andExpect(jsonPath("$[0].reviewCount").value(2150));
+    }
+
+    @Test
+    void hotelDetailMatchesTheMock() throws Exception {
+        // Khách sạn 1 (Đồi Mây): mô tả, tiện ích, giờ nhận/trả và hai loại phòng (sắp giá tăng) như lib/mock/hotels.ts.
+        mvc.perform(get("/hotels/khach-san-doi-may-da-lat"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(1))
+                .andExpect(jsonPath("$.name").value("Khách sạn Đồi Mây"))
+                .andExpect(jsonPath("$.destinationSlug").value("da-lat"))
+                .andExpect(jsonPath("$.minPricePerNight").value(1_250_000))
+                .andExpect(jsonPath("$.description", startsWith("Khách sạn nằm trên đồi thông yên tĩnh")))
+                .andExpect(jsonPath("$.amenities", contains("Hồ bơi nước ấm", "Bữa sáng buffet", "Wi-Fi miễn phí",
+                        "Bãi đỗ xe", "Đưa đón sân bay (có phí)")))
+                .andExpect(jsonPath("$.checkInTime").value("14:00"))
+                .andExpect(jsonPath("$.checkOutTime").value("12:00"))
+                .andExpect(jsonPath("$.roomTypes[*].id", contains(1, 2)))
+                .andExpect(jsonPath("$.roomTypes[0].name").value("Phòng Deluxe"))
+                .andExpect(jsonPath("$.roomTypes[0].maxGuests").value(2))
+                .andExpect(jsonPath("$.roomTypes[0].bedType").value("1 giường đôi lớn"))
+                .andExpect(jsonPath("$.roomTypes[0].areaM2").value(28))
+                .andExpect(jsonPath("$.roomTypes[1].pricePerNight").value(1_980_000));
+
+        // Khách sạn 2 mở cửa lúc 14:00 và trả phòng 11:00; khách sạn 3 nhận phòng 15:00.
+        mvc.perform(get("/hotels/villa-thong-xanh-da-lat"))
+                .andExpect(jsonPath("$.checkOutTime").value("11:00"));
+        mvc.perform(get("/hotels/resort-bai-sao-phu-quoc"))
+                .andExpect(jsonPath("$.checkInTime").value("15:00"));
+    }
+
+    @Test
+    void hiddenHotelDetailIsNotFound() throws Exception {
+        mvc.perform(get("/hotels/resort-bien-xanh-nha-trang")).andExpect(status().isNotFound());
+    }
+
+    @Test
+    void hotelSearchOverTheSeedMatchesTheWebRules() throws Exception {
+        // Đà Lạt có khách sạn 1 (phòng 1.250.000/2 khách, 1.980.000/4 khách) và 2 (690.000/2, 850.000/3).
+        // 2 khách, 3 đêm: Villa Thông Xanh 690.000 × 3 = 2.070.000 đứng trước Đồi Mây 1.250.000 × 3 = 3.750.000.
+        mvc.perform(get("/hotels").param("destination", "da-lat").param("checkIn", "2026-12-10")
+                .param("checkOut", "2026-12-13").param("guests", "2").param("rooms", "1"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.destinationName").value("Đà Lạt"))
+                .andExpect(jsonPath("$.items[*].id", contains(2, 1)))
+                .andExpect(jsonPath("$.items[*].totalPrice", contains(2_070_000, 3_750_000)))
+                .andExpect(jsonPath("$.items[0].room.name").value("Phòng Standard"));
+
+        // 3 khách / 1 phòng: Villa đổi sang phòng Hướng đồi (3 khách), Đồi Mây sang phòng gia đình (4 khách).
+        mvc.perform(get("/hotels").param("destination", "da-lat").param("checkIn", "2026-12-10")
+                .param("checkOut", "2026-12-13").param("guests", "3").param("rooms", "1"))
+                .andExpect(jsonPath("$.items[0].room.name").value("Phòng Hướng đồi"))
+                .andExpect(jsonPath("$.items[0].totalPrice").value(2_550_000))
+                .andExpect(jsonPath("$.items[1].room.name").value("Phòng Gia đình"));
+
+        // Nha Trang chỉ có khách sạn HIDDEN nên không có kết quả (điểm đến vẫn tồn tại nên có tên).
+        mvc.perform(get("/hotels").param("destination", "nha-trang").param("checkIn", "2026-12-10")
+                .param("checkOut", "2026-12-13"))
+                .andExpect(jsonPath("$.destinationName").value("Nha Trang"))
+                .andExpect(jsonPath("$.items", hasSize(0)));
     }
 
     @Test

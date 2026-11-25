@@ -55,6 +55,47 @@ test("Trang chủ: khách sạn sắp theo điểm đánh giá, không có khác
   await expect(page.getByText("Resort Biển Xanh")).toHaveCount(0);
 });
 
+test("/hotels: kết quả tìm do API tính (phòng rẻ nhất đủ chỗ, tổng tiền cả kỳ) và gợi ý không có khách sạn đang ẩn", async ({
+  page,
+}) => {
+  // Gợi ý khi chưa tìm: 7 khách sạn (8 trừ "Resort Biển Xanh" đang HIDDEN), thẻ → trang chi tiết.
+  await page.goto("/hotels");
+  await expect(page.getByRole("heading", { level: 2, name: "Khách sạn gợi ý" })).toBeVisible();
+  await expect(page.locator('section[aria-labelledby="ds-khach-san-heading"] ul > li')).toHaveCount(7);
+  await expect(page.getByText("Resort Biển Xanh")).toHaveCount(0);
+
+  // Tìm Đà Lạt 3 đêm, 3 khách: Villa đổi sang phòng Hướng đồi (850.000 × 3 = 2.550.000), Đồi Mây sang phòng gia đình.
+  await page.goto("/hotels?destination=da-lat&checkIn=2027-06-10&checkOut=2027-06-13&guests=3&rooms=1");
+  const cards = page.getByRole("region", { name: "Khách sạn ở Đà Lạt" }).getByRole("article");
+  await expect(cards).toHaveCount(2);
+  await expect(cards.nth(0)).toContainText("Villa Thông Xanh");
+  await expect(cards.nth(0)).toContainText("Phòng Hướng đồi");
+  await expect(cards.nth(0)).toContainText("2.550.000");
+  await expect(cards.nth(1)).toContainText("Phòng Gia đình");
+  await expect(page.getByText(/Chưa tải được/)).toHaveCount(0);
+});
+
+test("/hotels/[slug]: chi tiết từ API (giờ nhận/trả, tiện ích, loại phòng); khách sạn ẩn và slug lạ là 404", async ({
+  page,
+}) => {
+  await page.goto("/hotels/khach-san-doi-may-da-lat");
+  await expect(page.getByRole("heading", { level: 1, name: "Khách sạn Đồi Mây" })).toBeVisible();
+  await expect(page.getByText(/Nhận phòng từ 14:00, trả phòng trước 12:00/)).toBeVisible();
+  await expect(page.getByText("Hồ bơi nước ấm")).toBeVisible();
+  await expect(page.getByRole("heading", { level: 3, name: "Phòng Deluxe" })).toBeVisible();
+  await expect(page.getByRole("heading", { level: 3, name: "Phòng Gia đình" })).toBeVisible();
+
+  // Giờ trả phòng của Villa Thông Xanh là 11:00 (khác mặc định) nên chứng minh giờ đến từ dữ liệu chứ không cố định.
+  await page.goto("/hotels/villa-thong-xanh-da-lat");
+  await expect(page.getByText(/trả phòng trước 11:00/)).toBeVisible();
+
+  // Khách sạn đang ẩn, slug không có, và `featured` (có endpoint danh sách riêng ở API) đều là 404.
+  for (const slug of ["resort-bien-xanh-nha-trang", "khong-ton-tai", "featured"]) {
+    await page.goto(`/hotels/${slug}`);
+    await expect(page.getByRole("heading", { level: 1, name: "Không tìm thấy trang bạn cần" })).toBeVisible();
+  }
+});
+
 test("/destinations hiện đủ 6 điểm đến lấy từ API", async ({ page }) => {
   await page.goto("/destinations");
 

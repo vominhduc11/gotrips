@@ -37,11 +37,12 @@ public class SecurityConfig {
                 .requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll()
                 // Đăng ký / đăng nhập là công khai (chưa có token). /auth/me cần token nên không liệt kê ở đây.
                 .requestMatchers(HttpMethod.POST, "/auth/register", "/auth/login").permitAll()
-                // Dữ liệu công khai cho Trang chủ của website. Liệt kê đúng từng đường dẫn, KHÔNG dùng
-                // "/tours/**" hay "/hotels/**": các endpoint khác của tour/khách sạn (chi tiết, đặt chỗ...) sau
-                // này không được vô tình thành công khai.
-                .requestMatchers(HttpMethod.GET, "/destinations", "/airports", "/tours/featured", "/hotels/featured",
-                        "/flight-routes/popular", "/testimonials").permitAll()
+                // Dữ liệu công khai cho website. Liệt kê đúng từng đường dẫn, KHÔNG dùng "/tours/**" hay
+                // "/hotels/**": các endpoint khác của tour/khách sạn (đặt chỗ, quản trị...) sau này không được
+                // vô tình thành công khai. "/tours/*" và "/hotels/*" chỉ khớp MỘT đoạn (chi tiết /tours/{slug},
+                // /hotels/{slug}, gồm cả /tours/featured, /hotels/featured), không khớp /hotels/{slug}/gì-đó.
+                .requestMatchers(HttpMethod.GET, "/destinations", "/airports", "/tours", "/tours/*", "/hotels",
+                        "/hotels/*", "/flight-routes/popular", "/testimonials").permitAll()
                 // Đăng ký nhận ưu đãi (form ở Trang chủ, khách chưa đăng nhập).
                 .requestMatchers(HttpMethod.POST, "/newsletter/subscriptions").permitAll()
                 // Còn lại mặc định cần xác thực; khi thêm endpoint công khai cho website phải mở rõ ràng ở đây.

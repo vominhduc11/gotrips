@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { countNights } from "@/lib/data/hotel-view";
 import { formatDate } from "@/lib/format";
 import type { HotelStayValues } from "@/lib/schemas/hotel-booking";
-import type { HotelDetailView, HotelRoomType } from "@/lib/types";
+import type { HotelDetailView, HotelRoomTypeView } from "@/lib/types";
 import { StayPriceBreakdown } from "./StayPriceBreakdown";
 
 /** Phần thông tin khách sạn mà luồng đặt phòng cần (gửi sang Client Component nên chỉ lấy đủ dùng). */
@@ -26,7 +26,7 @@ export function HotelBookingSummaryCard({
   changeHref,
 }: {
   hotel: BookingHotel;
-  room: HotelRoomType;
+  room: HotelRoomTypeView;
   stay: HotelStayValues;
   /** Không có khi đang gửi đơn (khoá nút). */
   changeHref?: string;

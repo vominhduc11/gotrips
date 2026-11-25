@@ -25,7 +25,7 @@ import {
   type HotelBookingFormValues,
   type HotelStayValues,
 } from "@/lib/schemas/hotel-booking";
-import type { HotelRoomType } from "@/lib/types";
+import type { HotelRoomTypeView } from "@/lib/types";
 import { HotelBookingSummaryCard, type BookingHotel } from "./HotelBookingSummaryCard";
 
 const STEP_TITLES: Record<BookingStep, string> = {
@@ -52,7 +52,7 @@ export function HotelBookingWizard({
   user,
 }: {
   hotel: BookingHotel;
-  room: HotelRoomType;
+  room: HotelRoomTypeView;
   stay: HotelStayValues;
   user: SessionUser;
 }) {
@@ -232,7 +232,7 @@ function HotelStepReview({
   onEditDetails,
 }: {
   hotel: BookingHotel;
-  room: HotelRoomType;
+  room: HotelRoomTypeView;
   stay: HotelStayValues;
   onEditStay: () => void;
   onEditDetails: () => void;

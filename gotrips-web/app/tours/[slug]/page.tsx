@@ -2,16 +2,19 @@ import type { Metadata } from "next";
 import { Suspense } from "react";
 import { Container } from "@/components/common/Container";
 import { TourDetail, TourDetailSkeleton } from "@/components/tour/TourDetail";
-import { getTourDetail, getTourSlugs } from "@/lib/data/tours";
+import { loadSection } from "@/lib/data/load-section";
+import { getTourDetail } from "@/lib/data/tours";
 
-// Biết trước danh sách slug nên trang được prerender lúc build; slug lạ vẫn render theo yêu cầu rồi `notFound()`.
-export async function generateStaticParams() {
-  return (await getTourSlugs()).map((slug) => ({ slug }));
-}
-
+// Không có `generateStaticParams` có chủ đích: danh sách slug nằm ở gotrips-api mà `next build` (nhất là build Docker) không
+// có API để hỏi, và Cache Components bắt buộc trả ít nhất một slug nếu có hàm này. Không có nó thì `params` là dữ liệu theo
+// yêu cầu: khung trang (Header, Footer, khung chờ) vẫn prerender, nội dung tour stream sau và được cache theo `cacheLife`
+// của `getTourDetail`. Cùng khuôn với `/bookings/[code]`.
 export async function generateMetadata({ params }: PageProps<"/tours/[slug]">): Promise<Metadata> {
   const { slug } = await params;
-  const tour = await getTourDetail(slug);
+  // API lỗi thì dùng tiêu đề chung chứ không để cả trang hỏng vì thẻ <title> (nội dung trang tự báo lỗi riêng).
+  const result = await loadSection("chi tiết tour", () => getTourDetail(slug));
+  if (!result.ok) return { title: "Tour du lịch" };
+  const tour = result.data;
   if (!tour) return { title: "Không tìm thấy tour" };
 
   return {

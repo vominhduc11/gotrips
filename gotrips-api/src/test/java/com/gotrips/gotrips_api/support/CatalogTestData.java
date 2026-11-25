@@ -1,5 +1,8 @@
 package com.gotrips.gotrips_api.support;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 import org.springframework.jdbc.core.JdbcTemplate;
 
 /**
@@ -22,10 +25,17 @@ public class CatalogTestData {
 
     /** Tour mặc định rating 4.5 / 10 đánh giá, ACTIVE. {@code status}: "ACTIVE" hoặc "HIDDEN". */
     public long tour(String slug, long destinationId, boolean featured, String status) {
+        return tour(slug, "Tour " + slug, destinationId, featured, status, 4.5, 10);
+    }
+
+    /** Như trên nhưng đặt được tên tour, điểm đánh giá và số đánh giá (để kiểm thử tìm kiếm và sắp xếp). */
+    public long tour(String slug, String title, long destinationId, boolean featured, String status, double rating,
+            int reviewCount) {
         return insert("INSERT INTO tours (slug, title, destination_id, duration_days, duration_nights, departure_city, "
                 + "short_description, cover_image_url, cover_image_alt, rating, review_count, is_featured, status) "
-                + "VALUES (?, ?, ?, 3, 2, 'TP. Hồ Chí Minh', 'Mô tả', ?, ?, 4.5, 10, ?, ?) RETURNING id",
-                slug, "Tour " + slug, destinationId, "https://img.test/" + slug + ".jpg", "Ảnh " + slug, featured, status);
+                + "VALUES (?, ?, ?, 3, 2, 'TP. Hồ Chí Minh', 'Mô tả', ?, ?, ?, ?, ?, ?) RETURNING id",
+                slug, title, destinationId, "https://img.test/" + slug + ".jpg", "Ảnh " + slug, rating, reviewCount,
+                featured, status);
     }
 
     public long departure(long tourId, String date, long price, Long originalPrice, int totalSeats, int bookedSeats) {
@@ -42,9 +52,24 @@ public class CatalogTestData {
                 rating, reviewCount);
     }
 
+    /** Loại phòng mặc định "Phòng", tối đa 2 khách mỗi phòng. */
     public long room(long hotelId, long pricePerNight) {
+        return room(hotelId, "Phòng", pricePerNight, 2);
+    }
+
+    /** Như trên nhưng đặt được tên và sức chứa mỗi phòng (để kiểm thử tìm phòng đủ chỗ). */
+    public long room(long hotelId, String name, long pricePerNight, int maxGuests) {
         return insert("INSERT INTO hotel_room_types (hotel_id, name, price_per_night, max_guests, bed_type, area_m2) "
-                + "VALUES (?, 'Phòng', ?, 2, '1 giường đôi', 25) RETURNING id", hotelId, pricePerNight);
+                + "VALUES (?, ?, ?, ?, '1 giường đôi', 25) RETURNING id", hotelId, name, pricePerNight, maxGuests);
+    }
+
+    /** Đặt giới thiệu, tiện ích và giờ nhận/trả phòng ("HH:mm") của khách sạn (để kiểm thử trang chi tiết). */
+    public void hotelDetails(long hotelId, String description, List<String> amenities, String checkInTime,
+            String checkOutTime) {
+        String array = amenities.stream().map(a -> "'" + a.replace("'", "''") + "'")
+                .collect(Collectors.joining(", ", "ARRAY[", "]::text[]"));
+        jdbc.update("UPDATE hotels SET description = ?, amenities = " + array + ", check_in_time = TIME '" + checkInTime
+                + "', check_out_time = TIME '" + checkOutTime + "' WHERE id = ?", description, hotelId);
     }
 
     public void airport(String code, String name, String city, int sortOrder) {

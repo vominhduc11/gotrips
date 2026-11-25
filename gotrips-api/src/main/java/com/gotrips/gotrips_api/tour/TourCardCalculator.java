@@ -5,9 +5,9 @@ import java.util.Comparator;
 import java.util.List;
 
 /**
- * Tính các trường suy ra của thẻ tour. Hàm thuần (không đụng DB/đồng hồ, nhận {@code today}) nên kiểm thử
- * được từng trường hợp biên. Chép đúng {@code toTourCardView} (lib/data/tour-view.ts) của gotrips-web: hai nơi
- * phải cho CÙNG kết quả, đổi một nơi phải đổi nơi kia.
+ * Tính các trường suy ra của thẻ tour và của chuyến khởi hành. Hàm thuần (không đụng DB/đồng hồ, nhận {@code today})
+ * nên kiểm thử được từng trường hợp biên. Đây là NƠI DUY NHẤT tính các trường này: trước đây web tự tính
+ * ({@code toTourCardView}) nay chỉ nhận kết quả từ API.
  *
  * <ul>
  *   <li>Chuyến đặt được: sau hôm nay (không gồm hôm nay) và còn chỗ.
@@ -30,7 +30,7 @@ public final class TourCardCalculator {
     public static TourCardResponse toCard(Tour tour, List<TourDeparture> departures, LocalDate today) {
         // Thứ tự theo ngày rồi id để kết quả không phụ thuộc thứ tự DB trả về.
         List<TourDeparture> bookable = departures.stream()
-                .filter(d -> d.getDepartureDate().isAfter(today) && seatsLeft(d) > 0)
+                .filter(d -> isBookable(d, today))
                 .sorted(Comparator.comparing(TourDeparture::getDepartureDate).thenComparing(TourDeparture::getId))
                 .toList();
 
@@ -48,9 +48,7 @@ public final class TourCardCalculator {
         Integer seatsLeft = nearest == null ? null : seatsLeft(nearest);
         Integer discountPercent = null;
         if (cheapest != null && originalPriceFrom != null) {
-            // Cùng phép tính số thực với web (Math.round của JS và Java đều làm tròn .5 lên) để % khớp từng ký tự.
-            discountPercent = (int) Math.round(
-                    ((double) (originalPriceFrom - cheapest.getPrice()) / originalPriceFrom) * 100);
+            discountPercent = discountPercent(originalPriceFrom, cheapest.getPrice());
         }
 
         return new TourCardResponse(
@@ -72,6 +70,38 @@ public final class TourCardCalculator {
                 originalPriceFrom,
                 discountPercent,
                 seatsLeft != null && seatsLeft <= ALMOST_FULL_THRESHOLD);
+    }
+
+    /**
+     * Khách còn đặt được chuyến này: sau hôm nay (đặt trực tuyến từ ngày mai) và còn chỗ. Điều kiện này cũng nằm ở các
+     * query của {@code TourRepository}/{@code TourDepartureRepository} (để cắt sớm ở DB); đây mới là nguồn chính.
+     */
+    public static boolean isBookable(TourDeparture departure, LocalDate today) {
+        return departure.getDepartureDate().isAfter(today) && seatsLeft(departure) > 0;
+    }
+
+    /**
+     * Một chuyến ở trang chi tiết. Khác {@link #toCard}: không loại chuyến đã đầy (khách vẫn thấy lịch, nhãn "Hết chỗ"),
+     * việc bỏ chuyến đã qua do nơi gọi (query) lo.
+     */
+    public static TourDepartureResponse toDeparture(TourDeparture departure) {
+        int seatsLeft = seatsLeft(departure);
+        boolean discounted = departure.getOriginalPrice() != null && departure.getOriginalPrice() > departure.getPrice();
+
+        return new TourDepartureResponse(
+                departure.getId(),
+                departure.getDepartureDate(),
+                departure.getPrice(),
+                discounted ? departure.getOriginalPrice() : null,
+                discounted ? discountPercent(departure.getOriginalPrice(), departure.getPrice()) : null,
+                seatsLeft,
+                seatsLeft == 0,
+                seatsLeft > 0 && seatsLeft <= ALMOST_FULL_THRESHOLD);
+    }
+
+    /** Cùng phép tính số thực với web (Math.round của JS và Java đều làm tròn .5 lên) để % khớp từng ký tự. */
+    private static int discountPercent(long originalPrice, long price) {
+        return (int) Math.round(((double) (originalPrice - price) / originalPrice) * 100);
     }
 
     private static int seatsLeft(TourDeparture departure) {

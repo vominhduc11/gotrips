@@ -19,17 +19,38 @@ import org.springframework.http.MediaType;
 class PublicEndpointsTests extends CatalogApiTest {
 
     @ParameterizedTest
-    @ValueSource(strings = { "/destinations", "/airports", "/tours/featured", "/hotels/featured",
+    @ValueSource(strings = { "/destinations", "/airports", "/tours", "/tours/featured", "/hotels/featured",
             "/flight-routes/popular", "/testimonials" })
-    void homePageListsAreReachableWithoutAToken(String path) throws Exception {
+    void publicListsAreReachableWithoutAToken(String path) throws Exception {
         mvc.perform(get(path)).andExpect(status().isOk());
     }
 
+    @Test
+    void aTourDetailIsReachableWithoutATokenAndAnUnknownOneIsNotFoundRatherThanUnauthorized() throws Exception {
+        // 404 (chứ không phải 401) chứng minh /tours/{slug} đã được mở công khai.
+        mvc.perform(get("/tours/khong-ton-tai")).andExpect(status().isNotFound());
+    }
+
+    @Test
+    void aHotelDetailIsReachableWithoutATokenAndAnUnknownOneIsNotFoundRatherThanUnauthorized() throws Exception {
+        // 404 (chứ không phải 401) chứng minh /hotels/{slug} đã được mở công khai.
+        mvc.perform(get("/hotels/khong-ton-tai")).andExpect(status().isNotFound());
+    }
+
+    @Test
+    void hotelSearchIsReachableWithoutATokenAndMissingParametersAreABadRequestRatherThanUnauthorized() throws Exception {
+        // 400 (chứ không phải 401) chứng minh GET /hotels đã được mở công khai.
+        mvc.perform(get("/hotels")).andExpect(status().isBadRequest());
+    }
+
     @ParameterizedTest
-    @ValueSource(strings = { "/tours", "/tours/1", "/hotels", "/hotels/1", "/flight-routes", "/destinations/1",
-            "/airports/HAN", "/testimonials/1", "/newsletter/subscriptions", "/tours/featured/extra" })
+    @ValueSource(strings = { "/flight-routes", "/destinations/1", "/airports/HAN",
+            "/testimonials/1", "/newsletter/subscriptions", "/tours/featured/extra", "/tours/some-slug/book",
+            "/tours/some-slug/departures", "/hotels/featured/extra", "/hotels/some-slug/book",
+            "/hotels/some-slug/rooms" })
     void otherPathsStayProtected(String path) throws Exception {
-        // Mở đúng từng đường dẫn chứ không mở cả nhánh: các đường dẫn khác vẫn đòi token.
+        // Mở đúng từng đường dẫn chứ không mở cả nhánh: các đường dẫn khác (kể cả bên dưới /tours/{slug} và
+        // /hotels/{slug}) vẫn đòi token.
         mvc.perform(get(path)).andExpect(status().isUnauthorized());
     }
 

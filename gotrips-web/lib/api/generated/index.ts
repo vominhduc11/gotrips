@@ -9,15 +9,21 @@ import type {
   DestinationResponse,
   FlightRouteCardResponse,
   HotelCardResponse,
+  HotelDetailResponse,
+  HotelSearchResponse,
   ListFeaturedHotelsParams,
   ListFeaturedToursParams,
   ListPopularFlightRoutesParams,
   LoginRequest,
   LoginResponse,
   RegisterRequest,
+  SearchHotelsParams,
+  SearchToursParams,
   SubscribeNewsletterRequest,
   TestimonialResponse,
   TourCardResponse,
+  TourDetailResponse,
+  TourSearchResponse,
   UserResponse
 } from './model';
 
@@ -154,6 +160,87 @@ export const login = async (loginRequest: LoginRequest, options?: Parameters<typ
 
 
 
+export type searchToursResponse200 = {
+  data: TourSearchResponse
+  status: 200
+}
+
+export type searchToursResponseSuccess = (searchToursResponse200) & {
+  headers: Headers;
+};
+;
+
+export type searchToursResponse = (searchToursResponseSuccess)
+
+export const getSearchToursUrl = (params?: SearchToursParams,) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : String(value))
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0 ? `/tours?${stringifiedParams}` : `/tours`
+}
+
+/**
+ * Công khai. Chỉ tour ACTIVE. Mỗi trang 8 tour. date/guests chọn các chuyến còn đặt được thoả điều kiện, thẻ tour hiển thị giá/ngày của đúng các chuyến đó; tour không có chuyến nào thoả thì bị loại. Slug điểm đến không tồn tại cho kết quả rỗng. page vượt quá số trang được kẹp về trang cuối. Lỗi: 400 khi date không phải YYYY-MM-DD, guests ngoài 1–50, sort lạ hoặc page < 1.
+ * @summary Tìm tour: lọc, sắp xếp, phân trang
+ */
+export const searchTours = async (params?: SearchToursParams, options?: Parameters<typeof customFetch>[1]): Promise<searchToursResponse> => {
+
+  return customFetch<searchToursResponse>(getSearchToursUrl(params),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+export type getTourResponse200 = {
+  data: TourDetailResponse
+  status: 200
+}
+
+export type getTourResponseSuccess = (getTourResponse200) & {
+  headers: Headers;
+};
+;
+
+export type getTourResponse = (getTourResponseSuccess)
+
+export const getGetTourUrl = (slug: string,) => {
+
+
+
+
+  return `/tours/${slug}`
+}
+
+/**
+ * Công khai. Gồm mô tả, mọi chuyến khởi hành ở tương lai (kể cả chuyến đã đầy) và đánh giá. Lỗi: 404 khi slug không tồn tại hoặc tour đang bị ẩn (HIDDEN).
+ * @summary Chi tiết một tour
+ */
+export const getTour = async (slug: string, options?: Parameters<typeof customFetch>[1]): Promise<getTourResponse> => {
+
+  return customFetch<getTourResponse>(getGetTourUrl(slug),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
 export type listFeaturedToursResponse200 = {
   data: TourCardResponse[]
   status: 200
@@ -235,6 +322,87 @@ export const listTestimonials = async ( options?: Parameters<typeof customFetch>
 
 
 
+export type searchHotelsResponse200 = {
+  data: HotelSearchResponse
+  status: 200
+}
+
+export type searchHotelsResponseSuccess = (searchHotelsResponse200) & {
+  headers: Headers;
+};
+;
+
+export type searchHotelsResponse = (searchHotelsResponseSuccess)
+
+export const getSearchHotelsUrl = (params: SearchHotelsParams,) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : String(value))
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0 ? `/hotels?${stringifiedParams}` : `/hotels`
+}
+
+/**
+ * Công khai. Chỉ khách sạn ACTIVE của điểm đến, mỗi khách sạn kèm loại phòng rẻ nhất còn chứa đủ số khách với số phòng đã chọn và tổng tiền cả kỳ; khách sạn không có phòng nào đủ chỗ bị bỏ. Sắp theo tổng tiền tăng dần, rồi điểm đánh giá giảm dần, rồi id; không phân trang. Slug điểm đến không tồn tại cho kết quả rỗng (destinationName là null). Lỗi: 400 khi thiếu/sai kiểu tham số, ngày nhận ở quá khứ (theo giờ Việt Nam), ngày trả không sau ngày nhận, quá 30 đêm hoặc số phòng nhiều hơn số khách; mỗi lỗi kèm errors[{field,message}].
+ * @summary Tìm khách sạn theo điểm đến và khoảng ngày
+ */
+export const searchHotels = async (params: SearchHotelsParams, options?: Parameters<typeof customFetch>[1]): Promise<searchHotelsResponse> => {
+
+  return customFetch<searchHotelsResponse>(getSearchHotelsUrl(params),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+export type getHotelResponse200 = {
+  data: HotelDetailResponse
+  status: 200
+}
+
+export type getHotelResponseSuccess = (getHotelResponse200) & {
+  headers: Headers;
+};
+;
+
+export type getHotelResponse = (getHotelResponseSuccess)
+
+export const getGetHotelUrl = (slug: string,) => {
+
+
+
+
+  return `/hotels/${slug}`
+}
+
+/**
+ * Công khai. Gồm giới thiệu, tiện ích, giờ nhận/trả phòng và các loại phòng (giá tăng dần). Lỗi: 404 khi không có khách sạn, khách sạn đang ẩn hoặc chưa có loại phòng nào (không phân biệt).
+ * @summary Chi tiết khách sạn theo slug
+ */
+export const getHotel = async (slug: string, options?: Parameters<typeof customFetch>[1]): Promise<getHotelResponse> => {
+
+  return customFetch<getHotelResponse>(getGetHotelUrl(slug),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
 export type listFeaturedHotelsResponse200 = {
   data: HotelCardResponse[]
   status: 200
@@ -263,7 +431,7 @@ export const getListFeaturedHotelsUrl = (params?: ListFeaturedHotelsParams,) => 
 }
 
 /**
- * Công khai. Chỉ khách sạn ACTIVE có ít nhất một loại phòng, sắp theo điểm đánh giá giảm dần. Lỗi: 400 khi limit không phải số hoặc ngoài khoảng 1–50.
+ * Công khai. Chỉ khách sạn ACTIVE có ít nhất một loại phòng, sắp theo điểm đánh giá giảm dần. Cũng dùng làm danh sách gợi ý ở trang /hotels (limit tối đa 50). Lỗi: 400 khi limit không phải số hoặc ngoài khoảng 1–50.
  * @summary Khách sạn nổi bật cho Trang chủ
  */
 export const listFeaturedHotels = async (params?: ListFeaturedHotelsParams, options?: Parameters<typeof customFetch>[1]): Promise<listFeaturedHotelsResponse> => {

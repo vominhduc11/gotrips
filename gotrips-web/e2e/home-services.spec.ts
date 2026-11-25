@@ -12,8 +12,9 @@ import {
  * Thẻ khách sạn mở trang chi tiết khách sạn; thẻ chặng bay cuộn lên ô tìm kiếm, mở tab Vé máy bay và điền sẵn điểm
  * đi/đến (xem lib/hash-navigation.ts và components/home/use-search-prefill.ts). Chạy ở desktop và điện thoại.
  *
- * Dữ liệu mock (lib/mock/*): 4 khách sạn đầu theo điểm đánh giá là Resort Bãi Sao (Phú Quốc), Khách sạn Phố Hoa Đăng
- * (Hội An), Khách sạn Đồi Mây (Đà Lạt), Khách sạn Hoàng Hôn (Phú Quốc); "Resort Biển Xanh" (Nha Trang) là HIDDEN.
+ * Dữ liệu từ gotrips-api (seed chép từ lib/mock/*): 4 khách sạn đầu theo điểm đánh giá là Resort Bãi Sao (Phú Quốc),
+ * Khách sạn Phố Hoa Đăng (Hội An), Khách sạn Đồi Mây (Đà Lạt), Khách sạn Hoàng Hôn (Phú Quốc); "Resort Biển Xanh"
+ * (Nha Trang) là HIDDEN.
  */
 
 const VIEWPORTS = [

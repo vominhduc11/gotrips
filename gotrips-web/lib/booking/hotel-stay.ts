@@ -1,7 +1,7 @@
 import { findCheapestFittingRoom, sortRoomTypes } from "@/lib/data/hotel-view";
 import { createHotelStaySchema, type HotelStaySelection, type HotelStayValues } from "@/lib/schemas/hotel-booking";
 import { HOTEL_MAX_ROOMS } from "@/lib/schemas/hotel-search";
-import type { HotelRoomType } from "@/lib/types";
+import type { HotelRoomTypeView } from "@/lib/types";
 
 /**
  * Luật của lựa chọn lưu trú (loại phòng, ngày, số khách, số phòng) — hàm thuần, có test. Dùng chung cho thẻ "Đặt phòng"
@@ -13,7 +13,7 @@ import type { HotelRoomType } from "@/lib/types";
  * Loại phòng: phòng trên URL nếu thuộc khách sạn này, không thì phòng rẻ nhất chứa đủ khách, không nữa thì phòng rẻ
  * nhất. Ngày lấy nguyên từ URL (đã đúng định dạng); có còn hợp lệ không (đã qua ngày...) thì form báo khi bấm "Đặt phòng".
  */
-export function resolveHotelStay(params: HotelStaySelection, roomTypes: HotelRoomType[]): HotelStayValues {
+export function resolveHotelStay(params: HotelStaySelection, roomTypes: HotelRoomTypeView[]): HotelStayValues {
   const fromUrl = roomTypes.find((room) => room.id === params.room);
   const room =
     fromUrl ?? findCheapestFittingRoom(roomTypes, params.guests, params.rooms) ?? sortRoomTypes(roomTypes)[0];
@@ -32,7 +32,7 @@ export function resolveHotelStay(params: HotelStaySelection, roomTypes: HotelRoo
  */
 export function normalizeHotelStay(
   params: HotelStaySelection,
-  roomTypes: HotelRoomType[],
+  roomTypes: HotelRoomTypeView[],
   today?: string,
 ): HotelStayValues | null {
   const parsed = createHotelStaySchema(roomTypes, today).safeParse({
@@ -53,7 +53,7 @@ export function normalizeHotelStay(
 export function changeHotelRoom(
   current: HotelStayValues,
   roomTypeId: number,
-  roomTypes: HotelRoomType[],
+  roomTypes: HotelRoomTypeView[],
 ): HotelStayValues {
   const room = roomTypes.find((r) => r.id === roomTypeId);
   if (!room) return current;
@@ -80,7 +80,7 @@ export function getMaxStayGuests(maxGuestsPerRoom: number, limit: number): numbe
 export function changeHotelGuests(
   current: HotelStayValues,
   guests: number,
-  roomTypes: HotelRoomType[],
+  roomTypes: HotelRoomTypeView[],
 ): HotelStayValues {
   const room = roomTypes.find((r) => r.id === current.roomTypeId);
   const range = getRoomCountRange(guests, room?.maxGuests ?? guests);

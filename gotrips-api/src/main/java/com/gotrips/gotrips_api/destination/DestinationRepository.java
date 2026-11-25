@@ -1,6 +1,7 @@
 package com.gotrips.gotrips_api.destination;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -12,6 +13,8 @@ public interface DestinationRepository extends JpaRepository<Destination, Long> 
 
     /** Thứ tự cố định theo id (khớp thứ tự mock mà web đang hiển thị). */
     List<Destination> findAllByOrderByIdAsc();
+
+    Optional<Destination> findBySlug(String slug);
 
     /**
      * Số tour theo trạng thái cho từng điểm đến, một query cho tất cả điểm đến (tránh N+1). Điểm đến không có

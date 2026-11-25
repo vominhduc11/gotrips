@@ -23,8 +23,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 /**
- * Tour. Entity này hiện chỉ để ĐỌC: chưa map các cột như mô tả ngắn (admin/trang chi tiết chưa nối API) nên
- * không dùng để ghi. Giá, ngày và số chỗ nằm ở {@link TourDeparture}, không nằm ở đây.
+ * Tour. Entity này hiện chỉ để ĐỌC (admin chưa nối API): chỉ map các cột mà website cần. Giá, ngày và số chỗ nằm ở
+ * {@link TourDeparture}, không nằm ở đây.
  */
 @Entity
 @Table(name = "tours")
@@ -57,6 +57,10 @@ public class Tour {
     /** Nơi tập trung/khởi hành, ví dụ "TP. Hồ Chí Minh". */
     @Column(name = "departure_city", nullable = false, length = 100)
     private String departureCity;
+
+    /** Giới thiệu ngắn ở trang chi tiết (và mô tả cho công cụ tìm kiếm). */
+    @Column(name = "short_description", nullable = false, length = 500)
+    private String shortDescription;
 
     @Column(name = "cover_image_url", nullable = false, length = 500)
     private String coverImageUrl;

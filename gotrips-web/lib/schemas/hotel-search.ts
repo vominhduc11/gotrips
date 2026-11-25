@@ -7,6 +7,8 @@ export const HOTEL_MAX_GUESTS = 30;
 export const HOTEL_MAX_ROOMS = 10;
 /** Số đêm tối đa một lần đặt. */
 export const HOTEL_MAX_NIGHTS = 30;
+/** Độ dài tối đa của slug điểm đến (khớp `GET /hotels?destination`). */
+const HOTEL_DESTINATION_MAX_LENGTH = 100;
 
 const DESTINATION_MESSAGE = "Vui lòng chọn điểm đến.";
 const CHECK_IN_REQUIRED = "Vui lòng chọn ngày nhận phòng.";
@@ -48,8 +50,11 @@ export function checkStayDates(
 export function createHotelSearchSchema(today: string = getTodayInVietnam()) {
   return z
     .object({
-      /** Slug điểm đến (cùng quy ước với `/tours?destination=`). */
-      destination: z.string().trim().min(1, DESTINATION_MESSAGE),
+      /**
+       * Slug điểm đến (cùng quy ước với `/tours?destination=`). Tối đa 100 ký tự như API (`@Size(max = 100)`) và để khoá
+       * cache của `searchHotels` không phình theo chuỗi URL tuỳ ý.
+       */
+      destination: z.string().trim().min(1, DESTINATION_MESSAGE).max(HOTEL_DESTINATION_MAX_LENGTH, DESTINATION_MESSAGE),
       checkIn: z.string().min(1, CHECK_IN_REQUIRED).refine(isIsoDate, DATE_FORMAT_MESSAGE),
       checkOut: z.string().min(1, CHECK_OUT_REQUIRED).refine(isIsoDate, DATE_FORMAT_MESSAGE),
       guests: z

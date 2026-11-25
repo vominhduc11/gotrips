@@ -29,7 +29,9 @@ export const tourFiltersSchema = z.object({
   date: z.preprocess(first, z.iso.date().optional().catch(undefined)),
   guests: z.preprocess(first, z.coerce.number().int().min(1).max(50).optional().catch(undefined)),
   sort: z.preprocess(first, z.enum(TOUR_SORT_OPTIONS.map((o) => o.value) as [TourSort, ...TourSort[]]).catch(DEFAULT_TOUR_SORT)),
-  page: z.preprocess(first, z.coerce.number().int().min(1).catch(1)),
+  // Trần 10.000: số trang vượt xa thực tế là rác (về trang 1) và API chỉ nhận số nguyên 32 bit; trang lớn nhưng còn
+  // trong trần thì API kẹp về trang cuối.
+  page: z.preprocess(first, z.coerce.number().int().min(1).max(10_000).catch(1)),
 });
 
 export type TourFilters = z.infer<typeof tourFiltersSchema>;

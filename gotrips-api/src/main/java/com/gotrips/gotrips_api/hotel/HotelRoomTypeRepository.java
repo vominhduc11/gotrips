@@ -14,6 +14,11 @@ public interface HotelRoomTypeRepository extends JpaRepository<HotelRoomType, Lo
             + "where r.hotelId in :hotelIds group by r.hotelId")
     List<MinPrice> findMinPriceByHotelIds(@Param("hotelIds") Collection<Long> hotelIds);
 
+    /** Loại phòng của các khách sạn trong danh sách: một query cho cả danh sách (tránh N+1). */
+    List<HotelRoomType> findByHotelIdIn(Collection<Long> hotelIds);
+
+    List<HotelRoomType> findByHotelId(Long hotelId);
+
     interface MinPrice {
         Long getHotelId();
 

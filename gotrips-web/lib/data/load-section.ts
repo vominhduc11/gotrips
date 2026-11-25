@@ -5,8 +5,9 @@ import { unstable_rethrow } from "next/navigation";
 export type SectionResult<T> = { ok: true; data: T } | { ok: false };
 
 /**
- * Nạp dữ liệu cho một section của Trang chủ, gói lỗi lại thành `{ ok: false }` để lỗi API chỉ làm hỏng ĐÚNG section
- * đó chứ không kéo sập cả trang. Gọi từ Server Component bọc trong `<Suspense>`.
+ * Nạp dữ liệu danh mục từ gotrips-api cho một khối của trang (section Trang chủ, danh sách/chi tiết tour...), gói lỗi lại
+ * thành `{ ok: false }` để lỗi API chỉ làm hỏng ĐÚNG khối đó chứ không kéo sập cả trang. Gọi từ Server Component bọc
+ * trong `<Suspense>`.
  *
  * `await io()` đặt trước mọi thứ: các hàm `lib/data/*` là `"use cache"` nên mặc định chạy luôn lúc `next build` để
  * điền static shell, tức build phải gọi được API (Docker build không có API → hỏng build). `<Suspense>` một mình không
@@ -25,7 +26,7 @@ export async function loadSection<T>(name: string, load: () => Promise<T>): Prom
     // trong khi thực ra chỉ là lượt prerender bị dừng.
     unstable_rethrow(error);
     // Chỉ ghi nguyên nhân: không có dữ liệu người dùng ở đây, nhưng giữ cùng nguyên tắc với luồng đăng nhập.
-    console.error(`[trang chủ] Không tải được ${name}:`, describeError(error));
+    console.error(`[danh mục] Không tải được ${name}:`, describeError(error));
     return { ok: false };
   }
 }

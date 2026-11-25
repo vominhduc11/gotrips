@@ -43,7 +43,9 @@ test("có JSON-LD TouristTrip hợp lệ", async ({ page }) => {
 });
 
 test("slug không tồn tại hoặc tour bị ẩn hiện 404 tiếng Việt và không bị lập chỉ mục", async ({ page }) => {
-  for (const slug of ["khong-ton-tai", "sapa-4n3d-chinh-phuc-fansipan"]) {
+  // `featured` có endpoint danh sách riêng ở API (`/tours/featured` trả 200 kèm mảng): phải bị chặn ở web chứ không được
+  // coi là một tour.
+  for (const slug of ["khong-ton-tai", "sapa-4n3d-chinh-phuc-fansipan", "featured"]) {
     // Với Cache Components, slug ngoài generateStaticParams được stream sau shell nên mã HTTP vẫn là 200
     // (xem docs Next: loading.md > Status codes); Next tự chèn meta noindex để công cụ tìm kiếm bỏ qua.
     await page.goto(`/tours/${slug}`);

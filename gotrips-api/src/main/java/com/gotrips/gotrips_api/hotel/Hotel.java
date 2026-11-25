@@ -1,6 +1,11 @@
 package com.gotrips.gotrips_api.hotel;
 
 import java.math.BigDecimal;
+import java.time.LocalTime;
+import java.util.List;
+
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 
 import com.gotrips.gotrips_api.common.catalog.CatalogStatus;
 import com.gotrips.gotrips_api.destination.Destination;
@@ -22,10 +27,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-/**
- * Khách sạn. Chỉ để ĐỌC ở giai đoạn này: chưa map giới thiệu, tiện ích ({@code text[]}) và giờ nhận/trả phòng
- * vì Trang chủ không dùng; các cột đó đã có trong bảng và sẽ được map khi nối trang chi tiết khách sạn.
- */
+/** Khách sạn. Chỉ để ĐỌC (admin chưa nối API): map các cột mà website cần. Giá nằm ở {@link HotelRoomType}. */
 @Entity
 @Table(name = "hotels")
 @Getter
@@ -72,4 +74,24 @@ public class Hotel {
 
     @Column(name = "review_count", nullable = false)
     private int reviewCount;
+
+    /** Giới thiệu ở trang chi tiết (cột {@code text}). */
+    @Column(nullable = false)
+    private String description;
+
+    /**
+     * Tiện ích, cột {@code text[]} của PostgreSQL. {@code SqlTypes.ARRAY} để Hibernate đọc thẳng thành danh sách
+     * (không cần converter) và vẫn qua được {@code ddl-auto: validate}.
+     */
+    @JdbcTypeCode(SqlTypes.ARRAY)
+    @Column(nullable = false)
+    private List<String> amenities;
+
+    /** Giờ nhận phòng theo giờ địa phương (cột {@code time}). */
+    @Column(name = "check_in_time", nullable = false)
+    private LocalTime checkInTime;
+
+    /** Giờ trả phòng theo giờ địa phương (cột {@code time}). */
+    @Column(name = "check_out_time", nullable = false)
+    private LocalTime checkOutTime;
 }

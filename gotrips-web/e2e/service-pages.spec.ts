@@ -2,12 +2,12 @@ import { expect, test, type Page } from "@playwright/test";
 import { expectNotReloaded, markPage, waitForHeaderHydrated } from "./search-tab-helpers";
 
 /**
- * Trang riêng của các mục menu: /destinations, /hotels, /flights (dữ liệu mock). Khi chưa tìm: /hotels có ô tìm kiếm +
- * khách sạn gợi ý (bấm thẻ mở trang chi tiết); /flights có ô tìm vé + chặng bay phổ biến (bấm thẻ điền sẵn ô tìm kiếm
- * NGAY TRÊN TRANG đó). Kết quả tìm kiếm và luồng đặt nằm ở hotel-booking.spec.ts / flight-booking.spec.ts.
+ * Trang riêng của các mục menu: /destinations, /hotels, /flights. Khi chưa tìm: /hotels có ô tìm kiếm + khách sạn gợi ý
+ * (bấm thẻ mở trang chi tiết); /flights có ô tìm vé + chặng bay phổ biến (bấm thẻ điền sẵn ô tìm kiếm NGAY TRÊN TRANG
+ * đó). Kết quả tìm kiếm và luồng đặt nằm ở hotel-booking.spec.ts / flight-booking.spec.ts.
  *
- * Dữ liệu mock (lib/mock/*): 6 điểm đến; 8 khách sạn, trong đó "Resort Biển Xanh" (Nha Trang) là HIDDEN → hiện 7;
- * 6 chặng bay.
+ * Dữ liệu: điểm đến và khách sạn lấy từ gotrips-api (seed chép từ lib/mock/*): 6 điểm đến; 8 khách sạn, trong đó "Resort
+ * Biển Xanh" (Nha Trang) là HIDDEN → hiện 7. Chặng bay vẫn là mock (lib/mock/*): 6 chặng.
  */
 
 const VIEWPORTS = [

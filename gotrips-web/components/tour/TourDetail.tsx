@@ -2,6 +2,7 @@ import { Clock, Compass, MapPin, Star } from "lucide-react";
 import { notFound } from "next/navigation";
 import { AppLink } from "@/components/common/AppLink";
 import { CoverImage } from "@/components/common/CoverImage";
+import { SectionUnavailable } from "@/components/common/SectionUnavailable";
 import { StarRating } from "@/components/common/StarRating";
 import { DepartureList } from "@/components/tour/DepartureList";
 import { TourBookingCard } from "@/components/tour/TourBookingCard";
@@ -15,6 +16,7 @@ import {
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
 import { Skeleton } from "@/components/ui/skeleton";
+import { loadSection } from "@/lib/data/load-section";
 import { getTourDetail } from "@/lib/data/tours";
 import { formatDuration, formatRating } from "@/lib/format";
 
@@ -25,7 +27,10 @@ import { formatDuration, formatRating } from "@/lib/format";
  */
 export async function TourDetail({ params }: Pick<PageProps<"/tours/[slug]">, "params">) {
   const { slug } = await params;
-  const tour = await getTourDetail(slug);
+  // `loadSection`: API lỗi thì hiện thông báo cục bộ (kèm log) thay vì trang lỗi chung của Next; slug không có/ẩn thì 404.
+  const detail = await loadSection("chi tiết tour", () => getTourDetail(slug));
+  if (!detail.ok) return <SectionUnavailable what="thông tin tour" className="bg-surface shadow-card" />;
+  const tour = detail.data;
   if (!tour) notFound();
 
   // Dữ liệu có cấu trúc cho công cụ tìm kiếm. Thay `<` để chuỗi từ dữ liệu không thể đóng thẻ <script> (XSS).

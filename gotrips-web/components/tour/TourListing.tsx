@@ -1,10 +1,12 @@
 import { AppLink } from "@/components/common/AppLink";
+import { SectionUnavailable } from "@/components/common/SectionUnavailable";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { TourCard } from "@/components/tour/TourCard";
 import { TourFilterBar } from "@/components/tour/TourFilterBar";
 import { TourPagination } from "@/components/tour/TourPagination";
 import { loadDestinations } from "@/lib/data/catalog-loaders";
+import { loadSection } from "@/lib/data/load-section";
 import { searchTours } from "@/lib/data/tours";
 import { parseTourFilters } from "@/lib/schemas/tour-filters";
 
@@ -18,12 +20,26 @@ export async function TourListing({
   searchParams: Promise<Record<string, string | string[] | undefined>>;
 }) {
   const filters = parseTourFilters(await searchParams);
-  const [destinationList, result] = await Promise.all([loadDestinations(), searchTours(filters)]);
-  // Danh sách điểm đến (từ gotrips-api) chỉ để dựng ô lọc. API lỗi thì ô lọc thiếu lựa chọn điểm đến nhưng danh sách tour
-  // và các bộ lọc khác vẫn dùng được, nên không để cả trang vỡ (lỗi đã được ghi log trong `loadSection`).
+  // Cả hai lời gọi đều gọi gotrips-api và đi qua `loadSection`: lỗi API (đã ghi log trong đó) chỉ làm hỏng ĐÚNG khối đó,
+  // và `next build` không phải gọi API. Danh sách điểm đến chỉ để dựng ô lọc nên thiếu thì ô lọc thiếu lựa chọn điểm đến mà
+  // các bộ lọc khác vẫn dùng được; danh sách tour lỗi thì thay bằng thông báo, ô lọc vẫn hiện để khách đổi bộ lọc thử lại.
+  const [destinationList, search] = await Promise.all([
+    loadDestinations(),
+    loadSection("danh sách tour", () => searchTours(filters)),
+  ]);
   const destinations = destinationList.ok ? destinationList.data : [];
 
-  const heading = result.destination ? `Tour ${result.destination.name}` : "Tất cả tour";
+  if (!search.ok) {
+    return (
+      <div className="space-y-6">
+        <TourFilterBar filters={filters} destinations={destinations} />
+        <SectionUnavailable what="danh sách tour" className="bg-surface shadow-card" />
+      </div>
+    );
+  }
+
+  const result = search.data;
+  const heading = result.destinationName ? `Tour ${result.destinationName}` : "Tất cả tour";
   const hasFilters = Boolean(filters.destination || filters.q || filters.date || filters.guests);
 
   return (

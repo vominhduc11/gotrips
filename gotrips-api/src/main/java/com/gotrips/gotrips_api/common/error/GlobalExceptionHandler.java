@@ -10,6 +10,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ProblemDetail;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -64,6 +65,23 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(invalidDataProblem(errors));
     }
 
+    /** Thiếu tham số bắt buộc (ví dụ {@code GET /hotels} không có {@code checkIn}): 400, cùng format {@code errors[]}. */
+    @ExceptionHandler(MissingServletRequestParameterException.class)
+    public ResponseEntity<ProblemDetail> handleMissingParameter(MissingServletRequestParameterException ex) {
+        List<FieldViolation> errors = List.of(
+                new FieldViolation(ex.getParameterName(), "Thiếu tham số " + ex.getParameterName() + "."));
+
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(invalidDataProblem(errors));
+    }
+
+    /** Sai luật nghiệp vụ gắn với một tham số (cần "hôm nay" hoặc so sánh nhiều tham số): 400 kèm lỗi theo field. */
+    @ExceptionHandler(InvalidRequestException.class)
+    public ResponseEntity<ProblemDetail> handleInvalidRequest(InvalidRequestException ex) {
+        List<FieldViolation> errors = List.of(new FieldViolation(ex.getField(), ex.getMessage()));
+
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(invalidDataProblem(errors));
+    }
+
     /** Email đã có tài khoản: 409, kèm lỗi theo field để form gắn đúng vào ô email. */
     @ExceptionHandler(DuplicateEmailException.class)
     public ResponseEntity<ProblemDetail> handleDuplicateEmail(DuplicateEmailException ex) {
@@ -83,6 +101,15 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                 .header(HttpHeaders.WWW_AUTHENTICATE, "Bearer")
                 .body(problem);
+    }
+
+    /** Không có tài nguyên (hoặc tài nguyên đang ẩn): 404. {@code detail} là câu tiếng Việt an toàn để hiển thị. */
+    @ExceptionHandler(ResourceNotFoundException.class)
+    public ResponseEntity<ProblemDetail> handleNotFound(ResourceNotFoundException ex) {
+        ProblemDetail problem = ProblemDetail.forStatusAndDetail(HttpStatus.NOT_FOUND, ex.getMessage());
+        problem.setTitle("Không tìm thấy");
+
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(problem);
     }
 
     private static ProblemDetail invalidDataProblem(List<FieldViolation> errors) {

@@ -5,8 +5,9 @@ import { expect, submitLoginForm, test } from "./fixtures";
  * Luồng khách sạn: tìm ở /hotels → trang chi tiết (chọn phòng, ngày, khách) → đăng nhập giữa chừng → đặt phòng 2 bước →
  * trang đơn. Ngày cố định ở tương lai xa để test không phụ thuộc hôm nay (như booking.spec.ts dùng chuyến năm 2027).
  *
- * Dữ liệu mock: Đà Lạt có Villa Thông Xanh (Phòng Standard 690.000 ₫ / 2 khách, Phòng Hướng đồi 850.000 ₫ / 3 khách)
- * và Khách sạn Đồi Mây (Phòng Deluxe 1.250.000 ₫ / 2 khách). Resort Biển Xanh (Nha Trang) là HIDDEN.
+ * Dữ liệu danh mục lấy từ gotrips-api (seed, cùng id/slug/giá với lib/mock/*): Đà Lạt có Villa Thông Xanh (Phòng
+ * Standard 690.000 ₫ / 2 khách, Phòng Hướng đồi 850.000 ₫ / 3 khách) và Khách sạn Đồi Mây (Phòng Deluxe 1.250.000 ₫ /
+ * 2 khách). Resort Biển Xanh (Nha Trang) là HIDDEN. Việc tạo/lưu đơn vẫn là bản demo (cookie) tới khi nối đơn đặt chỗ.
  */
 
 const CHECK_IN = "2027-06-10";

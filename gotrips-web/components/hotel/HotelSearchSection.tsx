@@ -6,6 +6,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { SectionUnavailable } from "@/components/common/SectionUnavailable";
 import { loadDestinations } from "@/lib/data/catalog-loaders";
 import { getHotels, searchHotels } from "@/lib/data/hotels";
+import { loadSection } from "@/lib/data/load-section";
 import { buildHotelSearchParams, hasHotelSearchParams, parseHotelSearchParams } from "@/lib/schemas/hotel-search";
 import { HotelCard } from "./HotelCard";
 import { HotelResultCard } from "./HotelResultCard";
@@ -42,7 +43,7 @@ export async function HotelSearchSection({
         </div>
       ) : (
         // Điểm đến (từ gotrips-api) là dữ liệu của ô chọn: không có thì form không dùng được, hiện thông báo thay cho form;
-        // phần kết quả/gợi ý bên dưới (chưa nối API) vẫn hiện.
+        // phần kết quả/gợi ý bên dưới đọc API riêng nên vẫn tự hiện (hoặc tự báo lỗi) độc lập.
         <SectionUnavailable what="ô tìm khách sạn" className="mt-8 bg-surface shadow-card" />
       )}
 
@@ -56,7 +57,10 @@ export async function HotelSearchSection({
 }
 
 async function HotelResults({ query }: { query: NonNullable<ReturnType<typeof parseHotelSearchParams>> }) {
-  const { destinationName, items } = await searchHotels(query);
+  // API lỗi thì chỉ khối kết quả báo lỗi (form phía trên vẫn dùng được), không làm vỡ cả trang.
+  const result = await loadSection("kết quả tìm khách sạn", () => searchHotels(query));
+  if (!result.ok) return <SectionUnavailable what="kết quả tìm khách sạn" className="mt-10 bg-surface shadow-card" />;
+  const { destinationName, items } = result.data;
 
   return (
     <section aria-labelledby="ket-qua-khach-san-heading" className="mt-10">
@@ -91,7 +95,9 @@ async function HotelResults({ query }: { query: NonNullable<ReturnType<typeof pa
 }
 
 async function HotelSuggestions({ invalidSearch }: { invalidSearch: boolean }) {
-  const hotels = await getHotels();
+  const result = await loadSection("danh sách khách sạn", getHotels);
+  if (!result.ok) return <SectionUnavailable what="danh sách khách sạn" className="mt-12 bg-surface shadow-card" />;
+  const hotels = result.data;
 
   return (
     <section aria-labelledby="ds-khach-san-heading" className="mt-12">

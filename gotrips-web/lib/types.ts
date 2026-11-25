@@ -105,10 +105,13 @@ export interface Hotel {
   checkOutTime: string;
 }
 
-/** Loại phòng của khách sạn; "giá từ" của khách sạn là giá thấp nhất trong các loại phòng của nó. */
-export interface HotelRoomType {
+/**
+ * Loại phòng như API trả về (nằm trong một khách sạn nên không có `hotelId`); "giá từ" của khách sạn là giá thấp nhất
+ * trong các loại phòng của nó. Mọi chỗ chỉ cần thông tin phòng (tạm tính, chọn phòng, đặt phòng) nhận kiểu này; bản ghi
+ * của mock/DB (`HotelRoomType`) cũng gán được vào đây.
+ */
+export interface HotelRoomTypeView {
   id: number;
-  hotelId: number;
   name: string;
   /** Giá mỗi đêm cho MỘT phòng, VND. */
   pricePerNight: number;
@@ -118,6 +121,11 @@ export interface HotelRoomType {
   bedType: string;
   /** Diện tích phòng, m². */
   areaM2: number;
+}
+
+/** Loại phòng của khách sạn như một dòng của bảng (còn dùng cho mock và đơn đặt phòng demo tới khi nối đơn). */
+export interface HotelRoomType extends HotelRoomTypeView {
+  hotelId: number;
 }
 
 /** Chặng bay phổ biến ở Trang chủ và trang `/flights` (gợi ý điểm đi/đến; giá tham khảo, không phải giá bán). */
@@ -325,6 +333,18 @@ export interface TourCardView {
   isAlmostFull: boolean;
 }
 
+/** Một trang kết quả của `/tours` (API lọc, sắp xếp và phân trang). */
+export interface TourSearchResultView {
+  items: TourCardView[];
+  /** Tổng số tour khớp bộ lọc (trước khi phân trang). */
+  total: number;
+  /** Trang thực tế sau khi API kẹp vào [1, pageCount]. */
+  page: number;
+  pageCount: number;
+  /** Tên điểm đến đang lọc; null nếu không lọc hoặc slug không tồn tại. */
+  destinationName: string | null;
+}
+
 /** Một chuyến khởi hành ở trang chi tiết tour (chỉ chuyến ở tương lai; chuyến đã đầy vẫn có để khách thấy lịch). */
 export interface TourDepartureView {
   id: number;
@@ -384,12 +404,12 @@ export interface HotelDetailView extends HotelCardView {
   checkInTime: string;
   checkOutTime: string;
   /** Sắp theo giá tăng dần. */
-  roomTypes: HotelRoomType[];
+  roomTypes: HotelRoomTypeView[];
 }
 
 /** Một khách sạn trong kết quả tìm kiếm: phòng rẻ nhất chứa đủ số khách và tổng tiền cho cả kỳ lưu trú. */
 export interface HotelSearchResultView extends HotelCardView {
-  room: HotelRoomType;
+  room: HotelRoomTypeView;
   nights: number;
   rooms: number;
   /** `room.pricePerNight × nights × rooms`, VND. */

@@ -175,6 +175,45 @@ class TourCardCalculatorTests {
     }
 
     @Test
+    void departureViewOfADiscountedAlmostFullDeparture() {
+        TourDepartureResponse view = TourCardCalculator.toDeparture(departure(7, "2027-01-14", 8_490_000, 10_490_000L, 24, 20));
+
+        assertThat(view.id()).isEqualTo(7L);
+        assertThat(view.departureDate()).isEqualTo(LocalDate.of(2027, 1, 14));
+        assertThat(view.price()).isEqualTo(8_490_000L);
+        assertThat(view.originalPrice()).isEqualTo(10_490_000L);
+        assertThat(view.discountPercent()).isEqualTo(19);
+        assertThat(view.seatsLeft()).isEqualTo(4);
+        assertThat(view.isSoldOut()).isFalse();
+        assertThat(view.isAlmostFull()).isTrue();
+    }
+
+    @Test
+    void departureViewKeepsSoldOutDeparturesAndHasNoDiscountWithoutOne() {
+        TourDepartureResponse soldOut = TourCardCalculator.toDeparture(departure(1, "2027-01-09", 3_190_000, null, 20, 20));
+        TourDepartureResponse notReallyDiscounted = TourCardCalculator.toDeparture(
+                departure(2, "2027-01-09", 1_000_000, 1_000_000L, 20, 0));
+
+        assertThat(soldOut.seatsLeft()).isZero();
+        assertThat(soldOut.isSoldOut()).isTrue();
+        // Hết chỗ thì không phải "sắp hết chỗ" (hai nhãn loại trừ nhau).
+        assertThat(soldOut.isAlmostFull()).isFalse();
+        assertThat(soldOut.originalPrice()).isNull();
+        assertThat(soldOut.discountPercent()).isNull();
+        assertThat(notReallyDiscounted.originalPrice()).isNull();
+        assertThat(notReallyDiscounted.discountPercent()).isNull();
+    }
+
+    @Test
+    void departureViewNeverReportsNegativeSeats() {
+        // Dữ liệu hỏng (đã đặt nhiều hơn tổng chỗ) vẫn không ra số chỗ âm.
+        TourDepartureResponse view = TourCardCalculator.toDeparture(departure(1, "2027-01-09", 100, null, 20, 25));
+
+        assertThat(view.seatsLeft()).isZero();
+        assertThat(view.isSoldOut()).isTrue();
+    }
+
+    @Test
     void equalPricesPickTheEarlierDeparture() {
         List<TourDeparture> departures = List.of(
                 departure(1, "2027-03-10", 1_000_000, 1_500_000L, 20, 0),

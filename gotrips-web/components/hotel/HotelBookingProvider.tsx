@@ -13,13 +13,13 @@ import {
   parseHotelStayParams,
   type HotelStayValues,
 } from "@/lib/schemas/hotel-booking";
-import type { HotelRoomType } from "@/lib/types";
+import type { HotelRoomTypeView } from "@/lib/types";
 
 /** `id` của ô chọn loại phòng trong thẻ "Đặt phòng" (nút "Chọn phòng này" đưa focus tới đây). */
 export const HOTEL_ROOM_FIELD_ID = `${HOTEL_BOOKING_CARD_ID}-phong`;
 
 type HotelBookingContextValue = {
-  roomTypes: HotelRoomType[];
+  roomTypes: HotelRoomTypeView[];
   /** Chọn loại phòng từ danh sách phòng: đổi lựa chọn trong thẻ "Đặt phòng" rồi đưa khách tới ô loại phòng của thẻ. */
   selectRoom: (roomTypeId: number) => void;
 };
@@ -36,7 +36,7 @@ export function useHotelBooking(): HotelBookingContextValue {
 export function applyHotelRoom(
   form: Pick<UseFormReturn<HotelStayValues>, "getValues" | "setValue">,
   roomTypeId: number,
-  roomTypes: HotelRoomType[],
+  roomTypes: HotelRoomTypeView[],
 ) {
   const next = changeHotelRoom(form.getValues(), roomTypeId, roomTypes);
   form.setValue("roomTypeId", next.roomTypeId, { shouldDirty: true });
@@ -51,7 +51,7 @@ export function applyHotelRoom(
  *    Next hiện lại trang đang ẩn bằng `<Activity>`), nên liên kết từ kết quả tìm kiếm / từ trang đặt phòng điền sẵn được.
  *  - form → URL: khách đổi lựa chọn thì `replaceState`, để tải lại trang hoặc bấm Back từ trang đặt phòng vẫn giữ.
  */
-export function HotelBookingProvider({ roomTypes, children }: { roomTypes: HotelRoomType[]; children: ReactNode }) {
+export function HotelBookingProvider({ roomTypes, children }: { roomTypes: HotelRoomTypeView[]; children: ReactNode }) {
   const form = useForm<HotelStayValues>({
     // Dựng schema MỖI LẦN validate để "hôm nay" luôn đúng (không đọc "hôm nay" lúc render).
     resolver: ((values, context, options) =>

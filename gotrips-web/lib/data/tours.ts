@@ -1,54 +1,48 @@
 /**
- * Lớp truy cập dữ liệu cho trang /tours. Cùng quy ước với `lib/data/home.ts`: component chỉ import từ đây;
- * khi nối API thật chỉ đổi thân hàm, giữ nguyên chữ ký và các directive cache.
+ * Lớp truy cập dữ liệu cho trang /tours và /tours/[slug]. Cùng quy ước với `lib/data/home.ts`: component CHỈ import từ
+ * đây; gọi gotrips-api qua client do Orval sinh, giữ các directive `"use cache"` / `cacheLife` / `cacheTag`.
  *
- * `filters` là đối số nên nằm trong khoá cache: mỗi tổ hợp bộ lọc được cache riêng (tối đa 1 giờ).
- * Schema đã giới hạn độ dài `q` để khoá cache không phình vô hạn.
+ *  - Lọc, sắp xếp, phân trang và mọi trường suy ra (giá từ, ngày gần nhất, số chỗ, giảm giá...) do API tính; web không tải
+ *    lịch khởi hành để tự tính nữa. Response của API khớp kiểu "View" trong `lib/types.ts` nên gán thẳng; TypeScript báo
+ *    lỗi nếu API đổi hình dạng.
+ *  - `filters` là đối số nên nằm trong khoá cache: mỗi tổ hợp bộ lọc được cache riêng (tối đa 1 giờ). Schema đã giới hạn
+ *    độ dài `q`/`page` nên khoá cache không phình vô hạn.
+ *  - Hàm KHÔNG bắt lỗi (trừ 404 ở `getTourDetail`, là kết quả hợp lệ): API lỗi thì ném ra và Next không cache kết quả đó.
+ *    Nơi gọi dùng `loadSection` để hiện trạng thái lỗi cục bộ và để `next build` không phải gọi API.
  */
 import { cacheLife, cacheTag } from "next/cache";
+import { getTour, searchTours as searchToursApi } from "@/lib/api/generated";
+import { ApiError } from "@/lib/api/http";
 import type { TourFilters } from "@/lib/schemas/tour-filters";
-import { departures } from "@/lib/mock/departures";
-import { destinations } from "@/lib/mock/destinations";
-import { testimonials } from "@/lib/mock/testimonials";
-import { tours } from "@/lib/mock/tours";
-import type { TourDetailView } from "@/lib/types";
-import { searchTourList, type TourSearchResult } from "./tour-search";
-import { getTodayInVietnam, toTourDetailView } from "./tour-view";
+import type { TourDetailView, TourSearchResultView } from "@/lib/types";
+import { catalogRequestInit } from "./catalog-request";
+import { isValidTourSlug, toSearchToursParams } from "./tour-request";
 
-export type { TourSearchResult };
-
-export async function searchTours(filters: TourFilters): Promise<TourSearchResult> {
+export async function searchTours(filters: TourFilters): Promise<TourSearchResultView> {
   "use cache";
   cacheLife("hours");
+  // `destinations` vì kết quả mang tên điểm đến; `departures` vì giá/ngày/số chỗ của thẻ tour đến từ lịch khởi hành.
   cacheTag("tours", "departures", "destinations");
 
-  return searchTourList({ tours, destinations, departures, filters, today: getTodayInVietnam() });
+  const { data } = await searchToursApi(toSearchToursParams(filters), catalogRequestInit());
+  return data;
 }
 
-/** Slug của mọi tour đang hiển thị — dùng cho `generateStaticParams` (tour HIDDEN không có trang). */
-export async function getTourSlugs(): Promise<string[]> {
-  "use cache";
-  cacheLife("hours");
-  cacheTag("tours");
-
-  return tours.filter((tour) => tour.status === "ACTIVE").map((tour) => tour.slug);
-}
-
-/** Chi tiết một tour; `null` nếu không có hoặc đang bị ẩn (trang sẽ trả 404). */
+/** Chi tiết một tour; `null` nếu không có hoặc đang bị ẩn (API trả 404, trang sẽ `notFound()`). */
 export async function getTourDetail(slug: string): Promise<TourDetailView | null> {
   "use cache";
   cacheLife("hours");
   cacheTag("tours", "departures", "testimonials");
 
-  const tour = tours.find((t) => t.slug === slug && t.status === "ACTIVE");
-  const destination = tour && destinations.find((d) => d.id === tour.destinationId);
-  if (!tour || !destination) return null;
+  // Slug sai định dạng thì không thể có tour nào, và không được ghép vào đường dẫn API (xem `isValidTourSlug`).
+  if (!isValidTourSlug(slug)) return null;
 
-  return toTourDetailView(
-    tour,
-    destination,
-    departures.filter((d) => d.tourId === tour.id),
-    testimonials.filter((t) => t.tourId === tour.id),
-    getTodayInVietnam(),
-  );
+  try {
+    const { data } = await getTour(slug, catalogRequestInit());
+    return data;
+  } catch (error) {
+    // 404 là kết quả hợp lệ (slug không tồn tại / tour HIDDEN) và được cache như mọi kết quả khác; lỗi còn lại ném tiếp.
+    if (error instanceof ApiError && error.status === 404) return null;
+    throw error;
+  }
 }
