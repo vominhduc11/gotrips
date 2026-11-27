@@ -1,5 +1,7 @@
 package com.gotrips.gotrips_api.common.error;
 
+import lombok.Getter;
+
 /**
  * Yêu cầu hợp lệ về kiểu nhưng sai luật nghiệp vụ gắn với MỘT tham số (ngày nhận phòng ở quá khứ, ngày trả không sau
  * ngày nhận, số phòng nhiều hơn số khách...): {@code GlobalExceptionHandler} trả 400 kèm {@code errors[{field,message}]}
@@ -11,15 +13,12 @@ package com.gotrips.gotrips_api.common.error;
  */
 public class InvalidRequestException extends RuntimeException {
 
+    /** Tên tham số bị sai, đúng như client gửi (ví dụ {@code checkIn}). */
+    @Getter
     private final String field;
 
     public InvalidRequestException(String field, String message) {
         super(message);
         this.field = field;
-    }
-
-    /** Tên tham số bị sai, đúng như client gửi (ví dụ {@code checkIn}). */
-    public String getField() {
-        return field;
     }
 }

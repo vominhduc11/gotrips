@@ -1,14 +1,20 @@
 package com.gotrips.gotrips_api.support;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.hasItems;
 import static org.hamcrest.Matchers.hasSize;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import java.nio.charset.StandardCharsets;
+import java.util.Map;
+
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
+
+import com.jayway.jsonpath.JsonPath;
 
 /**
  * Hợp đồng OpenAPI của các API danh mục. Client của web do Orval sinh từ spec này nên tên hàm (operationId), kiểu
@@ -115,24 +121,62 @@ class CatalogOpenApiTests extends CatalogApiTest {
         String detail = "$.components.schemas.HotelDetailResponse";
         String result = "$.components.schemas.HotelSearchResultResponse";
 
-        // Thẻ có 12 field. Chi tiết = thẻ + 5 (description, amenities, checkInTime, checkOutTime, roomTypes);
+        // Thẻ có 12 field. Chi tiết = thẻ + 6 (description, amenities, images, checkInTime, checkOutTime, roomTypes);
         // kết quả tìm = thẻ + 4 (room, nights, rooms, totalPrice). Không field nào nullable.
         mvc.perform(get("/v3/api-docs"))
                 .andExpect(jsonPath(card + ".required", hasSize(12)))
-                .andExpect(jsonPath(detail + ".required", hasSize(17)))
-                .andExpect(jsonPath(detail + ".required", hasItems("description", "amenities", "checkInTime",
+                .andExpect(jsonPath(detail + ".required", hasSize(18)))
+                .andExpect(jsonPath(detail + ".required", hasItems("description", "amenities", "images", "checkInTime",
                         "checkOutTime", "roomTypes", "minPricePerNight")))
                 // Giờ là chuỗi "HH:mm" (không phải kiểu time của OpenAPI) để web in nguyên.
                 .andExpect(jsonPath(detail + ".properties.checkInTime.type").value("string"))
                 .andExpect(jsonPath(detail + ".properties.checkOutTime.type").value("string"))
-                .andExpect(jsonPath(detail + ".properties.amenities.items.type").value("string"))
+                .andExpect(jsonPath(detail + ".properties.amenities.items['$ref']")
+                        .value("#/components/schemas/AmenityResponse"))
+                .andExpect(jsonPath(detail + ".properties.images.items['$ref']")
+                        .value("#/components/schemas/ImageResponse"))
                 .andExpect(jsonPath(detail + ".properties.roomTypes.items['$ref']")
-                        .value("#/components/schemas/HotelRoomTypeResponse"))
+                        .value("#/components/schemas/HotelRoomTypeDetailResponse"))
                 .andExpect(jsonPath(result + ".required", hasSize(16)))
                 .andExpect(jsonPath(result + ".required", hasItems("room", "nights", "rooms", "totalPrice")))
                 .andExpect(jsonPath(result + ".properties.room['$ref']")
                         .value("#/components/schemas/HotelRoomTypeResponse"))
                 .andExpect(jsonPath("$.components.schemas.HotelRoomTypeResponse.required", hasSize(6)));
+    }
+
+    @Test
+    void hotelImagesAmenitiesAndDetailedRoomTypesAreFullyRequired() throws Exception {
+        String roomDetail = "$.components.schemas.HotelRoomTypeDetailResponse";
+
+        // Thiếu REQUIRED ở đâu thì Orval sinh `T?` và web phải xử lý một trường hợp không bao giờ xảy ra.
+        mvc.perform(get("/v3/api-docs"))
+                .andExpect(jsonPath("$.components.schemas.AmenityResponse.required", hasItems("code", "name")))
+                .andExpect(jsonPath("$.components.schemas.AmenityResponse.required", hasSize(2)))
+                .andExpect(jsonPath("$.components.schemas.ImageResponse.required", hasItems("url", "alt")))
+                .andExpect(jsonPath("$.components.schemas.ImageResponse.required", hasSize(2)))
+                .andExpect(jsonPath(roomDetail + ".required", hasSize(8)))
+                .andExpect(jsonPath(roomDetail + ".required", hasItems("images", "amenities")))
+                .andExpect(jsonPath(roomDetail + ".properties.images.items['$ref']")
+                        .value("#/components/schemas/ImageResponse"))
+                .andExpect(jsonPath(roomDetail + ".properties.amenities.items['$ref']")
+                        .value("#/components/schemas/AmenityResponse"));
+    }
+
+    /**
+     * Loại phòng chi tiết phải chứa nguyên vẹn bản gốc: web dùng bản chi tiết ở chỗ nhận kiểu gốc. MapStruct chỉ canh
+     * được TÊN field lúc biên dịch; test này canh cả kiểu và chú thích {@code @Schema}.
+     */
+    @Test
+    void detailedRoomTypeKeepsEveryPropertyOfTheBaseRoomTypeWithTheSameSchema() throws Exception {
+        String spec = mvc.perform(get("/v3/api-docs"))
+                .andExpect(status().isOk())
+                .andReturn().getResponse().getContentAsString(StandardCharsets.UTF_8);
+        Map<String, Object> base = JsonPath.read(spec, "$.components.schemas.HotelRoomTypeResponse.properties");
+        Map<String, Object> detail = JsonPath.read(spec,
+                "$.components.schemas.HotelRoomTypeDetailResponse.properties");
+
+        assertThat(base).hasSize(6);
+        assertThat(detail).containsAllEntriesOf(base);
     }
 
     @Test

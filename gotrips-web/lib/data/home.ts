@@ -1,8 +1,8 @@
 /**
- * Lớp truy cập dữ liệu cho Trang chủ. Component CHỈ import từ `lib/data/*`, không import `lib/mock/*`.
+ * Lớp truy cập dữ liệu cho Trang chủ. Component CHỈ import từ `lib/data/*`.
  *
- * Điểm đến, tour nổi bật và đánh giá lấy từ gotrips-api (client do Orval sinh ở `lib/api/generated`). Chữ ký hàm và các
- * directive `"use cache"` / `cacheLife` / `cacheTag` giữ nguyên từ thời còn mock. Banner Hero vẫn là dữ liệu tĩnh.
+ * Điểm đến, tour nổi bật và đánh giá lấy từ gotrips-api (client do Orval sinh ở `lib/api/generated`). Banner Hero là
+ * nội dung cấu hình của website (`lib/site-content.ts`).
  *
  *  - Mọi trường suy ra (`tourCount`, `priceFrom`, `nextDepartureDate`, `seatsLeft`, giảm giá...) do API tính sẵn,
  *    kèm luật bỏ tour HIDDEN; web không tải lịch khởi hành để tự tính nữa. Response của API khớp kiểu "View" trong
@@ -15,7 +15,7 @@
  */
 import { cacheLife, cacheTag } from "next/cache";
 import { listDestinations, listFeaturedTours, listTestimonials } from "@/lib/api/generated";
-import { heroBanner } from "@/lib/mock/site";
+import { HERO_BANNER } from "@/lib/site-content";
 import type { DestinationCardView, HeroBanner, TestimonialView, TourCardView } from "@/lib/types";
 import { catalogRequestInit } from "./catalog-request";
 
@@ -24,7 +24,7 @@ export async function getHeroBanner(): Promise<HeroBanner> {
   cacheLife("days");
   cacheTag("site");
 
-  return heroBanner;
+  return HERO_BANNER;
 }
 
 export async function getPopularDestinations(): Promise<DestinationCardView[]> {
@@ -50,9 +50,11 @@ export async function getFeaturedTours(limit = 8): Promise<TourCardView[]> {
 export async function getTestimonials(): Promise<TestimonialView[]> {
   "use cache";
   cacheLife("days");
-  cacheTag("testimonials");
+  // `tours`: ẩn hoặc xoá một tour làm đánh giá của nó (kèm tên tour) biến khỏi API, nên cache này phải hết hạn theo
+  // webhook của tour, nếu không Trang chủ còn hiện tên tour đã gỡ cho tới hết ngày.
+  cacheTag("testimonials", "tours");
 
-  // API không trả đánh giá của tour HIDDEN (kèm tên tour) — mock cũ không lọc điểm này.
+  // API không trả đánh giá của tour đang ẩn hoặc đã xoá.
   const { data } = await listTestimonials(catalogRequestInit());
   return data;
 }

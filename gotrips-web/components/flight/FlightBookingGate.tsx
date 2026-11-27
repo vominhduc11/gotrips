@@ -1,7 +1,9 @@
 import { redirect } from "next/navigation";
 import { connection } from "next/server";
+import { SectionUnavailable } from "@/components/common/SectionUnavailable";
 import { getCurrentUser } from "@/lib/auth/session";
 import { getFlightOption } from "@/lib/data/flights";
+import { loadSection } from "@/lib/data/load-section";
 import { getTodayInVietnam } from "@/lib/data/tour-view";
 import { buildLoginHref } from "@/lib/safe-redirect";
 import {
@@ -9,17 +11,34 @@ import {
   buildFlightResultsHref,
   isFlightSelectionComplete,
   parseFlightBookingParams,
+  type FlightSelection,
 } from "@/lib/schemas/flight-booking";
+import type { FlightSearchValues } from "@/lib/schemas/flight-search";
 import type { FlightOptionView } from "@/lib/types";
 import { FlightBookingWizard } from "./FlightBookingWizard";
+
+/** Các chặng đã chọn (đi, rồi về nếu khứ hồi); `null` nếu một chuyến không có hoặc không đúng chiều. */
+async function loadSegments(search: FlightSearchValues, selection: FlightSelection): Promise<FlightOptionView[] | null> {
+  const { cabin, adults, children, infants } = search;
+  const passengers = { cabin, adults, children, infants };
+  const [outbound, inbound] = await Promise.all([
+    getFlightOption(selection.out ?? 0, { ...passengers, from: search.from, to: search.to, date: search.departDate }),
+    search.tripType === "roundTrip"
+      ? getFlightOption(selection.ret ?? 0, { ...passengers, from: search.to, to: search.from, date: search.returnDate })
+      : undefined,
+  ]);
+  if (!outbound || inbound === null) return null;
+  return inbound ? [outbound, inbound] : [outbound];
+}
 
 /**
  * Phần theo-yêu-cầu của trang đặt vé (đọc cookie phiên và search params) — trang bọc trong `<Suspense>`. Cùng khuôn với
  * `BookingGate` của tour:
- *  - lượt tìm trên URL sai → về `/flights`; chưa chọn đủ chuyến, chuyến không khớp chặng, hoặc bay trong hôm nay → về
- *    trang kết quả của lượt tìm đó để chọn lại;
+ *  - lượt tìm trên URL sai → về `/flights`; chưa chọn đủ chuyến, chuyến không khớp chặng, không còn đặt được (không đủ
+ *    ghế) hoặc bay trong hôm nay → về trang kết quả của lượt tìm đó để chọn lại;
+ *  - API lỗi → thông báo tại chỗ (tải chuyến TRƯỚC khi kiểm phiên: khi API lỗi, kiểm phiên coi khách là chưa đăng nhập);
  *  - chưa đăng nhập → đăng nhập kèm `next` là đúng URL đang mở.
- * Server Action tạo đơn vẫn tự kiểm tra lại tất cả.
+ * gotrips-api vẫn tự kiểm tra lại tất cả khi tạo đơn.
  */
 export async function FlightBookingGate({
   searchParams,
@@ -35,25 +54,10 @@ export async function FlightBookingGate({
     redirect(buildFlightResultsHref(search));
   }
 
-  const outbound = await getFlightOption({
-    scheduleId: selection.out ?? 0,
-    from: search.from,
-    to: search.to,
-    date: search.departDate,
-    cabin: search.cabin,
-  });
-  const inbound =
-    search.tripType === "roundTrip"
-      ? await getFlightOption({
-          scheduleId: selection.ret ?? 0,
-          from: search.to,
-          to: search.from,
-          date: search.returnDate,
-          cabin: search.cabin,
-        })
-      : null;
-  if (!outbound || (search.tripType === "roundTrip" && !inbound)) redirect(buildFlightResultsHref(search));
-  const segments: FlightOptionView[] = inbound ? [outbound, inbound] : [outbound];
+  const loaded = await loadSection("chuyến bay đã chọn", () => loadSegments(search, selection));
+  if (!loaded.ok) return <SectionUnavailable what="thông tin chuyến bay" className="bg-surface shadow-card" />;
+  const segments = loaded.data;
+  if (!segments || segments.some((segment) => !segment.isBookable)) redirect(buildFlightResultsHref(search));
 
   const user = await getCurrentUser();
   if (!user) redirect(buildLoginHref(buildFlightBookingHref(search, selection, step)));

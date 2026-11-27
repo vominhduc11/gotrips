@@ -14,7 +14,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 /**
- * Chặng bay phổ biến (gợi ý điểm đi/đến; giá chỉ để tham khảo, không phải giá bán). Chỉ để ĐỌC ở giai đoạn này.
+ * Chặng bay phổ biến (gợi ý điểm đi/đến; giá chỉ để tham khảo, không phải giá bán).
  * Đặt tên trường {@code fromAirport}/{@code toAirport} vì {@code from} là từ khoá của JPQL.
  */
 @Entity
@@ -51,4 +51,18 @@ public class FlightRoute {
     /** Thứ tự hiển thị theo độ phổ biến. */
     @Column(name = "sort_order", nullable = false)
     private int sortOrder;
+
+    void update(Airport fromAirport, Airport toAirport, int durationMinutes, long referencePrice,
+            String imageUrl, String imageAlt) {
+        this.fromAirport = fromAirport;
+        this.toAirport = toAirport;
+        this.durationMinutes = durationMinutes;
+        this.referencePrice = referencePrice;
+        this.imageUrl = imageUrl;
+        this.imageAlt = imageAlt;
+    }
+
+    void moveTo(int sortOrder) {
+        this.sortOrder = sortOrder;
+    }
 }

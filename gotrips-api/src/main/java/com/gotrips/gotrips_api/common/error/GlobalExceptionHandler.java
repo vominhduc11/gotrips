@@ -9,6 +9,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ProblemDetail;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -82,6 +83,21 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(invalidDataProblem(errors));
     }
 
+    /**
+     * Trạng thái dữ liệu hiện tại không cho phép (hết chỗ/phòng/ghế, đơn đã đổi trạng thái): 409. {@code detail} là câu
+     * để hiển thị; có field thì kèm {@code errors[]} như lỗi 400.
+     */
+    @ExceptionHandler(ConflictException.class)
+    public ResponseEntity<ProblemDetail> handleConflict(ConflictException ex) {
+        ProblemDetail problem = ProblemDetail.forStatusAndDetail(HttpStatus.CONFLICT, ex.getMessage());
+        problem.setTitle("Không thực hiện được");
+        if (ex.getField() != null) {
+            problem.setProperty("errors", List.of(new FieldViolation(ex.getField(), ex.getMessage())));
+        }
+
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(problem);
+    }
+
     /** Email đã có tài khoản: 409, kèm lỗi theo field để form gắn đúng vào ô email. */
     @ExceptionHandler(DuplicateEmailException.class)
     public ResponseEntity<ProblemDetail> handleDuplicateEmail(DuplicateEmailException ex) {
@@ -110,6 +126,13 @@ public class GlobalExceptionHandler {
         problem.setTitle("Không tìm thấy");
 
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(problem);
+    }
+
+    @ExceptionHandler(AccessDeniedException.class)
+    public ResponseEntity<ProblemDetail> handleAccessDenied(AccessDeniedException ex) {
+        ProblemDetail problem = ProblemDetail.forStatusAndDetail(HttpStatus.FORBIDDEN, ex.getMessage());
+        problem.setTitle("Không có quyền");
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(problem);
     }
 
     private static ProblemDetail invalidDataProblem(List<FieldViolation> errors) {

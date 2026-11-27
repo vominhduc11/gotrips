@@ -43,9 +43,12 @@ public class SecurityConfig {
                 // /hotels/{slug}, gồm cả /tours/featured, /hotels/featured), không khớp /hotels/{slug}/gì-đó.
                 .requestMatchers(HttpMethod.GET, "/destinations", "/airports", "/tours", "/tours/*", "/hotels",
                         "/hotels/*", "/flight-routes/popular", "/testimonials").permitAll()
+                // Tìm chuyến bay: đúng GET /flights và GET /flights/{scheduleId}, KHÔNG dùng "/flights/**".
+                .requestMatchers(HttpMethod.GET, "/flights", "/flights/*").permitAll()
                 // Đăng ký nhận ưu đãi (form ở Trang chủ, khách chưa đăng nhập).
                 .requestMatchers(HttpMethod.POST, "/newsletter/subscriptions").permitAll()
-                // Còn lại mặc định cần xác thực; khi thêm endpoint công khai cho website phải mở rõ ràng ở đây.
+                // Còn lại (gồm /bookings/**) mặc định cần đăng nhập; khi thêm endpoint công khai cho website phải mở rõ
+                // ràng ở đây.
                 .anyRequest().authenticated())
             // API-only: xác thực bằng JWT ở header "Authorization: Bearer ...". Không có form login/Basic,
             // chưa xác thực thì trả 401 (kèm WWW-Authenticate: Bearer) thay vì redirect.

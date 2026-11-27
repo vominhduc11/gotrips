@@ -29,13 +29,17 @@ public class TestcontainersConfiguration {
     }
 
     /**
-     * Khoá ký JWT chỉ dùng cho test (application.yaml cố ý không có giá trị mặc định cho secret).
-     * Đặt ở đây để mọi test import cấu hình này đều có sẵn, và chia sẻ chung một application context.
+     * Khoá ký JWT và tài khoản nhận chuyển khoản chỉ dùng cho test (application.yaml cố ý không có giá trị mặc định cho
+     * chúng). Đặt ở đây để mọi test import cấu hình này đều có sẵn, và chia sẻ chung một application context.
      */
     @Bean
-    DynamicPropertyRegistrar jwtTestProperties() {
-        return registry -> registry.add("gotrips.jwt.secret",
-                () -> "chi-dung-cho-test-khong-dung-o-moi-truong-that-0123456789");
+    DynamicPropertyRegistrar requiredTestProperties() {
+        return registry -> {
+            registry.add("gotrips.jwt.secret", () -> "chi-dung-cho-test-khong-dung-o-moi-truong-that-0123456789");
+            registry.add("gotrips.payment.bank-transfer.bank-name", () -> "Ngân hàng Test");
+            registry.add("gotrips.payment.bank-transfer.account-number", () -> "1234 5678");
+            registry.add("gotrips.payment.bank-transfer.account-name", () -> "CONG TY TEST");
+        };
     }
 
     /** Thời điểm cố định của mọi test: 01:30 sáng 25/11/2026 giờ Việt Nam (lúc đó theo UTC vẫn là 24/11). */

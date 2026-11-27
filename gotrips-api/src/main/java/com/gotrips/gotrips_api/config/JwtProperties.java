@@ -19,6 +19,7 @@ public record JwtProperties(
                 + "Tạo bằng: openssl rand -base64 48")
         String secret,
         @NotNull Duration expiration,
+        @NotNull Duration adminExpiration,
         @NotBlank String issuer) {
 
     /** Không in khoá ký ra log/ngoại lệ. */

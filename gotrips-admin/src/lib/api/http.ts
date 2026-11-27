@@ -7,7 +7,7 @@
  */
 
 // Gốc API lấy từ biến build-time VITE_API_URL. Bỏ dấu / cuối để nối path không bị đôi "//".
-const API_BASE_URL = (import.meta.env.VITE_API_URL ?? '').replace(/\/+$/, '')
+const API_BASE_URL = (import.meta.env.VITE_API_URL || '/api').replace(/\/+$/, '')
 
 /** Lỗi của một field, đúng format GlobalExceptionHandler của API trả trong `errors` (HTTP 400 do @Valid). */
 export interface ApiFieldError {
@@ -41,7 +41,6 @@ export class ApiError extends Error {
 // Các trường có thể có trong ProblemDetail; mọi trường đều optional vì body có thể không đầy đủ.
 interface ProblemBody {
   title?: string
-  status?: number
   detail?: string
   errors?: unknown
 }
@@ -70,22 +69,30 @@ async function toApiError(response: Response): Promise<ApiError> {
   const body: ProblemBody = await response.json().catch((): ProblemBody => ({}))
 
   return new ApiError({
-    status: body.status ?? response.status,
+    status: response.status,
     title: body.title ?? fallbackTitle,
     detail: body.detail,
     errors: parseFieldErrors(body.errors),
   })
 }
 
+const safeMethods = new Set(['GET', 'HEAD', 'OPTIONS', 'TRACE'])
+
 /**
- * Gọi API. `path` bắt đầu bằng "/" (ví dụ "/api/tours").
- * `credentials: "include"` để trình duyệt gửi cookie khi API và admin khác origin.
+ * Orval truyền đường dẫn API (ví dụ "/admin/auth/me"). Proxy ở cùng origin xử lý tiền tố "/api".
  */
 export async function apiFetch<T>(path: string, init: RequestInit = {}): Promise<T> {
   const headers = new Headers(init.headers)
   // FormData tự đặt Content-Type kèm boundary; đặt tay sẽ làm hỏng request.
   if (init.body !== undefined && !(init.body instanceof FormData) && !headers.has('Content-Type')) {
     headers.set('Content-Type', 'application/json')
+  }
+
+  const method = (init.method ?? 'GET').toUpperCase()
+  if (!safeMethods.has(method) && !headers.has('X-XSRF-TOKEN')) {
+    const token = document.cookie.split(';').map((entry) => entry.trim())
+      .find((entry) => entry.startsWith('XSRF-TOKEN='))?.slice('XSRF-TOKEN='.length)
+    if (token) headers.set('X-XSRF-TOKEN', token)
   }
 
   const response = await fetch(`${API_BASE_URL}${path}`, {

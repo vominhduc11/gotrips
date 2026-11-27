@@ -2,9 +2,10 @@ import { ClipboardList } from "lucide-react";
 import { redirect } from "next/navigation";
 import { AppLink } from "@/components/common/AppLink";
 import { CoverImage } from "@/components/common/CoverImage";
+import { SectionUnavailable } from "@/components/common/SectionUnavailable";
 import { Button } from "@/components/ui/button";
-import { getCurrentUser } from "@/lib/auth/session";
 import { getMyBookings } from "@/lib/data/bookings";
+import { loadSection } from "@/lib/data/load-section";
 import { formatDateTime, formatVND } from "@/lib/format";
 import { buildLoginHref } from "@/lib/safe-redirect";
 import { BookingHighlights } from "./BookingHighlights";
@@ -12,13 +13,13 @@ import { BookingStatusBadges } from "./BookingStatusBadges";
 
 /**
  * Danh sách "Đơn đặt chỗ của tôi": tour, khách sạn, vé máy bay chung một danh sách, mới nhất trước (đọc cookie nên trang
- * bọc trong Suspense). Chưa đăng nhập → đăng nhập rồi quay lại.
+ * bọc trong Suspense). Chưa đăng nhập hoặc phiên hết hạn → đăng nhập rồi quay lại; API lỗi → thông báo tại chỗ.
  */
 export async function BookingHistory() {
-  const user = await getCurrentUser();
-  if (!user) redirect(buildLoginHref("/bookings"));
-
-  const bookings = await getMyBookings();
+  const result = await loadSection("đơn đặt chỗ", getMyBookings);
+  if (!result.ok) return <SectionUnavailable what="danh sách đơn đặt chỗ" className="bg-surface-muted" />;
+  if (result.data.status === "unauthenticated") redirect(buildLoginHref("/bookings"));
+  const bookings = result.data.data;
 
   if (bookings.length === 0) {
     return (

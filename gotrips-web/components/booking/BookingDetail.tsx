@@ -2,7 +2,7 @@ import { ArrowLeft, CircleAlert, Plane } from "lucide-react";
 import { notFound, redirect } from "next/navigation";
 import { AppLink } from "@/components/common/AppLink";
 import { CoverImage } from "@/components/common/CoverImage";
-import { TrialNotice } from "@/components/common/TrialNotice";
+import { SectionUnavailable } from "@/components/common/SectionUnavailable";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import {
   Breadcrumb,
@@ -12,36 +12,35 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
-import { getCurrentUser } from "@/lib/auth/session";
-import { isBookingCode } from "@/lib/booking/booking-code";
-import { getAvailableActions } from "@/lib/booking/transitions";
-import { getBankTransferInfo, getMyBooking } from "@/lib/data/bookings";
+import { isBookingCode } from "@/lib/booking/booking-code-format";
+import { getMyBooking } from "@/lib/data/bookings";
+import { loadSection } from "@/lib/data/load-section";
 import { formatDate, formatDateTime, formatFlightDuration, formatVND } from "@/lib/format";
 import { cabinLabel } from "@/lib/schemas/flight-search";
 import { buildLoginHref } from "@/lib/safe-redirect";
+import type { BookingKind } from "@/lib/types";
 import { BankTransferInfo } from "./BankTransferInfo";
 import { BookingHighlights } from "./BookingHighlights";
-import { BookingSimulator } from "./BookingSimulator";
 import { BookingStatusBadges } from "./BookingStatusBadges";
 
 const sectionClass = "rounded-card bg-surface p-5 shadow-card";
 
-const SECTION_TITLE = { tour: "Chuyến đi", hotel: "Kỳ lưu trú", flight: "Chuyến bay" } as const;
+const SECTION_TITLE: Record<BookingKind, string> = { TOUR: "Chuyến đi", HOTEL: "Kỳ lưu trú", FLIGHT: "Chuyến bay" };
 
 /**
  * Chi tiết một đơn — tour, khách sạn hay vé máy bay đều chung khung này; phần khác nhau theo loại đã được quy về
  * `highlights`, `priceLines`, `people` (và `flightSegments` với vé máy bay) ở `lib/data/booking-view.ts`.
  * Đọc cookie → trang bọc trong Suspense. Mã sai định dạng, không có, hoặc là đơn của người khác
- * đều trả 404 như nhau — không cho đoán mã để biết đơn có tồn tại hay không.
+ * đều trả 404 như nhau — không cho đoán mã để biết đơn có tồn tại hay không. API lỗi → thông báo tại chỗ.
  */
 export async function BookingDetail({ params }: { params: Promise<{ code: string }> }) {
   const { code } = await params;
   if (!isBookingCode(code)) notFound();
 
-  const user = await getCurrentUser();
-  if (!user) redirect(buildLoginHref(`/bookings/${code}`));
-
-  const [booking, bank] = await Promise.all([getMyBooking(code), getBankTransferInfo()]);
+  const result = await loadSection("chi tiết đơn", () => getMyBooking(code));
+  if (!result.ok) return <SectionUnavailable what="thông tin đơn đặt chỗ" className="bg-surface shadow-card" />;
+  if (result.data.status === "unauthenticated") redirect(buildLoginHref(`/bookings/${code}`));
+  const booking = result.data.data;
   if (!booking) notFound();
 
   const awaitingPayment = booking.status !== "CANCELLED" && booking.paymentStatus === "UNPAID";
@@ -79,12 +78,7 @@ export async function BookingDetail({ params }: { params: Promise<{ code: string
         <BookingStatusBadges status={booking.status} paymentStatus={booking.paymentStatus} />
       </div>
 
-      <TrialNotice className="mt-6 mb-8">
-        Bản thử nghiệm: đơn chỉ được lưu trên trình duyệt này, chưa thu tiền thật. Tài khoản ngân hàng bên dưới là dữ
-        liệu demo, vui lòng không chuyển khoản.
-      </TrialNotice>
-
-      <div className="grid gap-8 lg:grid-cols-[1fr_22rem] lg:items-start">
+      <div className="mt-8 grid gap-8 lg:grid-cols-[1fr_22rem] lg:items-start">
         <div className="min-w-0 space-y-6">
           <section aria-labelledby="chuyen-di-heading" className={sectionClass}>
             <h2 id="chuyen-di-heading" className="text-xl font-bold text-ink">
@@ -200,9 +194,7 @@ export async function BookingDetail({ params }: { params: Promise<{ code: string
             </dl>
 
             <div className="mt-4 space-y-3 text-sm">
-              {awaitingPayment ? (
-                <BankTransferInfo bank={bank} amount={booking.totalAmount} transferContent={booking.code} />
-              ) : null}
+              {awaitingPayment ? <BankTransferInfo bank={booking.bankTransfer} amount={booking.totalAmount} /> : null}
               {booking.paidAt ? (
                 <p className="text-success-700">
                   Đã nhận thanh toán lúc <time dateTime={booking.paidAt}>{formatDateTime(booking.paidAt)}</time>.
@@ -230,11 +222,6 @@ export async function BookingDetail({ params }: { params: Promise<{ code: string
               ) : null}
             </div>
           </section>
-
-          <BookingSimulator
-            code={booking.code}
-            available={getAvailableActions({ status: booking.status, paymentStatus: booking.paymentStatus })}
-          />
         </div>
       </div>
 

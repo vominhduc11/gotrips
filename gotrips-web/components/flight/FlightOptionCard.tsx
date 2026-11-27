@@ -14,6 +14,7 @@ export function FlightOptionCard({
   passengersLabel,
   action,
   selected = false,
+  lacksSeats = false,
 }: {
   flight: FlightOptionView;
   /** Tiền chặng này cho cả đoàn. */
@@ -22,6 +23,8 @@ export function FlightOptionCard({
   passengersLabel: string;
   action?: ReactNode;
   selected?: boolean;
+  /** Không còn đủ ghế cho cả đoàn (nút chọn bị khoá). */
+  lacksSeats?: boolean;
 }) {
   return (
     <article
@@ -75,6 +78,7 @@ export function FlightOptionCard({
           <p className="text-xs text-ink-muted">
             {formatVND(total)} cho {passengersLabel}
           </p>
+          {lacksSeats ? <p className="mt-1 text-sm font-semibold text-danger-700">Không đủ ghế</p> : null}
           {action ? <div className="mt-3">{action}</div> : null}
         </div>
       </div>

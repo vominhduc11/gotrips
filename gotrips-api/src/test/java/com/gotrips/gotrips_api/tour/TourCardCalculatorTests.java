@@ -12,8 +12,8 @@ import com.gotrips.gotrips_api.common.catalog.CatalogStatus;
 import com.gotrips.gotrips_api.destination.Destination;
 
 /**
- * Kiểm thử từng trường hợp biên của phép tính thẻ tour (hàm thuần, không cần DB). Các ca bám theo dữ liệu mock
- * của gotrips-web (tour 1: chuyến rẻ nhất đã đầy; tour 3: giảm giá; tour 5: sắp hết chỗ) để hai bên cho cùng kết quả.
+ * Kiểm thử từng trường hợp biên của phép tính thẻ tour (hàm thuần, không cần DB). Các ca bám theo dữ liệu mẫu
+ * (tour 1: chuyến rẻ nhất đã đầy; tour 3: giảm giá; tour 5: sắp hết chỗ).
  */
 class TourCardCalculatorTests {
 
@@ -59,7 +59,7 @@ class TourCardCalculatorTests {
 
     @Test
     void soldOutDepartureIsSkippedEvenWhenItIsTheCheapestAndEarliest() {
-        // Giống tour 1 của mock: chuyến 09/01 rẻ nhất nhưng đã đầy ⇒ "giá từ" và "ngày gần nhất" phải bỏ qua nó.
+        // Giống tour 1 của seed: chuyến 09/01 rẻ nhất nhưng đã đầy ⇒ "giá từ" và "ngày gần nhất" phải bỏ qua nó.
         List<TourDeparture> departures = List.of(
                 departure(1, "2027-01-09", 3_190_000, null, 20, 20),
                 departure(2, "2027-01-23", 3_490_000, null, 20, 11),
@@ -91,7 +91,7 @@ class TourCardCalculatorTests {
 
     @Test
     void discountComesFromTheCheapestDepartureItself() {
-        // Giống tour 3 của mock: giá từ ở chuyến 08/04 (8.49tr, gốc 10.49tr) ⇒ giảm 19%.
+        // Giống tour 3 của seed: giá từ ở chuyến 08/04 (8.49tr, gốc 10.49tr) ⇒ giảm 19%.
         List<TourDeparture> departures = List.of(
                 departure(8, "2027-01-14", 8_990_000, 10_990_000L, 24, 14),
                 departure(9, "2027-02-25", 9_490_000, 11_490_000L, 24, 20),
@@ -162,7 +162,7 @@ class TourCardCalculatorTests {
 
     @Test
     void almostFullUsesTheNearestDepartureNotTheCheapestOne() {
-        // Giống tour 5 của mock: chuyến gần nhất còn 3 chỗ (sắp hết), chuyến rẻ hơn ở sau còn nhiều chỗ.
+        // Giống tour 5 của seed: chuyến gần nhất còn 3 chỗ (sắp hết), chuyến rẻ hơn ở sau còn nhiều chỗ.
         List<TourDeparture> departures = List.of(
                 departure(1, "2027-01-17", 3_890_000, null, 20, 17),
                 departure(2, "2027-03-27", 3_790_000, null, 20, 10));

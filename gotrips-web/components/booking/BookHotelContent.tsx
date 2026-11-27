@@ -3,7 +3,6 @@ import { Suspense } from "react";
 import { BookingWizardSkeleton } from "@/components/booking/BookingSkeletons";
 import { AppLink } from "@/components/common/AppLink";
 import { SectionUnavailable } from "@/components/common/SectionUnavailable";
-import { TrialNotice } from "@/components/common/TrialNotice";
 import { HotelBookingGate } from "@/components/hotel/HotelBookingGate";
 import {
   Breadcrumb,
@@ -64,13 +63,11 @@ export async function BookHotelContent({
       <h1 className="text-3xl font-bold tracking-tight text-ink sm:text-4xl">Đặt phòng</h1>
       <p className="mt-2 text-base text-ink-muted">{hotel.name}</p>
 
-      <TrialNotice className="mt-6 mb-8">
-        Bản thử nghiệm: đơn chỉ được lưu trên trình duyệt này, chưa thu tiền thật và chưa giữ phòng với khách sạn.
-      </TrialNotice>
-
-      <Suspense fallback={<BookingWizardSkeleton />}>
-        <HotelBookingGate hotel={hotel} searchParams={searchParams} />
-      </Suspense>
+      <div className="mt-8">
+        <Suspense fallback={<BookingWizardSkeleton />}>
+          <HotelBookingGate hotel={hotel} searchParams={searchParams} />
+        </Suspense>
+      </div>
     </>
   );
 }
@@ -82,8 +79,9 @@ export function BookHotelSkeleton() {
       <Skeleton className="mb-4 h-5 w-72 max-w-full" />
       <Skeleton className="h-10 w-40" />
       <Skeleton className="mt-2 h-6 w-80 max-w-full" />
-      <Skeleton className="mt-6 mb-8 h-14 w-full rounded-card" />
-      <BookingWizardSkeleton />
+      <div className="mt-8">
+        <BookingWizardSkeleton />
+      </div>
     </div>
   );
 }

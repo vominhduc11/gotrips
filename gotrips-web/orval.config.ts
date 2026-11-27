@@ -9,6 +9,7 @@ export default defineConfig({
   gotrips: {
     input: {
       target: "http://localhost:8080/v3/api-docs",
+      filters: { mode: "exclude", tags: [/^Quản trị /] },
     },
     output: {
       target: "lib/api/generated/index.ts",

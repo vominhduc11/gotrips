@@ -10,7 +10,7 @@ import java.util.List;
  * ({@code toTourCardView}) nay chỉ nhận kết quả từ API.
  *
  * <ul>
- *   <li>Chuyến đặt được: sau hôm nay (không gồm hôm nay) và còn chỗ.
+ *   <li>Chuyến đặt được: sau hôm nay (không gồm hôm nay), đang mở bán và còn chỗ.
  *   <li>Giá từ = chuyến đặt được có giá thấp nhất (giá bằng nhau thì chuyến sớm hơn), kèm giá gốc/% giảm
  *       của CHÍNH chuyến đó.
  *   <li>Ngày gần nhất và số chỗ còn lại = của chuyến đặt được sớm nhất.
@@ -100,11 +100,15 @@ public final class TourCardCalculator {
     }
 
     /** Cùng phép tính số thực với web (Math.round của JS và Java đều làm tròn .5 lên) để % khớp từng ký tự. */
-    private static int discountPercent(long originalPrice, long price) {
+    static int discountPercent(long originalPrice, long price) {
         return (int) Math.round(((double) (originalPrice - price) / originalPrice) * 100);
     }
 
+    /** Số chỗ khách còn mua được: chuyến đã đóng bán là 0 dù còn ghế (website hiện "Hết chỗ"). */
     private static int seatsLeft(TourDeparture departure) {
+        if (departure.isSalesClosed()) {
+            return 0;
+        }
         return Math.max(0, departure.getTotalSeats() - departure.getBookedSeats());
     }
 }

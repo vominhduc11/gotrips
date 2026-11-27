@@ -6,8 +6,15 @@
  */
 import type {
   AirportResponse,
+  BookingDetailResponse,
+  BookingSummaryResponse,
+  CreateFlightBookingRequest,
+  CreateHotelBookingRequest,
+  CreateTourBookingRequest,
   DestinationResponse,
+  FlightOptionResponse,
   FlightRouteCardResponse,
+  GetFlightParams,
   HotelCardResponse,
   HotelDetailResponse,
   HotelSearchResponse,
@@ -17,6 +24,7 @@ import type {
   LoginRequest,
   LoginResponse,
   RegisterRequest,
+  SearchFlightsParams,
   SearchHotelsParams,
   SearchToursParams,
   SubscribeNewsletterRequest,
@@ -81,6 +89,117 @@ export const subscribeNewsletter = async (subscribeNewsletterRequest: SubscribeN
     method: 'POST',
     headers: getHeaders({ 'Content-Type': 'application/json' }, options?.headers),
     body: JSON.stringify(subscribeNewsletterRequest)
+  }
+);}
+
+
+
+export type createTourBookingResponse201 = {
+  data: BookingDetailResponse
+  status: 201
+}
+
+export type createTourBookingResponseSuccess = (createTourBookingResponse201) & {
+  headers: Headers;
+};
+;
+
+export type createTourBookingResponse = (createTourBookingResponseSuccess)
+
+export const getCreateTourBookingUrl = () => {
+
+
+
+
+  return `/bookings/tours`
+}
+
+/**
+ * Giá do API tính và chốt vào đơn. Lỗi: 400 dữ liệu không hợp lệ (chuyến không tồn tại/tour ẩn, chuyến đã đóng đặt chỗ, số người đi khác số khách), 401, 409 chuyến không còn đủ chỗ; kèm errors[{field,message}].
+ * @summary Đặt tour
+ */
+export const createTourBooking = async (createTourBookingRequest: CreateTourBookingRequest, options?: Parameters<typeof customFetch>[1]): Promise<createTourBookingResponse> => {
+
+  return customFetch<createTourBookingResponse>(getCreateTourBookingUrl(),
+  {
+    ...options,
+    method: 'POST',
+    headers: getHeaders({ 'Content-Type': 'application/json' }, options?.headers),
+    body: JSON.stringify(createTourBookingRequest)
+  }
+);}
+
+
+
+export type createHotelBookingResponse201 = {
+  data: BookingDetailResponse
+  status: 201
+}
+
+export type createHotelBookingResponseSuccess = (createHotelBookingResponse201) & {
+  headers: Headers;
+};
+;
+
+export type createHotelBookingResponse = (createHotelBookingResponseSuccess)
+
+export const getCreateHotelBookingUrl = () => {
+
+
+
+
+  return `/bookings/hotels`
+}
+
+/**
+ * Nhận phòng từ ngày mai. Lỗi: 400 dữ liệu không hợp lệ (loại phòng/khách sạn không nhận đặt, ngày sai, quá sức chứa), 401, 409 không còn đủ phòng trống; kèm errors[{field,message}].
+ * @summary Đặt phòng khách sạn
+ */
+export const createHotelBooking = async (createHotelBookingRequest: CreateHotelBookingRequest, options?: Parameters<typeof customFetch>[1]): Promise<createHotelBookingResponse> => {
+
+  return customFetch<createHotelBookingResponse>(getCreateHotelBookingUrl(),
+  {
+    ...options,
+    method: 'POST',
+    headers: getHeaders({ 'Content-Type': 'application/json' }, options?.headers),
+    body: JSON.stringify(createHotelBookingRequest)
+  }
+);}
+
+
+
+export type createFlightBookingResponse201 = {
+  data: BookingDetailResponse
+  status: 201
+}
+
+export type createFlightBookingResponseSuccess = (createFlightBookingResponse201) & {
+  headers: Headers;
+};
+;
+
+export type createFlightBookingResponse = (createFlightBookingResponseSuccess)
+
+export const getCreateFlightBookingUrl = () => {
+
+
+
+
+  return `/bookings/flights`
+}
+
+/**
+ * Bay từ ngày mai. Lỗi: 400 dữ liệu không hợp lệ (chuyến sai chiều, số hành khách/tuổi sai), 401, 409 chuyến không còn đủ ghế; kèm errors[{field,message}].
+ * @summary Đặt vé máy bay (một chiều hoặc khứ hồi)
+ */
+export const createFlightBooking = async (createFlightBookingRequest: CreateFlightBookingRequest, options?: Parameters<typeof customFetch>[1]): Promise<createFlightBookingResponse> => {
+
+  return customFetch<createFlightBookingResponse>(getCreateFlightBookingUrl(),
+  {
+    ...options,
+    method: 'POST',
+    headers: getHeaders({ 'Content-Type': 'application/json' }, options?.headers),
+    body: JSON.stringify(createFlightBookingRequest)
   }
 );}
 
@@ -447,6 +566,96 @@ export const listFeaturedHotels = async (params?: ListFeaturedHotelsParams, opti
 
 
 
+export type searchFlightsResponse200 = {
+  data: FlightOptionResponse[]
+  status: 200
+}
+
+export type searchFlightsResponseSuccess = (searchFlightsResponse200) & {
+  headers: Headers;
+};
+;
+
+export type searchFlightsResponse = (searchFlightsResponseSuccess)
+
+export const getSearchFlightsUrl = (params: SearchFlightsParams,) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : String(value))
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0 ? `/flights?${stringifiedParams}` : `/flights`
+}
+
+/**
+ * Công khai. Các chuyến trong ngày, sắp theo giờ cất cánh rồi id; kèm giá, ghế còn lại và isBookable cho số hành khách của lượt tìm. Mã sân bay lạ cho danh sách rỗng. Lỗi: 400 khi thiếu/sai kiểu tham số, điểm đi trùng điểm đến, ngày ở quá khứ (giờ Việt Nam), không có người lớn, em bé nhiều hơn người lớn hoặc quá 9 hành khách; kèm errors[{field,message}].
+ * @summary Tìm chuyến bay theo chặng, ngày và hạng ghế
+ */
+export const searchFlights = async (params: SearchFlightsParams, options?: Parameters<typeof customFetch>[1]): Promise<searchFlightsResponse> => {
+
+  return customFetch<searchFlightsResponse>(getSearchFlightsUrl(params),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+export type getFlightResponse200 = {
+  data: FlightOptionResponse
+  status: 200
+}
+
+export type getFlightResponseSuccess = (getFlightResponse200) & {
+  headers: Headers;
+};
+;
+
+export type getFlightResponse = (getFlightResponseSuccess)
+
+export const getGetFlightUrl = (scheduleId: number,
+    params: GetFlightParams,) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : String(value))
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0 ? `/flights/${scheduleId}?${stringifiedParams}` : `/flights/${scheduleId}`
+}
+
+/**
+ * Công khai. Cùng dữ liệu như một dòng của kết quả tìm; adults/children/infants (tuỳ chọn) dùng để tính isBookable. Lỗi: 400 như tìm chuyến bay; 404 khi id không có hoặc không đúng chiều from → to.
+ * @summary Một chuyến bay theo id lịch bay
+ */
+export const getFlight = async (scheduleId: number,
+    params: GetFlightParams, options?: Parameters<typeof customFetch>[1]): Promise<getFlightResponse> => {
+
+  return customFetch<getFlightResponse>(getGetFlightUrl(scheduleId,params),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
 export type listPopularFlightRoutesResponse200 = {
   data: FlightRouteCardResponse[]
   status: 200
@@ -518,6 +727,80 @@ export const getListDestinationsUrl = () => {
 export const listDestinations = async ( options?: Parameters<typeof customFetch>[1]): Promise<listDestinationsResponse> => {
 
   return customFetch<listDestinationsResponse>(getListDestinationsUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+export type getMyBookingResponse200 = {
+  data: BookingDetailResponse
+  status: 200
+}
+
+export type getMyBookingResponseSuccess = (getMyBookingResponse200) & {
+  headers: Headers;
+};
+;
+
+export type getMyBookingResponse = (getMyBookingResponseSuccess)
+
+export const getGetMyBookingUrl = (code: string,) => {
+
+
+
+
+  return `/bookings/${code}`
+}
+
+/**
+ * Kèm thông tin chuyển khoản. Lỗi: 401; 404 khi mã không có hoặc không phải đơn của người gọi.
+ * @summary Chi tiết một đơn của tôi
+ */
+export const getMyBooking = async (code: string, options?: Parameters<typeof customFetch>[1]): Promise<getMyBookingResponse> => {
+
+  return customFetch<getMyBookingResponse>(getGetMyBookingUrl(code),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+export type listMyBookingsResponse200 = {
+  data: BookingSummaryResponse[]
+  status: 200
+}
+
+export type listMyBookingsResponseSuccess = (listMyBookingsResponse200) & {
+  headers: Headers;
+};
+;
+
+export type listMyBookingsResponse = (listMyBookingsResponseSuccess)
+
+export const getListMyBookingsUrl = () => {
+
+
+
+
+  return `/bookings/me`
+}
+
+/**
+ * Lỗi: 401.
+ * @summary Đơn của tôi, mới nhất trước
+ */
+export const listMyBookings = async ( options?: Parameters<typeof customFetch>[1]): Promise<listMyBookingsResponse> => {
+
+  return customFetch<listMyBookingsResponse>(getListMyBookingsUrl(),
   {
     ...options,
     method: 'GET'

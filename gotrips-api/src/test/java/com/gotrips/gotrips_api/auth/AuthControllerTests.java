@@ -1,6 +1,7 @@
 package com.gotrips.gotrips_api.auth;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.hamcrest.Matchers.startsWith;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
@@ -10,9 +11,11 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import java.nio.charset.StandardCharsets;
 import java.time.Instant;
+import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
+import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
 
 import org.junit.jupiter.api.Test;
@@ -22,12 +25,6 @@ import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
-import org.springframework.security.oauth2.jose.jws.MacAlgorithm;
-import org.springframework.security.oauth2.jwt.JwsHeader;
-import org.springframework.security.oauth2.jwt.JwtClaimsSet;
-import org.springframework.security.oauth2.jwt.JwtEncoder;
-import org.springframework.security.oauth2.jwt.JwtEncoderParameters;
-import org.springframework.security.oauth2.jwt.NimbusJwtEncoder;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 
@@ -35,7 +32,9 @@ import com.gotrips.gotrips_api.TestcontainersConfiguration;
 import com.gotrips.gotrips_api.user.User;
 import com.gotrips.gotrips_api.user.UserRepository;
 import com.jayway.jsonpath.JsonPath;
-import com.nimbusds.jose.jwk.source.ImmutableSecret;
+
+import io.jsonwebtoken.JwtBuilder;
+import io.jsonwebtoken.Jwts;
 
 /** Luồng đăng ký → đăng nhập → /auth/me với PostgreSQL thật (Testcontainers) và Spring Security thật. */
 @SpringBootTest
@@ -49,9 +48,9 @@ class AuthControllerTests {
     MockMvc mvc;
     @Autowired
     UserRepository users;
-    /** Encoder thật của ứng dụng (cùng khoá với decoder) — dùng để dựng token hết hạn. */
+    /** Khoá ký thật của ứng dụng — dùng để dựng token hỏng đúng một chỗ (hết hạn, sai issuer...). */
     @Autowired
-    JwtEncoder jwtEncoder;
+    SecretKey jwtSigningKey;
 
     private static String uniqueEmail() {
         return "user-" + UUID.randomUUID() + "@example.com";
@@ -226,38 +225,70 @@ class AuthControllerTests {
                 .andExpect(status().isUnauthorized());
     }
 
+    /** Đối chứng cho các test từ chối bên dưới: token dựng đúng thì được nhận. */
+    @Test
+    void meAcceptsCorrectlySignedToken() throws Exception {
+        String token = sign(validClaims(registeredUserId()));
+
+        mvc.perform(get("/auth/me").header(HttpHeaders.AUTHORIZATION, "Bearer " + token))
+                .andExpect(status().isOk());
+    }
+
     @Test
     void meRejectsTokenSignedWithAnotherKey() throws Exception {
-        String email = uniqueEmail();
-        register("Nguyễn Văn An", email, PASSWORD).andExpect(status().isCreated());
-        UUID userId = users.findByEmail(email).orElseThrow().getId();
-
         // Cùng nội dung, cùng issuer, nhưng ký bằng khoá khác (kẻ giả mạo token, kể cả đòi quyền ADMIN)
-        JwtEncoder attacker = new NimbusJwtEncoder(new ImmutableSecret<>(new SecretKeySpec(
-                "khoa-cua-ke-gia-mao-token-khoa-cua-ke-gia-mao".getBytes(StandardCharsets.UTF_8), "HmacSHA256")));
-        String forged = encode(attacker, userId, Instant.now().plusSeconds(600), List.of("ADMIN"));
+        SecretKey attackerKey = new SecretKeySpec(
+                "khoa-cua-ke-gia-mao-token-khoa-cua-ke-gia-mao".getBytes(StandardCharsets.UTF_8), "HmacSHA256");
+        String forged = validClaims(registeredUserId()).claim("roles", List.of("ADMIN"))
+                .signWith(attackerKey, Jwts.SIG.HS256).compact();
 
-        mvc.perform(get("/auth/me").header(HttpHeaders.AUTHORIZATION, "Bearer " + forged))
-                .andExpect(status().isUnauthorized());
+        assertRejectedAsInvalidToken(forged);
     }
 
     @Test
     void meRejectsExpiredToken() throws Exception {
-        String email = uniqueEmail();
-        register("Nguyễn Văn An", email, PASSWORD).andExpect(status().isCreated());
-        UUID userId = users.findByEmail(email).orElseThrow().getId();
-
         // Hết hạn từ 10 phút trước (vượt xa độ lệch đồng hồ cho phép 60 giây)
-        String expired = encode(jwtEncoder, userId, Instant.now().minusSeconds(600), List.of("CUSTOMER"));
+        String expired = sign(validClaims(registeredUserId())
+                .expiration(Date.from(Instant.now().minusSeconds(600))));
 
-        mvc.perform(get("/auth/me").header(HttpHeaders.AUTHORIZATION, "Bearer " + expired))
-                .andExpect(status().isUnauthorized());
+        assertRejectedAsInvalidToken(expired);
+    }
+
+    @Test
+    void meRejectsTokenWithoutExpiry() throws Exception {
+        String endless = sign(validClaims(registeredUserId()).expiration(null));
+
+        assertRejectedAsInvalidToken(endless);
+    }
+
+    @Test
+    void meRejectsTokenOfAnotherIssuer() throws Exception {
+        String foreign = sign(validClaims(registeredUserId()).issuer("he-thong-khac"));
+
+        assertRejectedAsInvalidToken(foreign);
+    }
+
+    @Test
+    void meRejectsTokenUsingAnotherHmacAlgorithm() throws Exception {
+        // Đúng khoá của ứng dụng nhưng HS384: API chỉ nhận HS256
+        String hs384 = validClaims(registeredUserId())
+                .signWith(new SecretKeySpec(jwtSigningKey.getEncoded(), "HmacSHA384"), Jwts.SIG.HS384)
+                .compact();
+
+        assertRejectedAsInvalidToken(hs384);
+    }
+
+    @Test
+    void meRejectsUnsignedToken() throws Exception {
+        String unsigned = validClaims(registeredUserId()).compact();
+
+        assertRejectedAsInvalidToken(unsigned);
     }
 
     @Test
     void meRejectsValidTokenOfDeletedAccount() throws Exception {
         // Token hợp lệ về chữ ký/hạn nhưng tài khoản không còn → 401 (không phải 500)
-        String token = encode(jwtEncoder, UUID.randomUUID(), Instant.now().plusSeconds(600), List.of("CUSTOMER"));
+        String token = sign(validClaims(UUID.randomUUID()));
 
         mvc.perform(get("/auth/me").header(HttpHeaders.AUTHORIZATION, "Bearer " + token))
                 .andExpect(status().isUnauthorized())
@@ -269,15 +300,31 @@ class AuthControllerTests {
         mvc.perform(get("/actuator/health")).andExpect(status().isOk());
     }
 
-    private String encode(JwtEncoder encoder, UUID userId, Instant expiresAt, List<String> roles) {
-        JwtClaimsSet claims = JwtClaimsSet.builder()
+    private UUID registeredUserId() throws Exception {
+        String email = uniqueEmail();
+        register("Nguyễn Văn An", email, PASSWORD).andExpect(status().isCreated());
+        return users.findByEmail(email).orElseThrow().getId();
+    }
+
+    private JwtBuilder validClaims(UUID userId) {
+        Instant now = Instant.now();
+        return Jwts.builder()
                 .issuer("gotrips-api")
-                .issuedAt(expiresAt.minusSeconds(3600))
-                .expiresAt(expiresAt)
                 .subject(userId.toString())
-                .claim("roles", roles)
-                .build();
-        return encoder.encode(JwtEncoderParameters.from(JwsHeader.with(MacAlgorithm.HS256).build(), claims))
-                .getTokenValue();
+                .issuedAt(Date.from(now.minusSeconds(3600)))
+                .expiration(Date.from(now.plusSeconds(600)))
+                .claim("roles", List.of("CUSTOMER"));
+    }
+
+    private String sign(JwtBuilder claims) {
+        return claims.signWith(jwtSigningKey, Jwts.SIG.HS256).compact();
+    }
+
+    /** 401 do chính bước kiểm token (header có {@code error="invalid_token"}), không phải do tầng nghiệp vụ. */
+    private void assertRejectedAsInvalidToken(String token) throws Exception {
+        mvc.perform(get("/auth/me").header(HttpHeaders.AUTHORIZATION, "Bearer " + token))
+                .andExpect(status().isUnauthorized())
+                .andExpect(header().string(HttpHeaders.WWW_AUTHENTICATE,
+                        startsWith("Bearer error=\"invalid_token\"")));
     }
 }

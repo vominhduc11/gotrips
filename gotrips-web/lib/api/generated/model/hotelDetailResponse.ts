@@ -4,10 +4,12 @@
  * GoTrips API
  * OpenAPI spec version: 0.0.1
  */
-import type { HotelRoomTypeResponse } from './hotelRoomTypeResponse';
+import type { AmenityResponse } from './amenityResponse';
+import type { HotelRoomTypeDetailResponse } from './hotelRoomTypeDetailResponse';
+import type { ImageResponse } from './imageResponse';
 
 /**
- * Chi tiết khách sạn: thông tin thẻ, giới thiệu, tiện ích, giờ nhận/trả phòng và các loại phòng
+ * Chi tiết khách sạn: thông tin thẻ, giới thiệu, tiện ích, bộ ảnh, giờ nhận/trả phòng và các loại phòng
  */
 export interface HotelDetailResponse {
   id: number;
@@ -27,8 +29,10 @@ export interface HotelDetailResponse {
   /** Giá từ: giá một đêm thấp nhất trong các loại phòng (VND) */
   minPricePerNight: number;
   description: string;
-  /** Tiện ích của khách sạn */
-  amenities: string[];
+  /** Tiện ích của khách sạn, theo thứ tự danh mục */
+  amenities: AmenityResponse[];
+  /** Ảnh xem thêm theo thứ tự hiển thị, KHÔNG gồm ảnh đại diện (imageUrl); có thể rỗng */
+  images: ImageResponse[];
   /**
      * Giờ nhận phòng (HH:mm, giờ địa phương)
      * @pattern ^\d{2}:\d{2}$
@@ -40,5 +44,5 @@ export interface HotelDetailResponse {
      */
   checkOutTime: string;
   /** Các loại phòng, sắp theo giá một đêm tăng dần */
-  roomTypes: HotelRoomTypeResponse[];
+  roomTypes: HotelRoomTypeDetailResponse[];
 }

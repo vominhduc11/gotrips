@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-// Kiểm tra định dạng cơ bản, đủ cho prototype (xác thực thật nằm ở backend).
+// Kiểm tra định dạng cơ bản để báo lỗi sớm; gotrips-api kiểm lại bằng cùng định dạng.
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
 
 /** Đăng ký nhận ưu đãi qua email. */

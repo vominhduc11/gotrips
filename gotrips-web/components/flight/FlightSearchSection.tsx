@@ -11,6 +11,7 @@ import { loadAirports } from "@/lib/data/catalog-loaders";
 import { getFlightRoutes } from "@/lib/data/flight-routes";
 import { computeSegmentTotal, summarizePassengers } from "@/lib/data/flight-view";
 import { getFlightOption, searchFlights } from "@/lib/data/flights";
+import { loadSection } from "@/lib/data/load-section";
 import { getTodayInVietnam } from "@/lib/data/tour-view";
 import { formatDate } from "@/lib/format";
 import { buildFlightResultsHref, parseFlightBookingParams, type FlightSelection } from "@/lib/schemas/flight-booking";
@@ -62,8 +63,8 @@ export async function FlightSearchSection({
           />
         </div>
       ) : (
-        // Sân bay (từ gotrips-api) là dữ liệu của ô chọn: không có thì form không dùng được, hiện thông báo thay cho form;
-        // phần kết quả/gợi ý bên dưới (chưa nối API) vẫn hiện.
+        // Sân bay là dữ liệu của ô chọn: không có thì form không dùng được, hiện thông báo thay cho form; phần kết
+        // quả/gợi ý bên dưới tự xử lý lỗi của nó.
         <SectionUnavailable what="ô tìm vé máy bay" className="mt-8 bg-surface shadow-card" />
       )}
 
@@ -76,28 +77,38 @@ export async function FlightSearchSection({
   );
 }
 
-async function FlightResults({ search, selection }: { search: FlightSearchValues; selection: FlightSelection }) {
+/** Các chuyến của trang kết quả: chiều đi, chuyến đi đã chọn (khứ hồi) và chiều về. */
+async function loadFlightResults(search: FlightSearchValues, selection: FlightSelection) {
+  // Số hành khách gửi kèm để API tính "còn đủ ghế" (`isBookable`) cho cả đoàn.
+  const { cabin, adults, children, infants } = search;
+  const passengers = { cabin, adults, children, infants };
+  const outboundQuery = { ...passengers, from: search.from, to: search.to, date: search.departDate };
   const isRoundTrip = search.tripType === "roundTrip";
-  const passengersLabel = summarizePassengers(search.adults, search.children, search.infants);
-  // Chuyến bay trong ngày hôm nay đã đóng đặt vé trực tuyến (cùng luật với Server Action).
-  const closedToday = search.departDate <= getTodayInVietnam();
 
   const [outbound, chosenOutbound] = await Promise.all([
-    searchFlights({ from: search.from, to: search.to, date: search.departDate, cabin: search.cabin }),
-    isRoundTrip && selection.out
-      ? getFlightOption({
-          scheduleId: selection.out,
-          from: search.from,
-          to: search.to,
-          date: search.departDate,
-          cabin: search.cabin,
-        })
-      : null,
+    searchFlights(outboundQuery),
+    isRoundTrip && selection.out ? getFlightOption(selection.out, outboundQuery) : null,
   ]);
   const inbound =
     isRoundTrip && chosenOutbound
-      ? await searchFlights({ from: search.to, to: search.from, date: search.returnDate, cabin: search.cabin })
+      ? await searchFlights({ ...passengers, from: search.to, to: search.from, date: search.returnDate })
       : [];
+  return { outbound, chosenOutbound, inbound };
+}
+
+async function FlightResults({ search, selection }: { search: FlightSearchValues; selection: FlightSelection }) {
+  const isRoundTrip = search.tripType === "roundTrip";
+  const passengersLabel = summarizePassengers(search.adults, search.children, search.infants);
+  // Chuyến bay trong ngày hôm nay đã đóng đặt vé trực tuyến (cùng luật với API).
+  const closedToday = search.departDate <= getTodayInVietnam();
+
+  const results = await loadSection("kết quả tìm chuyến bay", () => loadFlightResults(search, selection));
+  if (!results.ok) {
+    return <SectionUnavailable what="danh sách chuyến bay" className="mt-10 bg-surface shadow-card" />;
+  }
+  const { outbound, chosenOutbound, inbound } = results.data;
+  /** Còn trong hạn đặt nhưng không đủ ghế cho cả đoàn. */
+  const lacksSeats = (flight: FlightOptionView) => !closedToday && !flight.isBookable;
 
   const from = outbound[0]?.from;
   const to = outbound[0]?.to;
@@ -134,6 +145,7 @@ async function FlightResults({ search, selection }: { search: FlightSearchValues
               flight={chosenOutbound}
               total={total(chosenOutbound)}
               passengersLabel={passengersLabel}
+              lacksSeats={lacksSeats(chosenOutbound)}
               selected
             />
           </div>
@@ -159,20 +171,27 @@ async function FlightResults({ search, selection }: { search: FlightSearchValues
                 flight={flight}
                 total={total(flight)}
                 passengersLabel={passengersLabel}
+                lacksSeats={lacksSeats(flight)}
                 action={
                   isRoundTrip ? (
-                    <Button asChild variant="accent" size="md" className="w-full md:w-auto">
-                      <AppLink href={`${buildFlightResultsHref(search, { out: flight.scheduleId })}#${RETURN_LIST_ID}`}>
+                    lacksSeats(flight) ? (
+                      <Button variant="accent" size="md" className="w-full md:w-auto" disabled>
                         Chọn chuyến đi<span className="sr-only"> ({flightLabel(flight)})</span>
-                      </AppLink>
-                    </Button>
+                      </Button>
+                    ) : (
+                      <Button asChild variant="accent" size="md" className="w-full md:w-auto">
+                        <AppLink href={`${buildFlightResultsHref(search, { out: flight.scheduleId })}#${RETURN_LIST_ID}`}>
+                          Chọn chuyến đi<span className="sr-only"> ({flightLabel(flight)})</span>
+                        </AppLink>
+                      </Button>
+                    )
                   ) : (
                     <SelectFlightButton
                       search={search}
                       outboundId={flight.scheduleId}
                       label="Chọn"
                       flightLabel={flightLabel(flight)}
-                      disabled={closedToday}
+                      disabled={!flight.isBookable}
                     />
                   )
                 }
@@ -200,6 +219,7 @@ async function FlightResults({ search, selection }: { search: FlightSearchValues
                 flight={flight}
                 total={total(flight)}
                 passengersLabel={passengersLabel}
+                lacksSeats={lacksSeats(flight)}
                 action={
                   <SelectFlightButton
                     search={search}
@@ -207,7 +227,7 @@ async function FlightResults({ search, selection }: { search: FlightSearchValues
                     returnId={flight.scheduleId}
                     label="Chọn chuyến về"
                     flightLabel={flightLabel(flight)}
-                    disabled={closedToday}
+                    disabled={!flight.isBookable || !chosenOutbound.isBookable}
                   />
                 }
               />
@@ -241,7 +261,7 @@ function FlightList({
 }
 
 async function FlightSuggestions({ invalidSearch }: { invalidSearch: boolean }) {
-  const routes = await getFlightRoutes();
+  const routes = await loadSection("chặng bay phổ biến", getFlightRoutes);
 
   return (
     <section aria-labelledby="ds-chang-bay-heading" className="mt-12">
@@ -260,9 +280,11 @@ async function FlightSuggestions({ invalidSearch }: { invalidSearch: boolean }) 
         Bấm một thẻ để điền sẵn điểm đi và điểm đến vào ô tìm kiếm phía trên, rồi chọn ngày bay. Giá chỉ để tham khảo.
       </p>
 
-      {routes.length > 0 ? (
+      {!routes.ok ? (
+        <SectionUnavailable what="chặng bay phổ biến" className="mt-6 bg-surface-muted" />
+      ) : routes.data.length > 0 ? (
         <ul className="mt-6 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-          {routes.map((route) => (
+          {routes.data.map((route) => (
             <li key={route.id}>
               <FlightRouteCard route={route} searchHref={`/flights#${FLIGHT_SEARCH_HASH}`} />
             </li>

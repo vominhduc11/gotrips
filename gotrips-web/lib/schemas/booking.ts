@@ -1,11 +1,12 @@
 import { z } from "zod";
-import { BOOKING_CODE_PATTERN } from "@/lib/booking/booking-code";
-import { BOOKING_ACTIONS } from "@/lib/booking/transitions";
 import { getTodayInVietnam } from "@/lib/data/tour-view";
 import { isIsoDate } from "@/lib/iso-date";
 import { emailSchema } from "./auth";
 
-/** Tối đa số khách mỗi đơn (bản demo lưu đơn trong cookie ≤ 4KB nên không cho danh sách người đi quá dài). */
+/**
+ * Tối đa số khách mỗi đơn tour. Luật đặt chỗ do gotrips-api kiểm lại (`CreateTourBookingRequest`) với CÙNG câu báo lỗi:
+ * đổi giới hạn hay câu chữ ở đây (hay ở `hotel-booking.ts`, `flight-booking.ts`, `flight-search.ts`) phải đổi cả API.
+ */
 export const MAX_GUESTS_PER_BOOKING = 10;
 
 // ---------------------------------------------------------------------------
@@ -187,105 +188,14 @@ export function createBookingFormSchema(today: string = getTodayInVietnam()) {
 
 export type BookingFormValues = z.input<ReturnType<typeof createBookingFormSchema>>;
 
-/** Dữ liệu Server Action nhận: form + slug tour. Server kiểm lại toàn bộ và tự tính giá — không có trường giá. */
+/**
+ * Dữ liệu Server Action nhận: form + slug tour (đi vào đường dẫn chuyển hướng nên chỉ nhận ký tự an toàn). Không có
+ * trường giá: API tự tính giá.
+ */
 export function createBookingRequestSchema(today: string = getTodayInVietnam()) {
   return z
-    .object({ ...bookingFormShape(today), tourSlug: z.string().trim().min(1).max(220) })
+    .object({ ...bookingFormShape(today), tourSlug: z.string().regex(/^[a-z0-9-]+$/).max(220) })
     .superRefine(checkTravelerCount);
 }
 
 export type BookingRequest = z.output<ReturnType<typeof createBookingRequestSchema>>;
-
-/** Tham số của thao tác mô phỏng nhân viên (Server Action nhận từ trình duyệt nên cũng phải kiểm). */
-export const simulateBookingSchema = z.object({
-  code: z.string().regex(BOOKING_CODE_PATTERN),
-  action: z.enum(BOOKING_ACTIONS),
-});
-
-// ---------------------------------------------------------------------------
-// Bản ghi đơn (mọi loại dịch vụ) lưu trong cookie demo — dữ liệu không tin cậy (người dùng sửa được cookie) nên đọc ra phải kiểm
-// ---------------------------------------------------------------------------
-
-const isoDateTime = z.iso.datetime({ offset: true });
-
-/** Phần chung của mọi đơn trong cookie. */
-const storedBookingBase = {
-  code: z.string().regex(BOOKING_CODE_PATTERN),
-  ownerEmail: z.string().max(255),
-  totalAmount: z.number().int().nonnegative(),
-  contact: z.object({ fullName: z.string().max(100), email: z.string().max(255), phone: z.string().max(30) }),
-  note: z.string().max(500).nullable(),
-  status: z.enum(["PENDING", "CONFIRMED", "CANCELLED"]),
-  payment: z.object({
-    method: z.literal("BANK_TRANSFER"),
-    amount: z.number().int().nonnegative(),
-    status: z.enum(["UNPAID", "PAID", "CANCELLED"]),
-    paidAt: isoDateTime.nullable(),
-  }),
-  createdAt: isoDateTime,
-  confirmedAt: isoDateTime.nullable(),
-  cancelledAt: isoDateTime.nullable(),
-};
-
-const storedTourBookingSchema = z.object({
-  ...storedBookingBase,
-  kind: z.literal("tour"),
-  departureId: z.number().int().positive(),
-  guestCount: z.number().int().min(1).max(MAX_GUESTS_PER_BOOKING),
-  unitPrice: z.number().int().nonnegative(),
-  travelers: z
-    .array(z.object({ fullName: z.string().max(100), dateOfBirth: z.iso.date().nullable() }))
-    .max(MAX_GUESTS_PER_BOOKING),
-});
-
-const storedHotelBookingSchema = z.object({
-  ...storedBookingBase,
-  kind: z.literal("hotel"),
-  hotelId: z.number().int().positive(),
-  roomTypeId: z.number().int().positive(),
-  checkIn: z.iso.date(),
-  checkOut: z.iso.date(),
-  nights: z.number().int().positive(),
-  rooms: z.number().int().positive(),
-  guestCount: z.number().int().positive(),
-  pricePerNight: z.number().int().nonnegative(),
-  guestName: z.string().max(100),
-});
-
-const storedFaresSchema = z.object({
-  adult: z.number().int().nonnegative(),
-  child: z.number().int().nonnegative(),
-  infant: z.number().int().nonnegative(),
-});
-
-const storedFlightBookingSchema = z.object({
-  ...storedBookingBase,
-  kind: z.literal("flight"),
-  cabin: z.enum(["economy", "premiumEconomy", "business", "first"]),
-  segments: z
-    .array(z.object({ scheduleId: z.number().int().positive(), date: z.iso.date(), fares: storedFaresSchema }))
-    .min(1)
-    .max(2),
-  passengers: z
-    .array(
-      z.object({
-        type: z.enum(["adult", "child", "infant"]),
-        fullName: z.string().max(100),
-        dateOfBirth: z.iso.date().nullable(),
-      }),
-    )
-    .min(1)
-    .max(9),
-});
-
-/**
- * Một đơn trong cookie. Đơn tạo trước khi có khách sạn/vé máy bay không có `kind` — coi là đơn tour, để khách không
- * mất đơn cũ khi cập nhật.
- */
-export const storedBookingSchema = z.preprocess(
-  (value) =>
-    value !== null && typeof value === "object" && !("kind" in value) ? { ...value, kind: "tour" } : value,
-  z.discriminatedUnion("kind", [storedTourBookingSchema, storedHotelBookingSchema, storedFlightBookingSchema]),
-);
-
-export const storedBookingsSchema = z.array(storedBookingSchema);

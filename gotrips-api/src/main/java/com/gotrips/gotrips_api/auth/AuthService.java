@@ -1,19 +1,17 @@
 package com.gotrips.gotrips_api.auth;
 
-import java.util.Set;
 import java.util.UUID;
 
-import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.gotrips.gotrips_api.common.error.DuplicateEmailException;
+import com.gotrips.gotrips_api.common.error.InvalidRequestException;
 import com.gotrips.gotrips_api.common.error.UnauthorizedException;
-import com.gotrips.gotrips_api.user.Role;
 import com.gotrips.gotrips_api.user.RoleName;
-import com.gotrips.gotrips_api.user.RoleRepository;
 import com.gotrips.gotrips_api.user.User;
+import com.gotrips.gotrips_api.user.UserAccountCreator;
 import com.gotrips.gotrips_api.user.UserMapper;
 import com.gotrips.gotrips_api.user.UserRepository;
 import com.gotrips.gotrips_api.user.UserResponse;
@@ -25,7 +23,7 @@ public class AuthService {
     static final String INVALID_CREDENTIALS = "Email hoặc mật khẩu không đúng.";
 
     private final UserRepository users;
-    private final RoleRepository roles;
+    private final UserAccountCreator accounts;
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
     private final UserMapper userMapper;
@@ -35,10 +33,10 @@ public class AuthService {
      */
     private final String dummyPasswordHash;
 
-    public AuthService(UserRepository users, RoleRepository roles, PasswordEncoder passwordEncoder,
+    public AuthService(UserRepository users, UserAccountCreator accounts, PasswordEncoder passwordEncoder,
             JwtService jwtService, UserMapper userMapper) {
         this.users = users;
-        this.roles = roles;
+        this.accounts = accounts;
         this.passwordEncoder = passwordEncoder;
         this.jwtService = jwtService;
         this.userMapper = userMapper;
@@ -47,41 +45,53 @@ public class AuthService {
 
     @Transactional
     public UserResponse register(RegisterRequest request) {
-        // Kiểm trước để trả lỗi rõ ràng trong trường hợp thường gặp; ràng buộc UNIQUE của DB bên dưới
-        // mới là chốt chặn thật khi hai request cùng email đến đồng thời.
-        if (users.existsByEmail(request.email())) {
-            throw new DuplicateEmailException();
-        }
-        Role customer = roles.findByName(RoleName.CUSTOMER)
-                .orElseThrow(() -> new IllegalStateException("Thiếu vai trò CUSTOMER trong bảng roles (migration V1)."));
-
-        User user = User.builder()
-                .email(request.email())
-                .fullName(request.fullName())
-                .passwordHash(passwordEncoder.encode(request.password()))
-                .roles(Set.of(customer))
-                .build();
-        try {
-            // flush ngay để vi phạm UNIQUE nổ ở đây (và được dịch thành lỗi 409) thay vì lúc commit
-            users.saveAndFlush(user);
-        } catch (DataIntegrityViolationException e) {
-            throw new DuplicateEmailException();
-        }
-        return userMapper.toResponse(user);
+        return userMapper.toResponse(accounts.create(request.fullName(), request.email(), request.password(),
+                RoleName.CUSTOMER));
     }
 
     @Transactional(readOnly = true)
     public LoginResponse login(LoginRequest request) {
-        User user = users.findByEmail(request.email()).orElse(null);
+        User user = authenticate(request);
+        JwtService.IssuedToken token = jwtService.issue(user);
+        return new LoginResponse(token.value(), "Bearer", token.expiresInSeconds(), userMapper.toResponse(user));
+    }
 
+    @Transactional(readOnly = true)
+    public AdminLogin loginAdmin(LoginRequest request) {
+        User user = authenticate(request);
+        UserResponse response = userMapper.toResponse(user);
+        if (!response.roles().contains(RoleName.STAFF) && !response.roles().contains(RoleName.ADMIN)) {
+            throw new AccessDeniedException("Tài khoản không có quyền truy cập trang quản trị");
+        }
+        return new AdminLogin(response, jwtService.issueAdmin(user));
+    }
+
+    @Transactional
+    public void changeAdminPassword(UUID userId, AdminChangePasswordRequest request) {
+        // Hai yêu cầu đổi mật khẩu đồng thời phải kiểm lại mật khẩu trên bản ghi sau khi có khoá.
+        User user = users.lockById(userId)
+                .orElseThrow(() -> new UnauthorizedException("Phiên đăng nhập không còn hợp lệ."));
+        if (!user.hasStaffAccess()) {
+            throw new AccessDeniedException("Tài khoản không còn quyền truy cập trang quản trị.");
+        }
+        if (!passwordEncoder.matches(request.currentPassword(), user.getPasswordHash())) {
+            throw new InvalidRequestException("currentPassword", "Mật khẩu hiện tại không đúng.");
+        }
+        user.changePasswordHash(passwordEncoder.encode(request.newPassword()));
+    }
+
+    record AdminLogin(UserResponse user, JwtService.IssuedToken token) {
+    }
+
+    private User authenticate(LoginRequest request) {
+        User user = users.findByEmail(request.email()).orElse(null);
         String hash = user != null ? user.getPasswordHash() : dummyPasswordHash;
         boolean passwordMatches = passwordEncoder.matches(request.password(), hash);
         if (user == null || !passwordMatches) {
             throw new UnauthorizedException(INVALID_CREDENTIALS);
         }
 
-        JwtService.IssuedToken token = jwtService.issue(user);
-        return new LoginResponse(token.value(), "Bearer", token.expiresInSeconds(), userMapper.toResponse(user));
+        return user;
     }
 
     /** Người dùng của token hiện tại. Tài khoản đã bị xoá sau khi cấp token thì coi như phiên hết hiệu lực. */

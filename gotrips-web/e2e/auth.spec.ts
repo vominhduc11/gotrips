@@ -142,7 +142,7 @@ test.describe("đăng nhập", () => {
     const session = (await context.cookies()).find((cookie) => cookie.name === "gotrips_session");
     expect(session?.httpOnly).toBe(true);
     expect(session?.sameSite).toBe("Lax");
-    expect(session?.value.split(".")).toHaveLength(3); // JWT do API cấp, không phải email như bản demo cũ
+    expect(session?.value.split(".")).toHaveLength(3); // JWT do API cấp
 
     expect(await page.evaluate(() => document.cookie)).not.toContain("gotrips_session");
   });

@@ -8,20 +8,14 @@ import javax.crypto.spec.SecretKeySpec;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.security.oauth2.jose.jws.MacAlgorithm;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
-import org.springframework.security.oauth2.jwt.JwtEncoder;
-import org.springframework.security.oauth2.jwt.JwtValidators;
-import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
-import org.springframework.security.oauth2.jwt.NimbusJwtEncoder;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
 import org.springframework.security.oauth2.server.resource.authentication.JwtGrantedAuthoritiesConverter;
 
-import com.nimbusds.jose.jwk.source.ImmutableSecret;
-
 /**
- * JWT ký đối xứng HS256 bằng Nimbus (có sẵn trong spring-security-oauth2-jose, không dùng jjwt).
- * Cùng một API vừa cấp token ({@link JwtEncoder}) vừa kiểm token ({@link JwtDecoder}) nên khoá đối xứng là đủ.
+ * JWT ký đối xứng HS256 bằng jjwt. Cùng một API vừa cấp token ({@code JwtService}) vừa kiểm token
+ * ({@link JjwtDecoder}) nên khoá đối xứng là đủ. Resource Server của Spring Security chỉ lo đọc header Bearer và
+ * phân quyền.
  */
 @Configuration
 @EnableConfigurationProperties(JwtProperties.class)
@@ -31,19 +25,21 @@ public class JwtConfig {
     private static final int MIN_SECRET_BYTES = 32;
     private static final String CLAIM_ROLES = "roles";
 
+    /** Khoá dùng chung cho việc ký và kiểm token. Thiếu hoặc quá ngắn thì API không khởi động. */
     @Bean
-    JwtEncoder jwtEncoder(JwtProperties properties) {
-        return new NimbusJwtEncoder(new ImmutableSecret<>(secretKey(properties)));
+    SecretKey jwtSigningKey(JwtProperties properties) {
+        byte[] bytes = properties.secret().getBytes(StandardCharsets.UTF_8);
+        if (bytes.length < MIN_SECRET_BYTES) {
+            // Không đưa giá trị khoá vào thông báo lỗi
+            throw new IllegalStateException("GOTRIPS_JWT_SECRET quá ngắn: cần tối thiểu " + MIN_SECRET_BYTES
+                    + " byte cho HS256. Tạo bằng: openssl rand -base64 48");
+        }
+        return new SecretKeySpec(bytes, "HmacSHA256");
     }
 
     @Bean
-    JwtDecoder jwtDecoder(JwtProperties properties) {
-        NimbusJwtDecoder decoder = NimbusJwtDecoder.withSecretKey(secretKey(properties))
-                .macAlgorithm(MacAlgorithm.HS256)
-                .build();
-        // Mặc định đã kiểm hạn (exp/nbf); thêm kiểm issuer để không nhận token do hệ thống khác cấp
-        decoder.setJwtValidator(JwtValidators.createDefaultWithIssuer(properties.issuer()));
-        return decoder;
+    JwtDecoder jwtDecoder(SecretKey jwtSigningKey, JwtProperties properties) {
+        return new JjwtDecoder(jwtSigningKey, properties.issuer());
     }
 
     /** Claim {@code roles: ["CUSTOMER"]} → authority {@code ROLE_CUSTOMER} để dùng với {@code hasRole("CUSTOMER")}. */
@@ -56,15 +52,5 @@ public class JwtConfig {
         JwtAuthenticationConverter converter = new JwtAuthenticationConverter();
         converter.setJwtGrantedAuthoritiesConverter(authorities);
         return converter;
-    }
-
-    private static SecretKey secretKey(JwtProperties properties) {
-        byte[] bytes = properties.secret().getBytes(StandardCharsets.UTF_8);
-        if (bytes.length < MIN_SECRET_BYTES) {
-            // Không đưa giá trị khoá vào thông báo lỗi
-            throw new IllegalStateException("GOTRIPS_JWT_SECRET quá ngắn: cần tối thiểu " + MIN_SECRET_BYTES
-                    + " byte cho HS256. Tạo bằng: openssl rand -base64 48");
-        }
-        return new SecretKeySpec(bytes, "HmacSHA256");
     }
 }

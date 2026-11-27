@@ -8,7 +8,6 @@ import {
   createBookingRequestSchema,
   MAX_GUESTS_PER_BOOKING,
   parseBookingParams,
-  simulateBookingSchema,
   startBookingRequestSchema,
   tripSelectionSchema,
   type BookingFormValues,
@@ -175,13 +174,5 @@ describe("createBookingRequestSchema", () => {
     expect(result.success).toBe(true);
     expect(result.data).not.toHaveProperty("unitPrice");
     expect(result.data).not.toHaveProperty("totalAmount");
-  });
-});
-
-describe("simulateBookingSchema", () => {
-  it("chỉ nhận mã đơn đúng định dạng và thao tác đã định nghĩa", () => {
-    expect(simulateBookingSchema.safeParse({ code: "GT7K4Q2M", action: "confirm" }).success).toBe(true);
-    expect(simulateBookingSchema.safeParse({ code: "GT7K4Q2M", action: "delete" }).success).toBe(false);
-    expect(simulateBookingSchema.safeParse({ code: "../../etc", action: "cancel" }).success).toBe(false);
   });
 });

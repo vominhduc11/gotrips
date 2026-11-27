@@ -1,4 +1,4 @@
-# Profile `seed`: nạp dữ liệu mẫu catalog (điểm đến, tour, khách sạn, chặng bay...) cho dev/Docker.
+# Profile `seed`: nạp dữ liệu mẫu catalog (điểm đến, tour, khách sạn, chặng bay, lịch bay...) cho dev/Docker.
 # KHÔNG bật ở production: mặc định (không có profile) Flyway không thấy thư mục db/seed.
 #
 # Bật bằng SPRING_PROFILES_ACTIVE=seed (docker-compose đã đặt sẵn) hoặc khi chạy local:
@@ -7,3 +7,12 @@ spring:
   flyway:
     # Migration lặp lại R__*.sql ở db/seed luôn chạy SAU mọi migration schema (V1, V2...).
     locations: classpath:db/migration,classpath:db/seed
+
+# Tài khoản nhận chuyển khoản THỬ NGHIỆM cho dev/Docker (không phải tài khoản thật, đừng chuyển tiền).
+# Biến môi trường vẫn ghi đè được.
+gotrips:
+  payment:
+    bank-transfer:
+      bank-name: ${GOTRIPS_BANK_NAME:Ngân hàng Thử nghiệm (bản demo)}
+      account-number: ${GOTRIPS_BANK_ACCOUNT_NUMBER:0000 1234 5678}
+      account-name: ${GOTRIPS_BANK_ACCOUNT_NAME:CONG TY GOTRIPS (DEMO)}

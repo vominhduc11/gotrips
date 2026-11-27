@@ -3,11 +3,9 @@ import type { HotelRoomTypeView } from "@/lib/types";
 
 /**
  * Các hàm nhỏ phục vụ GIAO DIỆN đặt phòng: tạm tính tiền ngay khi khách đổi ngày/số phòng và tự khớp số phòng với sức
- * chứa (thẻ "Đặt phòng", trang đặt phòng, `lib/booking/hotel-stay.ts`). Việc tìm khách sạn, chọn phòng rẻ nhất đủ chỗ,
- * tổng tiền cả kỳ và thứ tự kết quả do gotrips-api tính (`HotelStayCalculator`); đừng thêm luật tìm kiếm vào đây.
- *
- * Phần dành cho server (`computeStayTotal` ở `createHotelBookingAction`) còn lại tới khi đơn được tạo ở API, lúc đó giá
- * do API tính và chỉ phần tạm tính hiển thị còn dùng file này.
+ * chứa (thẻ "Đặt phòng", trang đặt phòng, `lib/booking/hotel-stay.ts`). Việc tìm khách sạn, chọn phòng rẻ nhất còn
+ * trống đủ chỗ, tổng tiền cả kỳ, phòng trống và giá của đơn do gotrips-api tính (`HotelStayCalculator`); đừng thêm luật
+ * tìm kiếm hay đặt phòng vào đây.
  */
 
 /** Số đêm lưu trú = số ngày lịch giữa ngày nhận và ngày trả (`YYYY-MM-DD`, đã hợp lệ). */
@@ -16,11 +14,27 @@ export function countNights(checkIn: string, checkOut: string): number {
 }
 
 /**
- * Tiền phòng = giá một phòng một đêm × số đêm × số phòng. Một chỗ tính duy nhất cho thẻ "Đặt phòng", trang đặt phòng
- * và Server Action (server tính lại, không tin số ở trình duyệt).
+ * Tạm tính tiền phòng = giá một phòng một đêm × số đêm × số phòng (thẻ "Đặt phòng", trang đặt phòng). Tiền thật do API
+ * tính lúc tạo đơn.
  */
 export function computeStayTotal(pricePerNight: number, nights: number, rooms: number): number {
   return pricePerNight * nights * rooms;
+}
+
+/**
+ * Chỉ giữ các trường của loại phòng gốc trước khi gửi sang Client Component (thẻ "Đặt phòng", form đặt phòng): ảnh và
+ * tiện ích chỉ phần server cần, gửi kèm làm payload RSC phình. Liệt kê từng trường, KHÔNG rải `...rest`: TypeScript coi
+ * bản chi tiết là hợp lệ ở chỗ nhận bản gốc nên không bắt được chỗ quên lược, và rải sẽ để lọt trường mới.
+ */
+export function toRoomTypeView({
+  id,
+  name,
+  pricePerNight,
+  maxGuests,
+  bedType,
+  areaM2,
+}: HotelRoomTypeView): HotelRoomTypeView {
+  return { id, name, pricePerNight, maxGuests, bedType, areaM2 };
 }
 
 /** Loại phòng chứa đủ số khách khi đặt `rooms` phòng: mỗi phòng ít nhất 1 khách, nhiều nhất `maxGuests`. */

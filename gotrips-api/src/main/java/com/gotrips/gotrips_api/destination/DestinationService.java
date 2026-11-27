@@ -22,8 +22,9 @@ public class DestinationService {
     @Transactional(readOnly = true)
     public List<DestinationResponse> listAll() {
         Map<Long, Long> tourCounts = new HashMap<>();
-        for (DestinationRepository.TourCount row : destinationRepository.countToursByDestination(CatalogStatus.ACTIVE)) {
-            tourCounts.put(row.getDestinationId(), row.getTourCount());
+        for (DestinationRepository.ReferenceCount row
+                : destinationRepository.countToursByDestination(CatalogStatus.ACTIVE)) {
+            tourCounts.put(row.getDestinationId(), row.getTotal());
         }
         return destinationRepository.findAllByOrderByIdAsc().stream()
                 .map(d -> destinationMapper.toResponse(d, tourCounts.getOrDefault(d.getId(), 0L)))

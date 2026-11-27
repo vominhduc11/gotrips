@@ -2,6 +2,7 @@ import { redirect } from "next/navigation";
 import { connection } from "next/server";
 import { getCurrentUser } from "@/lib/auth/session";
 import { normalizeHotelStay } from "@/lib/booking/hotel-stay";
+import { toRoomTypeView } from "@/lib/data/hotel-view";
 import { buildLoginHref } from "@/lib/safe-redirect";
 import { buildHotelBookingHref, buildHotelDetailHref, parseHotelStayParams } from "@/lib/schemas/hotel-booking";
 import type { HotelDetailView } from "@/lib/types";
@@ -46,7 +47,7 @@ export async function HotelBookingGate({
         checkInTime: hotel.checkInTime,
         checkOutTime: hotel.checkOutTime,
       }}
-      room={room}
+      room={toRoomTypeView(room)}
       stay={stay}
       user={user}
     />

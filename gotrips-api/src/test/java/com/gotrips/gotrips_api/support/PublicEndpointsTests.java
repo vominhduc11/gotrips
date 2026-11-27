@@ -44,6 +44,32 @@ class PublicEndpointsTests extends CatalogApiTest {
     }
 
     @ParameterizedTest
+    @ValueSource(strings = { "/flights", "/flights/1" })
+    void flightSearchIsReachableWithoutATokenAndMissingParametersAreABadRequest(String path) throws Exception {
+        // 400 (chứ không phải 401) chứng minh GET /flights và GET /flights/{scheduleId} đã được mở công khai.
+        mvc.perform(get(path)).andExpect(status().isBadRequest());
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = { "/flights/1/seats", "/flights/1/book", "/bookings", "/bookings/me", "/bookings/GT222222",
+            "/admin", "/admin/bookings", "/admin/bookings/GT222222", "/admin/airlines", "/admin/airports",
+            "/admin/flight-schedules", "/admin/flight-schedules/1", "/admin/flight-routes" })
+    void bookingAndAdminPathsAndSubPathsOfAFlightStayProtected(String path) throws Exception {
+        mvc.perform(get(path)).andExpect(status().isUnauthorized());
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = { "/flights", "/bookings/tours", "/bookings/hotels", "/bookings/flights",
+            "/admin/bookings/GT222222/mark-paid", "/admin/bookings/GT222222/confirm",
+            "/admin/bookings/GT222222/cancel", "/admin/airlines", "/admin/airports",
+            "/admin/flight-schedules", "/admin/flight-routes" })
+    void writingAlwaysNeedsAToken(String path) throws Exception {
+        // Chỉ GET /flights công khai: POST cùng đường dẫn vẫn đòi token.
+        mvc.perform(post(path).contentType(MediaType.APPLICATION_JSON).content("{}"))
+                .andExpect(status().isUnauthorized());
+    }
+
+    @ParameterizedTest
     @ValueSource(strings = { "/flight-routes", "/destinations/1", "/airports/HAN",
             "/testimonials/1", "/newsletter/subscriptions", "/tours/featured/extra", "/tours/some-slug/book",
             "/tours/some-slug/departures", "/hotels/featured/extra", "/hotels/some-slug/book",

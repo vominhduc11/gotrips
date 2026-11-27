@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import type { HotelRoomType } from "@/lib/types";
+import type { HotelRoomTypeView } from "@/lib/types";
 import {
   changeHotelGuests,
   changeHotelRoom,
@@ -11,9 +11,8 @@ import {
 
 const TODAY = "2027-01-01";
 
-const room = (id: number, pricePerNight: number, maxGuests: number): HotelRoomType => ({
+const room = (id: number, pricePerNight: number, maxGuests: number): HotelRoomTypeView => ({
   id,
-  hotelId: 1,
   name: `Phòng ${id}`,
   pricePerNight,
   maxGuests,

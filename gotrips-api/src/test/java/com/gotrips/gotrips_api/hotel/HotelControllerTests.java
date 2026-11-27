@@ -1,5 +1,7 @@
 package com.gotrips.gotrips_api.hotel;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.nullValue;
@@ -9,20 +11,28 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.Map;
 
+import org.hibernate.SessionFactory;
+import org.hibernate.stat.Statistics;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.ValueSource;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 
 import com.gotrips.gotrips_api.support.CatalogApiTest;
 
+import jakarta.persistence.EntityManagerFactory;
+
 /** GET /hotels/featured, GET /hotels (tìm) và GET /hotels/{slug} (chi tiết). */
 class HotelControllerTests extends CatalogApiTest {
+
+    @Autowired
+    private EntityManagerFactory entityManagerFactory;
 
     @Test
     void featuredIsPublicAndEmptyWithoutData() throws Exception {
@@ -66,6 +76,42 @@ class HotelControllerTests extends CatalogApiTest {
 
         mvc.perform(get("/hotels/featured"))
                 .andExpect(jsonPath("$[0].minPricePerNight").value(1_250_000));
+    }
+
+    @Test
+    void publicHotelPricesAndRoomsExcludeStoppedRoomTypes() throws Exception {
+        long destination = data.destination("da-lat", "Đà Lạt");
+        long hotel = data.hotel("doi-may", destination, "ACTIVE", 4.6, 10);
+        long cheap = data.room(hotel, 800_000);
+        long open = data.room(hotel, 1_250_000);
+        data.totalRooms(cheap, 0);
+
+        mvc.perform(get("/hotels/featured"))
+                .andExpect(jsonPath("$[0].minPricePerNight").value(1_250_000));
+        mvc.perform(search("da-lat", "2026-11-26", "2026-11-27", 2, 1))
+                .andExpect(jsonPath("$.items[0].minPricePerNight").value(1_250_000));
+        mvc.perform(get("/hotels/doi-may"))
+                .andExpect(jsonPath("$.minPricePerNight").value(1_250_000))
+                .andExpect(jsonPath("$.roomTypes[*].id", contains((int) open)));
+    }
+
+    @Test
+    void hotelDisappearsWhenTheLastTypeStopsAndReturnsWhenItReopens() throws Exception {
+        long destination = data.destination("da-lat", "Đà Lạt");
+        long hotel = data.hotel("doi-may", destination, "ACTIVE", 4.6, 10);
+        long room = data.room(hotel, 800_000);
+        data.totalRooms(room, 0);
+
+        mvc.perform(get("/hotels/featured")).andExpect(jsonPath("$", hasSize(0)));
+        mvc.perform(search("da-lat", "2026-11-26", "2026-11-27", 2, 1))
+                .andExpect(jsonPath("$.items", hasSize(0)));
+        mvc.perform(get("/hotels/doi-may")).andExpect(status().isNotFound());
+
+        data.totalRooms(room, 1);
+        mvc.perform(get("/hotels/featured")).andExpect(jsonPath("$[0].minPricePerNight").value(800_000));
+        mvc.perform(search("da-lat", "2026-11-26", "2026-11-27", 2, 1))
+                .andExpect(jsonPath("$.items[0].minPricePerNight").value(800_000));
+        mvc.perform(get("/hotels/doi-may")).andExpect(status().isOk());
     }
 
     @Test
@@ -305,7 +351,15 @@ class HotelControllerTests extends CatalogApiTest {
     void detailHasDescriptionAmenitiesTimesAndRoomTypesSortedByPrice() throws Exception {
         long destination = data.destination("da-lat", "Đà Lạt");
         long hotel = data.hotel("doi-may", destination, "ACTIVE", 4.6, 1280);
-        data.hotelDetails(hotel, "Khách sạn nhìn ra đồi thông", List.of("Hồ bơi", "Bữa sáng", "Wi-Fi"), "15:00", "11:30");
+        data.hotelDetails(hotel, "Khách sạn nhìn ra đồi thông", "15:00", "11:30");
+        // Tạo và gắn không theo thứ tự: API phải sắp theo sort_order, hoà thì theo id (spa tạo trước bar).
+        long wifi = data.amenity("wifi", "Wi-Fi", "BOTH", 30);
+        long spa = data.amenity("spa", "Spa", "HOTEL", 20);
+        long bar = data.amenity("bar", "Quầy bar", "HOTEL", 20);
+        long pool = data.amenity("pool", "Hồ bơi", "HOTEL", 10);
+        for (long amenity : new long[] { wifi, bar, pool, spa }) {
+            data.hotelAmenity(hotel, amenity);
+        }
         // Chèn không theo thứ tự giá: API phải sắp tăng dần (hoà giá thì theo id).
         long expensive = data.room(hotel, "Phòng gia đình", 1_980_000, 4);
         long cheapB = data.room(hotel, "Phòng B", 1_250_000, 2);
@@ -320,7 +374,10 @@ class HotelControllerTests extends CatalogApiTest {
                 .andExpect(jsonPath("$.rating").value(4.6))
                 .andExpect(jsonPath("$.minPricePerNight").value(1_250_000))
                 .andExpect(jsonPath("$.description").value("Khách sạn nhìn ra đồi thông"))
-                .andExpect(jsonPath("$.amenities", contains("Hồ bơi", "Bữa sáng", "Wi-Fi")))
+                .andExpect(jsonPath("$.amenities[*].code", contains("pool", "spa", "bar", "wifi")))
+                .andExpect(jsonPath("$.amenities[*].name", contains("Hồ bơi", "Spa", "Quầy bar", "Wi-Fi")))
+                // Mỗi tiện ích chỉ có code và name: không lộ id, scope hay thứ tự.
+                .andExpect(jsonPath("$.amenities[0].*", hasSize(2)))
                 // Giờ là chuỗi "HH:mm" (không phải "15:00:00") để web in nguyên.
                 .andExpect(jsonPath("$.checkInTime").value("15:00"))
                 .andExpect(jsonPath("$.checkOutTime").value("11:30"))
@@ -333,6 +390,166 @@ class HotelControllerTests extends CatalogApiTest {
                 .andExpect(jsonPath("$.roomTypes[2].bedType").value("1 giường đôi"))
                 .andExpect(jsonPath("$.roomTypes[2].areaM2").value(25))
                 .andExpect(jsonPath("$.roomTypes[2].pricePerNight").value(1_980_000));
+    }
+
+    @Test
+    void detailListsExtraImagesBySortOrderWithoutTheCoverImage() throws Exception {
+        long destination = data.destination("da-lat", "Đà Lạt");
+        long hotel = data.hotel("doi-may", destination, "ACTIVE", 4.6, 1280);
+        data.room(hotel, 1_000_000);
+        data.hotelImage(hotel, "thu-hai", 5);
+        data.hotelImage(hotel, "thu-ba", 9);
+        data.hotelImage(hotel, "thu-nhat", 0);
+
+        mvc.perform(get("/hotels/doi-may"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.imageUrl").value("https://img.test/doi-may.jpg"))
+                .andExpect(jsonPath("$.images[*].url", contains("https://img.test/thu-nhat.jpg",
+                        "https://img.test/thu-hai.jpg", "https://img.test/thu-ba.jpg")))
+                .andExpect(jsonPath("$.images[*].alt", contains("Ảnh thu-nhat", "Ảnh thu-hai", "Ảnh thu-ba")))
+                .andExpect(jsonPath("$.images[0].*", hasSize(2)));
+    }
+
+    @Test
+    void detailReturnsEmptyListsNotNullWhenThereAreNoImagesOrAmenities() throws Exception {
+        long destination = data.destination("da-lat", "Đà Lạt");
+        long hotel = data.hotel("tron", destination, "ACTIVE", 4.0, 1);
+        data.room(hotel, 1_000_000);
+
+        mvc.perform(get("/hotels/tron"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.images", hasSize(0)))
+                .andExpect(jsonPath("$.amenities", hasSize(0)))
+                .andExpect(jsonPath("$.roomTypes[0].images", hasSize(0)))
+                .andExpect(jsonPath("$.roomTypes[0].amenities", hasSize(0)));
+    }
+
+    /**
+     * Cũng canh khoá chính của hai entity bảng nối: {@code ddl-auto: validate} không kiểm khoá, khai sai (ví dụ chỉ lấy
+     * tiện ích làm khoá) thì Hibernate gộp các dòng khác nhau thành một và danh sách bị lặp hoặc thiếu.
+     */
+    @Test
+    void detailKeepsImagesAndAmenitiesWithTheirOwnerEvenWhenAmenitiesAreShared() throws Exception {
+        long destination = data.destination("da-lat", "Đà Lạt");
+        long hotel = data.hotel("doi-may", destination, "ACTIVE", 4.6, 1280);
+        long cheap = data.room(hotel, 1_000_000);
+        long dear = data.room(hotel, 2_000_000);
+        long bare = data.room(hotel, 3_000_000);
+        long otherHotel = data.hotel("khach-san-khac", destination, "ACTIVE", 4.0, 1);
+        long otherRoom = data.room(otherHotel, 1_000_000);
+
+        long wifi = data.amenity("wifi", "Wi-Fi", "BOTH", 10);
+        long television = data.amenity("tv", "TV", "ROOM", 20);
+        long safe = data.amenity("safe", "Két an toàn", "ROOM", 30);
+        data.hotelAmenity(hotel, wifi);
+        data.roomAmenity(cheap, wifi);
+        data.roomAmenity(dear, safe);
+        data.roomAmenity(dear, wifi);
+        data.roomAmenity(dear, television);
+        data.hotelAmenity(otherHotel, wifi);
+        data.roomAmenity(otherRoom, safe);
+
+        // Hai chủ khác nhau dùng cùng số thứ tự: thứ tự chỉ tính trong từng chủ.
+        data.roomImage(cheap, "re-2", 1);
+        data.roomImage(dear, "dat-1", 0);
+        data.roomImage(cheap, "re-1", 0);
+        data.hotelImage(otherHotel, "cua-nguoi-khac", 0);
+        data.roomImage(otherRoom, "phong-nguoi-khac", 0);
+
+        mvc.perform(get("/hotels/doi-may"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.amenities[*].code", contains("wifi")))
+                .andExpect(jsonPath("$.images", hasSize(0)))
+                .andExpect(jsonPath("$.roomTypes[*].id", contains((int) cheap, (int) dear, (int) bare)))
+                .andExpect(jsonPath("$.roomTypes[0].amenities[*].code", contains("wifi")))
+                .andExpect(jsonPath("$.roomTypes[0].images[*].alt", contains("Ảnh re-1", "Ảnh re-2")))
+                .andExpect(jsonPath("$.roomTypes[1].amenities[*].code", contains("wifi", "tv", "safe")))
+                .andExpect(jsonPath("$.roomTypes[1].images[*].url", contains("https://img.test/dat-1.jpg")))
+                .andExpect(jsonPath("$.roomTypes[2].amenities", hasSize(0)))
+                .andExpect(jsonPath("$.roomTypes[2].images", hasSize(0)));
+    }
+
+    /** Khách sạn + điểm đến, loại phòng, ảnh khách sạn, tiện ích khách sạn, ảnh phòng, tiện ích phòng: đúng 6 câu. */
+    @ParameterizedTest
+    @ValueSource(ints = { 1, 3 })
+    void detailRunsTheSameNumberOfStatementsHoweverManyRoomTypesThereAre(int roomCount) throws Exception {
+        long destination = data.destination("da-lat", "Đà Lạt");
+        long hotel = data.hotel("doi-may", destination, "ACTIVE", 4.6, 1280);
+        long wifi = data.amenity("wifi", "Wi-Fi", "BOTH", 10);
+        long television = data.amenity("tv", "TV", "ROOM", 20);
+        data.hotelAmenity(hotel, wifi);
+        data.hotelImage(hotel, "mot", 0);
+        for (int i = 0; i < roomCount; i++) {
+            long room = data.room(hotel, 1_000_000 + i);
+            data.roomAmenity(room, wifi);
+            data.roomAmenity(room, television);
+            data.roomImage(room, "phong-" + i, 0);
+        }
+
+        Statistics statistics = entityManagerFactory.unwrap(SessionFactory.class).getStatistics();
+        statistics.setStatisticsEnabled(true);
+        try {
+            statistics.clear();
+            mvc.perform(get("/hotels/doi-may"))
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$.roomTypes", hasSize(roomCount)));
+            assertThat(statistics.getPrepareStatementCount()).isEqualTo(6);
+        } finally {
+            statistics.setStatisticsEnabled(false);
+        }
+    }
+
+    /** Ảnh và tiện ích chỉ có ở trang chi tiết: kết quả tìm và thẻ giữ nguyên đúng bộ trường cũ. */
+    @Test
+    void searchAndFeaturedKeepTheirShapeWhenHotelsHaveImagesAndAmenities() throws Exception {
+        long destination = data.destination("da-lat", "Đà Lạt");
+        long hotel = data.hotel("doi-may", destination, "ACTIVE", 4.6, 1280);
+        long room = data.room(hotel, 1_000_000);
+        long wifi = data.amenity("wifi", "Wi-Fi", "BOTH", 10);
+        data.hotelAmenity(hotel, wifi);
+        data.roomAmenity(room, wifi);
+        data.hotelImage(hotel, "mot", 0);
+        data.roomImage(room, "phong", 0);
+
+        mvc.perform(search("da-lat", "2027-01-10", "2027-01-12", 2, 1))
+                .andExpect(status().isOk())
+                // Thẻ 12 trường + room, nights, rooms, totalPrice.
+                .andExpect(jsonPath("$.items[0].*", hasSize(16)))
+                .andExpect(jsonPath("$.items[0].images").doesNotExist())
+                .andExpect(jsonPath("$.items[0].amenities").doesNotExist())
+                .andExpect(jsonPath("$.items[0].room.*", hasSize(6)))
+                .andExpect(jsonPath("$.items[0].room.images").doesNotExist())
+                .andExpect(jsonPath("$.items[0].room.amenities").doesNotExist());
+        mvc.perform(get("/hotels/featured"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].*", hasSize(12)))
+                .andExpect(jsonPath("$[0].images").doesNotExist())
+                .andExpect(jsonPath("$[0].amenities").doesNotExist());
+    }
+
+    @Test
+    void anAmenityUsedByAHotelCannotBeDeleted() {
+        long destination = data.destination("da-lat", "Đà Lạt");
+        long hotel = data.hotel("doi-may", destination, "ACTIVE", 4.6, 1280);
+        long pool = data.amenity("pool", "Hồ bơi", "HOTEL", 10);
+        data.hotelAmenity(hotel, pool);
+
+        assertThatThrownBy(() -> jdbc.update("DELETE FROM amenities WHERE id = ?", pool))
+                .isInstanceOf(DataIntegrityViolationException.class)
+                .hasMessageContaining("fk_hotel_amenities_amenity");
+    }
+
+    @Test
+    void anAmenityUsedByARoomTypeCannotBeDeleted() {
+        long destination = data.destination("da-lat", "Đà Lạt");
+        long hotel = data.hotel("doi-may", destination, "ACTIVE", 4.6, 1280);
+        long room = data.room(hotel, 1_000_000);
+        long television = data.amenity("tv", "TV", "ROOM", 10);
+        data.roomAmenity(room, television);
+
+        assertThatThrownBy(() -> jdbc.update("DELETE FROM amenities WHERE id = ?", television))
+                .isInstanceOf(DataIntegrityViolationException.class)
+                .hasMessageContaining("fk_hotel_room_type_amenities_amenity");
     }
 
     @Test

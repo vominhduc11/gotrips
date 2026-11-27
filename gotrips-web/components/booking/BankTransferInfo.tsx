@@ -4,23 +4,15 @@ import { CopyButton } from "./CopyButton";
 
 /**
  * Hướng dẫn chuyển khoản thủ công: khách chuyển đúng số tiền với nội dung là MÃ ĐƠN, nhân viên đối chiếu sao kê rồi
- * đánh dấu đã thanh toán. (MVP chưa tích hợp cổng thanh toán.)
+ * đánh dấu đã thanh toán. (MVP chưa tích hợp cổng thanh toán.) Tài khoản nhận và nội dung đến từ chi tiết đơn của API.
  */
-export function BankTransferInfo({
-  bank,
-  amount,
-  transferContent,
-}: {
-  bank: BankTransferInfoData;
-  amount: number;
-  transferContent: string;
-}) {
+export function BankTransferInfo({ bank, amount }: { bank: BankTransferInfoData; amount: number }) {
   const rows = [
     { label: "Ngân hàng", value: bank.bankName },
     { label: "Số tài khoản", value: bank.accountNumber, copy: bank.accountNumber.replace(/\s/g, "") },
     { label: "Chủ tài khoản", value: bank.accountName },
     { label: "Số tiền", value: formatVND(amount), copy: String(amount) },
-    { label: "Nội dung chuyển khoản", value: transferContent, copy: transferContent, emphasis: true },
+    { label: "Nội dung chuyển khoản", value: bank.content, copy: bank.content, emphasis: true },
   ];
 
   return (

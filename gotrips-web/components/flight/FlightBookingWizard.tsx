@@ -47,9 +47,23 @@ const STEP_TITLES: Record<BookingStep, string> = {
 };
 
 const DETAIL_FIELDS = ["contact", "passengers", "note"] as const;
-/** Lỗi server về lượt tìm / chuyến đã chọn (không có ô trên trang này) hiện thành lỗi chung ở đầu form. */
-const isTripField = (field: string) =>
-  field.startsWith("search.") || field === "outboundId" || field === "returnId" || field === "passengers";
+/**
+ * Lỗi về lượt tìm / chuyến đã chọn (không có ô trên trang này) hiện thành lỗi chung ở đầu form: tên field của schema
+ * (`search.*`, `outboundId`, `returnId`) và của gotrips-api (`outboundScheduleId`..., hết ghế cũng rơi vào đây).
+ */
+const TRIP_FIELDS: ReadonlySet<string> = new Set([
+  "outboundId",
+  "returnId",
+  "outboundScheduleId",
+  "returnScheduleId",
+  "from",
+  "to",
+  "departDate",
+  "returnDate",
+  "cabin",
+  "passengers",
+]);
+const isTripField = (field: string) => field.startsWith("search.") || TRIP_FIELDS.has(field);
 
 const PASSENGER_HINT: Record<PassengerType, string> = {
   adult: "Từ 12 tuổi",
@@ -145,7 +159,7 @@ export function FlightBookingWizard({
       });
       if (result.ok) {
         toast.success("Đặt vé thành công", {
-          description: `Mã đơn của bạn: ${result.code}. Đây là bản thử nghiệm, chưa thu tiền thật.`,
+          description: `Mã đơn của bạn: ${result.code}.`,
         });
         router.push(result.redirectTo);
         return;

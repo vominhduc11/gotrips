@@ -6,6 +6,7 @@ export default defineConfig({
   gotrips: {
     input: {
       target: 'http://localhost:8080/v3/api-docs',
+      filters: { mode: 'include', tags: [/^Quản trị /] },
     },
     output: {
       mode: 'single',

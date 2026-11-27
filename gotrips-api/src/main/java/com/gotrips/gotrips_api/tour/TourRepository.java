@@ -1,15 +1,19 @@
 package com.gotrips.gotrips_api.tour;
 
 import java.time.LocalDate;
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
 import org.springframework.data.domain.Limit;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Lock;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import com.gotrips.gotrips_api.common.catalog.CatalogStatus;
+
+import jakarta.persistence.LockModeType;
 
 public interface TourRepository extends JpaRepository<Tour, Long> {
 
@@ -24,11 +28,29 @@ public interface TourRepository extends JpaRepository<Tour, Long> {
             select t from Tour t join fetch t.destination
             where t.status = :status and t.featured = true
               and exists (select 1 from TourDeparture d
-                          where d.tourId = t.id and d.departureDate > :today and d.totalSeats > d.bookedSeats)
+                          where d.tourId = t.id and d.departureDate > :today and d.salesClosed = false
+                            and d.totalSeats > d.bookedSeats)
             order by t.id
             """)
     List<Tour> findFeaturedWithBookableDeparture(@Param("status") CatalogStatus status,
             @Param("today") LocalDate today, Limit limit);
+
+    /** Khoá GHI dòng tour (không join) cho mọi lệnh ghi của admin trên tour và chuyến của nó. */
+    @Lock(LockModeType.PESSIMISTIC_WRITE)
+    @Query("select t from Tour t where t.id = :id")
+    Optional<Tour> lockById(@Param("id") Long id);
+
+    /**
+     * Khoá CHIA SẺ dòng tour khi đặt chỗ: nhiều đơn cùng tour không chặn nhau, nhưng admin không ẩn, xoá hay sửa chuyến
+     * được cho tới khi đơn ghi xong.
+     */
+    @Lock(LockModeType.PESSIMISTIC_READ)
+    @Query("select t from Tour t where t.id = :id")
+    Optional<Tour> lockForBooking(@Param("id") Long id);
+
+    boolean existsBySlug(String slug);
+
+    boolean existsBySlugAndIdNot(String slug, Long id);
 
     /** Mọi tour theo trạng thái (trang /tours không lọc điểm đến), theo id. {@code join fetch}: xem trên. */
     @Query("select t from Tour t join fetch t.destination where t.status = :status order by t.id")
@@ -42,6 +64,10 @@ public interface TourRepository extends JpaRepository<Tour, Long> {
             """)
     List<Tour> findAllByStatusAndDestination(@Param("status") CatalogStatus status,
             @Param("destinationId") Long destinationId);
+
+    /** Tour kèm điểm đến theo danh sách id, kể cả tour đã ẩn (đơn đã đặt vẫn phải hiện được). */
+    @Query("select t from Tour t join fetch t.destination where t.id in :ids")
+    List<Tour> findAllWithDestinationByIdIn(@Param("ids") Collection<Long> ids);
 
     /** Tour theo slug và trạng thái; tour HIDDEN coi như không tồn tại (không lộ ra ngoài). */
     @Query("select t from Tour t join fetch t.destination where t.slug = :slug and t.status = :status")

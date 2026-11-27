@@ -13,8 +13,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 /**
- * Loại phòng của khách sạn. Chỉ để ĐỌC. Có {@code @Builder} để test thuần của {@link HotelStayCalculator} dựng được
- * mà không cần DB.
+ * Loại phòng của khách sạn. Dòng này còn được khoá khi đặt phòng và khi nhân viên sửa/xoá: luôn khoá khách sạn trước
+ * rồi mới khoá loại phòng. Có {@code @Builder} để test thuần của {@link HotelStayCalculator} dựng được mà không cần DB.
  */
 @Entity
 @Table(name = "hotel_room_types")
@@ -28,8 +28,11 @@ public class HotelRoomType {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    /** Khoá ngoại thuần (không map quan hệ): loại phòng luôn được tải theo danh sách khách sạn đã chọn. */
-    @Column(name = "hotel_id", nullable = false)
+    /**
+     * Khoá ngoại thuần (không map quan hệ): loại phòng luôn được tải theo danh sách khách sạn đã chọn. Không bao giờ đổi
+     * ({@code updatable = false}), nhờ vậy đọc id khách sạn khi CHƯA khoá loại phòng là an toàn.
+     */
+    @Column(name = "hotel_id", nullable = false, updatable = false)
     private Long hotelId;
 
     @Column(nullable = false, length = 150)
@@ -48,4 +51,32 @@ public class HotelRoomType {
 
     @Column(name = "area_m2", nullable = false)
     private int areaM2;
+
+    /** Tổng số phòng của loại này; phòng trống theo ngày xem {@link HotelStayCalculator#availableRooms}. */
+    @Column(name = "total_rooms", nullable = false)
+    private int totalRooms;
+
+    /** Nội dung nhân viên sửa được. Dữ liệu phải đã được kiểm trước khi tới đây. */
+    record Content(String name, long pricePerNight, int maxGuests, String bedType, int areaM2, int totalRooms) {
+    }
+
+    static HotelRoomType create(long hotelId, Content content) {
+        HotelRoomType roomType = new HotelRoomType();
+        roomType.hotelId = hotelId;
+        roomType.update(content);
+        return roomType;
+    }
+
+    /**
+     * Giảm {@code totalRooms} chỉ hợp lệ khi nơi gọi đã khoá dòng này và kiểm số phòng đang được giữ
+     * ({@code AdminRoomTypeService}).
+     */
+    void update(Content content) {
+        name = content.name();
+        pricePerNight = content.pricePerNight();
+        maxGuests = content.maxGuests();
+        bedType = content.bedType();
+        areaM2 = content.areaM2();
+        totalRooms = content.totalRooms();
+    }
 }

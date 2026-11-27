@@ -7,6 +7,7 @@ import {
   createHotelStaySchema,
   hotelBookingFormSchema,
   parseHotelStayParams,
+  SAME_DAY_CHECK_IN_MESSAGE,
 } from "./hotel-booking";
 
 const TODAY = "2027-01-01";
@@ -56,9 +57,16 @@ describe("tham số URL", () => {
 describe("createHotelStaySchema", () => {
   const schema = createHotelStaySchema(roomTypes, TODAY);
 
-  it("chấp nhận lựa chọn hợp lệ, kể cả nhận phòng ngay hôm nay", () => {
+  it("chấp nhận lựa chọn hợp lệ, nhận phòng sớm nhất là ngày mai", () => {
     expect(schema.safeParse(stay).success).toBe(true);
-    expect(schema.safeParse({ ...stay, checkIn: TODAY }).success).toBe(true);
+    expect(schema.safeParse({ ...stay, checkIn: "2027-01-02" }).success).toBe(true);
+  });
+
+  it("nhận phòng ngay hôm nay đã đóng đặt trực tuyến (cùng luật và câu với API)", () => {
+    expect(fieldErrors(schema.safeParse({ ...stay, checkIn: TODAY }))).toEqual({ checkIn: SAME_DAY_CHECK_IN_MESSAGE });
+    expect(SAME_DAY_CHECK_IN_MESSAGE).toBe(
+      "Đặt phòng trực tuyến chỉ nhận phòng từ ngày mai. Bạn vui lòng chọn ngày khác.",
+    );
   });
 
   it("phòng không thuộc khách sạn", () => {

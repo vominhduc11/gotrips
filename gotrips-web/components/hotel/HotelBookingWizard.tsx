@@ -92,7 +92,7 @@ export function HotelBookingWizard({
       const result = await createHotelBookingAction({ ...values, ...stay, hotelSlug: hotel.slug });
       if (result.ok) {
         toast.success("Đặt phòng thành công", {
-          description: `Mã đơn của bạn: ${result.code}. Đây là bản thử nghiệm, chưa thu tiền thật.`,
+          description: `Mã đơn của bạn: ${result.code}.`,
         });
         router.push(result.redirectTo);
         return;

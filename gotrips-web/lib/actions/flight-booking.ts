@@ -1,10 +1,11 @@
 "use server";
 
 import { redirect } from "next/navigation";
+import { createFlightBooking } from "@/lib/api/generated";
+import { bearerRequestInit } from "@/lib/auth/bearer";
 import { getCurrentUser } from "@/lib/auth/session";
-import { addStoredBooking } from "@/lib/booking/demo-store";
-import { getFlightForBooking } from "@/lib/data/bookings";
-import { computeFlightTotal } from "@/lib/data/flight-view";
+import { API_CABIN, API_PASSENGER_TYPE } from "@/lib/data/flight-request";
+import { getFlightForBooking } from "@/lib/data/flights";
 import { getTodayInVietnam } from "@/lib/data/tour-view";
 import { buildLoginHref } from "@/lib/safe-redirect";
 import {
@@ -13,50 +14,37 @@ import {
   createStartFlightBookingSchema,
 } from "@/lib/schemas/flight-booking";
 import type { FlightSearchValues } from "@/lib/schemas/flight-search";
-import type { FlightBooking, FlightOptionView } from "@/lib/types";
-import type { BookingActionResult } from "./booking";
-import { simulateLatency } from "./demo-latency";
+import type { FlightOptionView } from "@/lib/types";
+import { submitBooking, type BookingActionResult } from "./booking-submit";
 import { toFieldErrors } from "./field-errors";
+import { SERVICE_UNAVAILABLE_MESSAGE } from "./messages";
 
-// PROTOTYPE: chưa có gotrips-api — đơn vé lưu cùng cookie với đơn tour (lib/booking/demo-store.ts), số ghế (mock) KHÔNG
-// giảm. Khi có API: thay thân hàm bằng `POST /flight-bookings` (backend giữ ghế, tự tính giá), giữ nguyên chữ ký.
+// Server Action của đơn vé máy bay. Chiều bay, ghế còn lại, tuổi hành khách và giá do gotrips-api kiểm/tính; ở đây chỉ
+// kiểm dữ liệu (báo lỗi sớm cho form) rồi gọi API.
 
-const SESSION_EXPIRED = "Phiên đăng nhập đã hết hạn. Bạn vui lòng đăng nhập lại để tiếp tục.";
 const SAME_DAY_MESSAGE = "Chuyến bay trong ngày hôm nay đã đóng đặt vé trực tuyến. Bạn vui lòng chọn ngày khác.";
 const MISSING_FLIGHT_MESSAGE = "Chuyến bay đã chọn không còn khai thác. Bạn vui lòng chọn chuyến khác.";
 
 /**
- * Các chặng của lựa chọn: chiều đi (`from → to`, ngày đi) và chiều về (`to → from`, ngày về) nếu khứ hồi. Id do trình
- * duyệt gửi nên phải kiểm đúng chiều bay. Một chặng không khớp → `null`.
+ * Field lỗi của API mà form đặt vé nhận được: ô của form, hoặc lượt tìm/chuyến đã chọn (hiện ở đầu form; xem
+ * `isTripField` ở `FlightBookingWizard`).
  */
-async function loadSegments(
-  search: FlightSearchValues,
-  outboundId: number,
-  returnId: number,
-): Promise<FlightOptionView[] | null> {
-  const outbound = await getFlightForBooking({
-    scheduleId: outboundId,
-    from: search.from,
-    to: search.to,
-    date: search.departDate,
-    cabin: search.cabin,
-  });
-  if (!outbound) return null;
-  if (search.tripType === "oneWay") return [outbound];
+const FLIGHT_FORM_FIELD =
+  /^(outboundScheduleId|returnScheduleId|from|to|departDate|returnDate|cabin|note|contact\.(fullName|email|phone)|passengers(\.\d+\.(fullName|dateOfBirth))?)$/;
 
-  const inbound = await getFlightForBooking({
-    scheduleId: returnId,
-    from: search.to,
-    to: search.from,
-    date: search.returnDate,
-    cabin: search.cabin,
-  });
-  return inbound ? [outbound, inbound] : null;
+/** Các chặng của lựa chọn: chiều đi (`from → to`) và chiều về (`to → from`) nếu khứ hồi. */
+function legsOf(search: FlightSearchValues, outboundId: number, returnId: number) {
+  const { cabin, adults, children, infants } = search;
+  const passengers = { cabin, adults, children, infants };
+  const outbound = { scheduleId: outboundId, query: { ...passengers, from: search.from, to: search.to, date: search.departDate } };
+  if (search.tripType === "oneWay") return [outbound];
+  return [outbound, { scheduleId: returnId, query: { ...passengers, from: search.to, to: search.from, date: search.returnDate } }];
 }
 
 /**
- * Nút "Chọn" ở trang kết quả (chuyến một chiều, hoặc chuyến về của khứ hồi): kiểm lựa chọn, kiểm phiên rồi chuyển thẳng
- * tới trang đặt vé (hoặc đăng nhập kèm `next`) — cùng lý do với `startBookingAction`.
+ * Nút "Chọn" ở trang kết quả (chuyến một chiều, hoặc chuyến về của khứ hồi): hỏi API (không cache) các chuyến còn đặt
+ * được cho đủ số hành khách, kiểm phiên rồi chuyển thẳng tới trang đặt vé (hoặc đăng nhập kèm `next`) — cùng lý do với
+ * `startBookingAction`.
  */
 export async function startFlightBookingAction(values: unknown): Promise<{ ok: false; message: string }> {
   const today = getTodayInVietnam();
@@ -65,7 +53,25 @@ export async function startFlightBookingAction(values: unknown): Promise<{ ok: f
 
   const { search, outboundId, returnId } = parsed.data;
   if (search.departDate <= today) return { ok: false, message: SAME_DAY_MESSAGE };
-  if (!(await loadSegments(search, outboundId, returnId))) return { ok: false, message: MISSING_FLIGHT_MESSAGE };
+
+  let flights: (FlightOptionView | null)[];
+  try {
+    flights = await Promise.all(
+      legsOf(search, outboundId, returnId).map((leg) => getFlightForBooking(leg.scheduleId, leg.query)),
+    );
+  } catch (error) {
+    console.error("[đặt chỗ] Không kiểm được chuyến bay:", error instanceof Error ? error.message : error);
+    return { ok: false, message: SERVICE_UNAVAILABLE_MESSAGE };
+  }
+  for (const flight of flights) {
+    if (!flight) return { ok: false, message: MISSING_FLIGHT_MESSAGE };
+    if (!flight.isBookable) {
+      return {
+        ok: false,
+        message: `Chuyến ${flight.flightNumber} không còn đủ ghế ở hạng đã chọn. Bạn vui lòng chọn chuyến khác.`,
+      };
+    }
+  }
 
   const bookingHref = buildFlightBookingHref(search, { out: outboundId, ret: returnId || undefined });
   const user = await getCurrentUser();
@@ -73,13 +79,10 @@ export async function startFlightBookingAction(values: unknown): Promise<{ ok: f
 }
 
 /**
- * Tạo đơn vé máy bay. Kiểm đăng nhập, kiểm lại toàn bộ (lượt tìm, chiều bay của từng chuyến, số hành khách từng loại,
- * tuổi theo ngày bay) và TỰ TÍNH GIÁ từ lịch bay — dữ liệu gửi lên không có trường giá nào.
+ * Tạo đơn vé máy bay (`POST /bookings/flights`). Kiểm số hành khách từng loại đúng như lượt tìm rồi gửi cho API; KHÔNG
+ * gửi giá: API tự tính từ lịch bay và chốt vào đơn.
  */
 export async function createFlightBookingAction(values: unknown): Promise<BookingActionResult> {
-  const user = await getCurrentUser();
-  if (!user) return { ok: false, message: SESSION_EXPIRED };
-
   const today = getTodayInVietnam();
   const parsed = createFlightBookingRequestSchema(today).safeParse(values);
   if (!parsed.success) {
@@ -90,36 +93,36 @@ export async function createFlightBookingAction(values: unknown): Promise<Bookin
     };
   }
 
-  await simulateLatency();
+  const { search, outboundId, returnId, contact, passengers, note } = parsed.data;
+  if (search.departDate <= today) return { ok: false, message: SAME_DAY_MESSAGE };
+  const roundTrip = search.tripType === "roundTrip";
 
-  const request = parsed.data;
-  if (request.search.departDate <= today) return { ok: false, message: SAME_DAY_MESSAGE };
-  const segments = await loadSegments(request.search, request.outboundId, request.returnId);
-  if (!segments) return { ok: false, message: MISSING_FLIGHT_MESSAGE };
-
-  const stored = segments.map((s) => ({ scheduleId: s.scheduleId, date: s.date, fares: s.fares }));
-  const totalAmount = computeFlightTotal(stored, request.search);
-
-  const booking = await addStoredBooking<FlightBooking>((code) => ({
-    kind: "flight",
-    code,
-    ownerEmail: user.email,
-    cabin: request.search.cabin,
-    segments: stored,
-    passengers: request.passengers.map((p) => ({
-      type: p.type,
-      fullName: p.fullName,
-      dateOfBirth: p.dateOfBirth || null,
-    })),
-    totalAmount,
-    contact: request.contact,
-    note: request.note || null,
-    status: "PENDING",
-    payment: { method: "BANK_TRANSFER", amount: totalAmount, status: "UNPAID", paidAt: null },
-    createdAt: new Date().toISOString(),
-    confirmedAt: null,
-    cancelledAt: null,
-  }));
-
-  return { ok: true, code: booking.code, redirectTo: `/bookings/${booking.code}` };
+  return submitBooking({
+    label: "Đặt vé máy bay",
+    loginNext: buildFlightBookingHref(search, { out: outboundId, ret: returnId || undefined }),
+    isFormField: (field) => FLIGHT_FORM_FIELD.test(field),
+    staleTags: ["flights"],
+    create: async (token) => {
+      const { data } = await createFlightBooking(
+        {
+          outboundScheduleId: outboundId,
+          returnScheduleId: roundTrip ? returnId : null,
+          from: search.from,
+          to: search.to,
+          departDate: search.departDate,
+          returnDate: roundTrip ? search.returnDate : null,
+          cabin: API_CABIN[search.cabin],
+          contact,
+          passengers: passengers.map((p) => ({
+            type: API_PASSENGER_TYPE[p.type],
+            fullName: p.fullName,
+            dateOfBirth: p.dateOfBirth || null,
+          })),
+          note: note || null,
+        },
+        bearerRequestInit(token),
+      );
+      return data;
+    },
+  });
 }

@@ -1,6 +1,9 @@
-import { expect, test } from "@playwright/test";
+import type { TourDetailResponse } from "../lib/api/generated/model";
+import { formatDate } from "../lib/format";
+import { apiGet, expect, test } from "./fixtures";
 
-const SLUG = "phu-quoc-4n3d-dao-ngoc-nghi-duong"; // tour 3: có giảm giá và có đánh giá
+// Tour có giảm giá và có đánh giá trong dữ liệu seed. booking.spec.ts không đặt chỗ ở tour này.
+const SLUG = "phu-quoc-4n3d-dao-ngoc-nghi-duong";
 
 test("bấm 'Xem chi tiết' ở thẻ tour mở trang chi tiết đúng tour", async ({ page }) => {
   await page.goto("/tours?destination=phu-quoc");
@@ -10,22 +13,26 @@ test("bấm 'Xem chi tiết' ở thẻ tour mở trang chi tiết đúng tour", 
   await expect(page.getByRole("heading", { level: 1, name: /Phú Quốc 4N3Đ/ })).toBeVisible();
 });
 
-test("trang chi tiết hiện giá từ, lịch khởi hành, đánh giá và breadcrumb", async ({ page }) => {
+test("trang chi tiết hiện giá từ, lịch khởi hành, đánh giá và breadcrumb", async ({ page, request }) => {
+  const tour = await apiGet<TourDetailResponse>(request, `/tours/${SLUG}`);
+  const open = tour.departures.filter((departure) => !departure.isSoldOut);
+  const defaultDate = formatDate(open[0]!.departureDate);
   await page.goto(`/tours/${SLUG}`);
 
   await expect(page.getByRole("heading", { level: 2, name: "Lịch khởi hành" })).toBeVisible();
-  const departures = page.getByRole("region", { name: "Lịch khởi hành" }).getByRole("listitem");
-  expect(await departures.count()).toBeGreaterThanOrEqual(3);
+  await expect(page.getByRole("region", { name: "Lịch khởi hành" }).getByRole("listitem")).toHaveCount(
+    tour.departures.length,
+  );
 
   // Thẻ "Đặt tour": chọn ngày + số khách ngay tại đây, chuyến gần nhất còn chỗ được chọn sẵn kèm tiền tạm tính.
   const priceCard = page.getByRole("complementary", { name: "Giá và đặt tour" });
   await expect(priceCard).toContainText("Giá từ");
-  await expect(priceCard.getByRole("combobox", { name: "Ngày khởi hành" })).toContainText("14/01/2027");
+  await expect(priceCard.getByRole("combobox", { name: "Ngày khởi hành" })).toContainText(defaultDate);
   await expect(priceCard).toContainText("Tạm tính");
   await expect(priceCard.getByRole("button", { name: "Đặt tour" })).toBeEnabled();
   // Chuyến còn chỗ có nút chọn nhanh (chọn chuyến trong thẻ); chuyến đang chọn hiện "Đã chọn".
-  await expect(page.getByRole("button", { name: "Đã chọn (14/01/2027)" })).toBeVisible();
-  await expect(page.getByRole("button", { name: /^Chọn ngày này/ })).toHaveCount(2);
+  await expect(page.getByRole("button", { name: `Đã chọn (${defaultDate})` })).toBeVisible();
+  await expect(page.getByRole("button", { name: /^Chọn ngày này/ })).toHaveCount(open.length - 1);
 
   await expect(page.getByRole("heading", { level: 2, name: "Khách hàng nói gì" })).toBeVisible();
 

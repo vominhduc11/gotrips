@@ -169,7 +169,7 @@ export function BookingWizard({
       const result = await createBookingAction({ ...values, tourSlug: tour.slug });
       if (result.ok) {
         toast.success("Đặt tour thành công", {
-          description: `Mã đơn của bạn: ${result.code}. Đây là bản thử nghiệm, chưa thu tiền thật.`,
+          description: `Mã đơn của bạn: ${result.code}.`,
         });
         router.push(result.redirectTo);
         return;

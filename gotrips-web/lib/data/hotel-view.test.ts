@@ -1,6 +1,13 @@
 import { describe, expect, it } from "vitest";
-import type { HotelRoomTypeView } from "@/lib/types";
-import { computeStayTotal, countNights, findCheapestFittingRoom, roomFitsGuests, sortRoomTypes } from "./hotel-view";
+import type { HotelRoomTypeDetailView, HotelRoomTypeView } from "@/lib/types";
+import {
+  computeStayTotal,
+  countNights,
+  findCheapestFittingRoom,
+  roomFitsGuests,
+  sortRoomTypes,
+  toRoomTypeView,
+} from "./hotel-view";
 
 // Luật tìm khách sạn (lọc ẩn/không phòng, phòng rẻ nhất đủ chỗ, sắp theo tổng tiền) đã chuyển sang gotrips-api và được
 // kiểm ở `HotelStayCalculatorTests`; ở đây chỉ còn các hàm nhỏ phục vụ tạm tính trên giao diện.
@@ -43,5 +50,18 @@ describe("sortRoomTypes", () => {
 
     expect(sortRoomTypes(rooms).map((room) => room.id)).toEqual([1, 2, 3]);
     expect(rooms.map((room) => room.id)).toEqual([3, 2, 1]);
+  });
+});
+
+describe("toRoomTypeView", () => {
+  it("bỏ ảnh, tiện ích và mọi trường lạ trước khi gửi sang client, giữ đủ 6 trường của loại phòng", () => {
+    const detail: HotelRoomTypeDetailView & { extra: string } = {
+      ...makeRoom(900_000, 7, 3),
+      images: [{ url: "https://img.test/phong.jpg", alt: "Ảnh phòng" }],
+      amenities: [{ code: "wifi", name: "Wi-Fi" }],
+      extra: "trường API thêm sau này",
+    };
+
+    expect(toRoomTypeView(detail)).toStrictEqual(makeRoom(900_000, 7, 3));
   });
 });

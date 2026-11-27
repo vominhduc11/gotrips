@@ -1,7 +1,5 @@
 package com.gotrips.gotrips_api.auth;
 
-import java.util.UUID;
-
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.jwt.Jwt;
@@ -12,7 +10,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.gotrips.gotrips_api.common.error.UnauthorizedException;
+import com.gotrips.gotrips_api.common.security.JwtUserId;
 import com.gotrips.gotrips_api.config.OpenApiConfig;
 import com.gotrips.gotrips_api.user.UserResponse;
 
@@ -56,15 +54,6 @@ public class AuthController {
             security = @SecurityRequirement(name = OpenApiConfig.BEARER_SCHEME))
     @GetMapping("/me")
     public UserResponse me(@AuthenticationPrincipal Jwt jwt) {
-        return authService.getCurrentUser(parseUserId(jwt));
-    }
-
-    private static UUID parseUserId(Jwt jwt) {
-        try {
-            return UUID.fromString(jwt.getSubject());
-        } catch (IllegalArgumentException | NullPointerException e) {
-            // Token ký đúng nhưng subject không phải id của hệ thống này: coi như không hợp lệ
-            throw new UnauthorizedException("Phiên đăng nhập không còn hợp lệ.");
-        }
+        return authService.getCurrentUser(JwtUserId.from(jwt));
     }
 }

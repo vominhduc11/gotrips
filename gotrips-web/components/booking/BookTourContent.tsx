@@ -4,7 +4,6 @@ import { BookingGate } from "@/components/booking/BookingGate";
 import { BookingWizardSkeleton } from "@/components/booking/BookingSkeletons";
 import { AppLink } from "@/components/common/AppLink";
 import { SectionUnavailable } from "@/components/common/SectionUnavailable";
-import { TrialNotice } from "@/components/common/TrialNotice";
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -63,13 +62,11 @@ export async function BookTourContent({
       <h1 className="text-3xl font-bold tracking-tight text-ink sm:text-4xl">Đặt tour</h1>
       <p className="mt-2 text-base text-ink-muted">{tour.title}</p>
 
-      <TrialNotice className="mt-6 mb-8">
-        Bản thử nghiệm: đơn chỉ được lưu trên trình duyệt này, chưa thu tiền thật và chưa trừ số chỗ của tour.
-      </TrialNotice>
-
-      <Suspense fallback={<BookingWizardSkeleton />}>
-        <BookingGate tour={tour} searchParams={searchParams} />
-      </Suspense>
+      <div className="mt-8">
+        <Suspense fallback={<BookingWizardSkeleton />}>
+          <BookingGate tour={tour} searchParams={searchParams} />
+        </Suspense>
+      </div>
     </>
   );
 }
@@ -81,8 +78,9 @@ export function BookTourSkeleton() {
       <Skeleton className="mb-4 h-5 w-72 max-w-full" />
       <Skeleton className="h-10 w-40" />
       <Skeleton className="mt-2 h-6 w-80 max-w-full" />
-      <Skeleton className="mt-6 mb-8 h-14 w-full rounded-card" />
-      <BookingWizardSkeleton />
+      <div className="mt-8">
+        <BookingWizardSkeleton />
+      </div>
     </div>
   );
 }

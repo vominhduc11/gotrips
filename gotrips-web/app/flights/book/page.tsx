@@ -4,7 +4,6 @@ import { BookingWizardSkeleton } from "@/components/booking/BookingSkeletons";
 import { AppLink } from "@/components/common/AppLink";
 import { Container } from "@/components/common/Container";
 import { FlightBookingGate } from "@/components/flight/FlightBookingGate";
-import { TrialNotice } from "@/components/common/TrialNotice";
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -50,13 +49,11 @@ export default function BookFlightPage({ searchParams }: PageProps<"/flights/boo
 
         <h1 className="text-3xl font-bold tracking-tight text-ink sm:text-4xl">Đặt vé máy bay</h1>
 
-        <TrialNotice className="mt-6 mb-8">
-          Bản thử nghiệm: đơn chỉ được lưu trên trình duyệt này, chưa thu tiền thật và chưa xuất vé với hãng bay.
-        </TrialNotice>
-
-        <Suspense fallback={<BookingWizardSkeleton />}>
-          <FlightBookingGate searchParams={searchParams} />
-        </Suspense>
+        <div className="mt-8">
+          <Suspense fallback={<BookingWizardSkeleton />}>
+            <FlightBookingGate searchParams={searchParams} />
+          </Suspense>
+        </div>
       </Container>
     </div>
   );

@@ -46,9 +46,21 @@ services:
       SERVER_PORT: 8080
       # Khoá ký JWT: bắt buộc, API không khởi động nếu thiếu (xem .env.example)
       GOTRIPS_JWT_SECRET: "${GOTRIPS_JWT_SECRET:?Chưa đặt GOTRIPS_JWT_SECRET trong .env, tạo bằng lệnh openssl rand -base64 48}"
+      GOTRIPS_JWT_ADMIN_EXPIRATION: ${GOTRIPS_JWT_ADMIN_EXPIRATION:-8h}
+      # Compose local chạy HTTP; môi trường HTTPS đặt true.
+      GOTRIPS_ADMIN_COOKIE_SECURE: ${GOTRIPS_ADMIN_COOKIE_SECURE:-false}
       # Profile `seed` nạp dữ liệu mẫu danh mục (db/seed). Mặc định BẬT cho dev/Docker; môi trường thật đặt
       # SPRING_PROFILES_ACTIVE= (rỗng) trong .env. Dấu `-` (không phải `:-`) để giá trị rỗng được tôn trọng.
       SPRING_PROFILES_ACTIVE: ${SPRING_PROFILES_ACTIVE-seed}
+      # Tài khoản nhận chuyển khoản. CỐ Ý để trống giá trị (truyền qua từ .env/shell, không đặt thì container không có
+      # biến này): viết ${GOTRIPS_BANK_NAME:-} sẽ truyền chuỗi RỖNG và đè mất giá trị thử nghiệm của profile seed.
+      GOTRIPS_BANK_NAME:
+      GOTRIPS_BANK_ACCOUNT_NUMBER:
+      GOTRIPS_BANK_ACCOUNT_NAME:
+      # Cũng cố ý để trống giá trị: không đặt thì API dùng danh sách nguồn ảnh mặc định.
+      GOTRIPS_CATALOG_ALLOWED_IMAGE_PREFIXES:
+      GOTRIPS_WEB_REVALIDATE_URL: ${GOTRIPS_WEB_REVALIDATE_URL:-}
+      GOTRIPS_REVALIDATE_SECRET: ${GOTRIPS_REVALIDATE_SECRET:-}
 
     depends_on:
       gotrips-db:
@@ -98,6 +110,7 @@ services:
     environment:
       # Địa chỉ API mà web gọi từ phía server (Server Component / Server Action), đọc lúc chạy chứ không nhúng lúc build
       API_URL: http://gotrips-api:8080
+      GOTRIPS_REVALIDATE_SECRET: ${GOTRIPS_REVALIDATE_SECRET:-}
 
     depends_on:
       gotrips-api:

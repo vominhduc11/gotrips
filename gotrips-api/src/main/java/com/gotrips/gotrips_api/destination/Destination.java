@@ -12,9 +12,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-/**
- * Điểm đến. Entity này hiện chỉ để ĐỌC (admin chưa có): không dùng để ghi vì chưa map hết các cột bắt buộc.
- */
+/** Điểm đến. Ghi qua {@link #create} và {@link #update} (trang quản trị). */
 @Entity
 @Table(name = "destinations")
 @Getter
@@ -42,4 +40,19 @@ public class Destination {
 
     @Column(name = "image_alt", nullable = false)
     private String imageAlt;
+
+    /** Dữ liệu phải đã được kiểm (annotation của request, URL ảnh, slug chưa dùng). */
+    static Destination create(AdminDestinationRequest request) {
+        Destination destination = new Destination();
+        destination.update(request);
+        return destination;
+    }
+
+    void update(AdminDestinationRequest request) {
+        slug = request.slug();
+        name = request.name();
+        region = request.region();
+        imageUrl = request.imageUrl();
+        imageAlt = request.imageAlt();
+    }
 }

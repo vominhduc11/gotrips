@@ -7,8 +7,7 @@ import { announceHashNavigation, getHashFromHref, scrollToHashTarget } from "@/l
 /**
  * `next/link` với `prefetch={false}` mặc định, và tự báo hash đích khi điều hướng client-side.
  *
- * - Ở giai đoạn prototype một số đích đến (vd /tours/[slug]) CHƯA tồn tại; Next prefetch ở production
- *   sẽ bắn request 404 vào console. Khi các trang đã có, bỏ default này (hoặc truyền `prefetch` tường minh).
+ * - Prefetch tắt mặc định; nơi nào muốn Next tải trước trang đích thì truyền `prefetch` tường minh.
  * - Link tới `/#tim-khach-san`... không tạo ra `hashchange` (Next dùng `pushState`), nên component đang hiển thị
  *   không biết hash đã đổi. `onNavigate` (chỉ chạy khi điều hướng client-side, và chạy trước khi URL đổi) phát sự kiện
  *   kèm hash lấy từ `href` — xem `lib/hash-navigation.ts`. Cần "use client" vì phải truyền hàm xuống `Link`.

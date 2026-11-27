@@ -23,16 +23,15 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 
 /**
  * Tài khoản đăng nhập (khách hàng, nhân viên, admin).
  * Không dùng {@code @Data}/{@code @ToString}: tránh vô tình in {@code passwordHash} ra log.
+ * Hibernate truy cập theo field. Các phương thức nghiệp vụ giới hạn phần dữ liệu có thể cập nhật.
  */
 @Entity
 @Table(name = "users")
 @Getter
-@Setter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @Builder
@@ -68,4 +67,24 @@ public class User {
     @UpdateTimestamp
     @Column(name = "updated_at", nullable = false)
     private Instant updatedAt;
+
+    public boolean hasRole(RoleName name) {
+        return roles.stream().anyMatch(role -> role.getName() == name);
+    }
+
+    public boolean hasStaffAccess() {
+        return hasRole(RoleName.STAFF) || hasRole(RoleName.ADMIN);
+    }
+
+    void replaceStaffRole(Role granted) {
+        roles.removeIf(role -> (role.getName() == RoleName.STAFF || role.getName() == RoleName.ADMIN)
+                && role != granted);
+        if (granted != null) {
+            roles.add(granted);
+        }
+    }
+
+    public void changePasswordHash(String passwordHash) {
+        this.passwordHash = passwordHash;
+    }
 }

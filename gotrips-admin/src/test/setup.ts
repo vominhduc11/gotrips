@@ -7,6 +7,14 @@ afterEach(() => {
   cleanup()
 })
 
+// jsdom không có ResizeObserver (Switch của Radix và cmdk cần) và scrollIntoView (cmdk gọi khi chọn mục).
+globalThis.ResizeObserver ??= class {
+  observe() {}
+  unobserve() {}
+  disconnect() {}
+}
+Element.prototype.scrollIntoView ??= function scrollIntoView() {}
+
 // jsdom không có window.matchMedia. Hook useIsMobile của sidebar cần nó để chạy.
 Object.defineProperty(window, 'matchMedia', {
   writable: true,

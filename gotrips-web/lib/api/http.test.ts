@@ -5,9 +5,9 @@ vi.mock("server-only", () => ({}));
 
 import { ApiError, apiFetch, customFetch } from "./http";
 
-const fetchMock = vi.fn<typeof fetch>();
+const fetchSpy = vi.fn<typeof fetch>();
 
-function mockResponse(body: unknown, init: ResponseInit & { contentType?: string } = {}): Response {
+function fakeResponse(body: unknown, init: ResponseInit & { contentType?: string } = {}): Response {
   const { contentType = "application/json", ...rest } = init;
   return new Response(body === undefined ? null : JSON.stringify(body), {
     ...rest,
@@ -17,25 +17,25 @@ function mockResponse(body: unknown, init: ResponseInit & { contentType?: string
 
 /** Request cuối cùng mà code đã gửi tới `fetch`. */
 function lastRequest() {
-  const [url, init] = fetchMock.mock.calls.at(-1)!;
+  const [url, init] = fetchSpy.mock.calls.at(-1)!;
   return { url: String(url), init: init as RequestInit, headers: new Headers(init?.headers) };
 }
 
 afterEach(() => {
-  fetchMock.mockReset();
+  fetchSpy.mockReset();
   vi.unstubAllGlobals();
   vi.unstubAllEnvs();
 });
 
 function stubFetch() {
-  vi.stubGlobal("fetch", fetchMock);
+  vi.stubGlobal("fetch", fetchSpy);
 }
 
 describe("customFetch (mutator của Orval)", () => {
   it("giữ nguyên body và header mà client do Orval truyền vào", async () => {
     // Lỗi cũ: body của client Orval bị ghi đè thành undefined nên API nhận request rỗng ("Failed to read request").
     stubFetch();
-    fetchMock.mockResolvedValue(mockResponse({ ok: true }, { status: 201 }));
+    fetchSpy.mockResolvedValue(fakeResponse({ ok: true }, { status: 201 }));
 
     await customFetch("/auth/register", {
       method: "POST",
@@ -54,7 +54,7 @@ describe("customFetch (mutator của Orval)", () => {
 
   it("trả { data, status, headers } như client Orval mong đợi", async () => {
     stubFetch();
-    fetchMock.mockResolvedValue(mockResponse({ id: "1" }, { status: 201 }));
+    fetchSpy.mockResolvedValue(fakeResponse({ id: "1" }, { status: 201 }));
 
     const result = await customFetch<{ data: { id: string }; status: number; headers: Headers }>("/x");
 
@@ -65,7 +65,7 @@ describe("customFetch (mutator của Orval)", () => {
 
   it("204 không có body thì data là undefined", async () => {
     stubFetch();
-    fetchMock.mockResolvedValue(new Response(null, { status: 204 }));
+    fetchSpy.mockResolvedValue(new Response(null, { status: 204 }));
 
     const result = await customFetch<{ data: unknown; status: number }>("/x", { method: "DELETE" });
 
@@ -76,7 +76,7 @@ describe("customFetch (mutator của Orval)", () => {
   it("đọc địa chỉ API từ biến môi trường API_URL lúc gọi (bỏ dấu / cuối)", async () => {
     vi.stubEnv("API_URL", "http://gotrips-api:8080/");
     stubFetch();
-    fetchMock.mockResolvedValue(mockResponse({}));
+    fetchSpy.mockResolvedValue(fakeResponse({}));
 
     await customFetch("/auth/me");
 
@@ -87,7 +87,7 @@ describe("customFetch (mutator của Orval)", () => {
 describe("apiFetch", () => {
   it("tự tạo body JSON và Content-Type từ `json`", async () => {
     stubFetch();
-    fetchMock.mockResolvedValue(mockResponse({ ok: true }));
+    fetchSpy.mockResolvedValue(fakeResponse({ ok: true }));
 
     await apiFetch("/x", { method: "POST", json: { a: 1 } });
 
@@ -98,7 +98,7 @@ describe("apiFetch", () => {
 
   it("không gửi body khi không có json", async () => {
     stubFetch();
-    fetchMock.mockResolvedValue(mockResponse({ ok: true }));
+    fetchSpy.mockResolvedValue(fakeResponse({ ok: true }));
 
     await apiFetch("/x");
 
@@ -119,7 +119,7 @@ describe("lỗi từ API (ProblemDetail → ApiError)", () => {
 
   it("customFetch ném ApiError có status, detail và errors theo field", async () => {
     stubFetch();
-    fetchMock.mockResolvedValue(mockResponse(problem, { status: 409, contentType: "application/problem+json" }));
+    fetchSpy.mockResolvedValue(fakeResponse(problem, { status: 409, contentType: "application/problem+json" }));
 
     const error = await customFetch("/auth/register", { method: "POST" }).catch((e: unknown) => e);
 
@@ -134,7 +134,7 @@ describe("lỗi từ API (ProblemDetail → ApiError)", () => {
 
   it("body không phải JSON vẫn cho ApiError có nghĩa theo mã trạng thái", async () => {
     stubFetch();
-    fetchMock.mockResolvedValue(new Response("<html>Bad Gateway</html>", { status: 502, statusText: "Bad Gateway" }));
+    fetchSpy.mockResolvedValue(new Response("<html>Bad Gateway</html>", { status: 502, statusText: "Bad Gateway" }));
 
     const error = await apiFetch("/x").catch((e: unknown) => e);
 

@@ -1,11 +1,51 @@
-import type { Page } from "@playwright/test";
-import { expect, loginAs, submitLoginForm, test, type TestUser } from "./fixtures";
+import type { APIRequestContext, Page } from "@playwright/test";
+import type { TourDepartureResponse, TourDetailResponse, TourSearchResponse } from "../lib/api/generated/model";
+import { formatDate, formatSeatsLeft } from "../lib/format";
+import {
+  addDays,
+  apiGet,
+  apiLogin,
+  apiPost,
+  bookingRow,
+  createTestUser,
+  expect,
+  expectBookingPage,
+  loginAs,
+  money,
+  randomFutureDate,
+  submitLoginForm,
+  test,
+  testContact,
+  type TestUser,
+} from "./fixtures";
+import { expectNotReloaded, markPage } from "./search-tab-helpers";
 
-// Tour 3: chuyến 8 (14/01/2027, còn 10 chỗ — chuyến gần nhất nên được chọn sẵn), 9 (25/02/2027, còn 4 chỗ),
-// 10 (08/04/2027). Mỗi test có trình duyệt riêng nên cookie đơn riêng.
-const SLUG = "phu-quoc-4n3d-dao-ngoc-nghi-duong";
-const DEPARTURE_ID = 8;
-const BOOKING_CODE = /GT[2-9A-HJKMNP-Z]{6}/;
+/**
+ * Luồng đặt tour: chọn chuyến ở trang chi tiết → đăng nhập (nếu cần) → trang đặt tour 2 bước → trang đơn.
+ *
+ * Đơn e2e TRỪ CHỖ THẬT của chuyến trong DB, nên tour được chọn động từ API (còn ít nhất 3 chuyến, mỗi chuyến ≥ 3 chỗ);
+ * tránh tour `tour-detail.spec.ts` đang đọc số chỗ để hai spec chạy song song không đạp lên nhau. Chạy rất nhiều lần
+ * làm mọi tour hết chỗ thì nạp lại DB dev (`docker compose down -v`).
+ */
+
+const READ_ONLY_TOUR = "phu-quoc-4n3d-dao-ngoc-nghi-duong";
+
+interface BookableTour {
+  tour: TourDetailResponse;
+  /** Các chuyến còn chỗ theo ngày; chuyến đầu được chọn sẵn ở trang chi tiết. */
+  open: TourDepartureResponse[];
+}
+
+async function pickTour(request: APIRequestContext): Promise<BookableTour> {
+  const { items } = await apiGet<TourSearchResponse>(request, "/tours", { guests: 3 });
+  for (const card of items) {
+    if (card.slug === READ_ONLY_TOUR) continue;
+    const tour = await apiGet<TourDetailResponse>(request, `/tours/${card.slug}`);
+    const open = tour.departures.filter((d) => !d.isSoldOut);
+    if (open.length >= 3 && open.slice(0, 3).every((d) => d.seatsLeft >= 3)) return { tour, open };
+  }
+  throw new Error("Không còn tour nào đủ chỗ để đặt trong DB dev: nạp lại dữ liệu bằng `docker compose down -v`.");
+}
 
 const bookingCard = (page: Page) => page.getByRole("complementary", { name: "Giá và đặt tour" });
 const summaryCard = (page: Page) => page.getByRole("complementary", { name: "Tóm tắt đơn đặt tour" });
@@ -20,19 +60,20 @@ async function chooseDepartureIn(page: Page, scope: ReturnType<Page["getByRole"]
   }).toPass();
 }
 
-/** Chọn chuyến + 2 khách ở thẻ "Đặt tour" rồi đi hết 2 bước, trả về mã đơn. Cần đã đăng nhập bằng `user`. */
-async function createBooking(page: Page, user: TestUser): Promise<string> {
-  await page.goto(`/tours/${SLUG}`);
-  await chooseDepartureIn(page, bookingCard(page), "14/01/2027");
+/** Trên trang chi tiết tour đang mở: chọn 2 khách ở thẻ "Đặt tour" (chuyến chọn sẵn) rồi đi hết 2 bước, trả mã đơn. */
+async function bookTwoSeats(page: Page, { tour, open }: BookableTour, user: TestUser): Promise<string> {
+  const departure = open[0]!;
+  const total = money(departure.price * 2);
+  await chooseDepartureIn(page, bookingCard(page), formatDate(departure.departureDate));
   await bookingCard(page).getByRole("button", { name: "Tăng số khách" }).click();
-  await expect(bookingCard(page)).toContainText("17.980.000");
+  await expect(bookingCard(page)).toContainText(total);
   await bookingCard(page).getByRole("button", { name: "Đặt tour" }).click();
 
   // Vào thẳng bước "Thông tin" — không còn bước chọn lịch.
-  await expect(page).toHaveURL(new RegExp(`/tours/${SLUG}/book\\?departure=${DEPARTURE_ID}&guests=2$`));
+  await expect(page).toHaveURL(new RegExp(`/tours/${tour.slug}/book\\?departure=${departure.id}&guests=2$`));
   await expect(page.getByRole("heading", { level: 2, name: "Thông tin người liên hệ và người đi" })).toBeVisible();
-  await expect(summaryCard(page)).toContainText("14/01/2027");
-  await expect(summaryCard(page)).toContainText("17.980.000");
+  await expect(summaryCard(page)).toContainText(formatDate(departure.departureDate));
+  await expect(summaryCard(page)).toContainText(total);
   // Người liên hệ và khách 1 được điền sẵn theo tài khoản đang đăng nhập.
   await expect(page.locator("#booking-contact-email")).toHaveValue(user.email);
   await expect(page.locator("#booking-traveler-0-name")).toHaveValue(user.fullName);
@@ -52,67 +93,104 @@ async function createBooking(page: Page, user: TestUser): Promise<string> {
   await expect(page.getByText("Trần Văn Bình")).toBeVisible();
   await page.getByRole("button", { name: "Xác nhận đặt tour" }).click();
 
-  await expect(page).toHaveURL(new RegExp(`/bookings/${BOOKING_CODE.source}$`));
-  const code = (await page.getByRole("heading", { level: 1 }).textContent())?.trim() ?? "";
-  expect(code).toMatch(BOOKING_CODE);
-  return code;
+  return expectBookingPage(page);
 }
 
-test("đăng nhập → chọn chuyến ở trang chi tiết → đặt tour 2 bước → thấy đơn PENDING và trong lịch sử", async ({ page, user }) => {
+test("đặt tour 2 bước → đơn PENDING; chuyển trang phía client thấy ngay đơn mới và số chỗ mới", async ({
+  page,
+  request,
+  user,
+}) => {
+  const bookable = await pickTour(request);
+  const departure = bookable.open[0]!;
   await loginAs(page, user);
-  const code = await createBooking(page, user);
+  // Ghé danh sách đơn TRƯỚC khi đặt: sau khi đặt, quay lại bằng liên kết (không tải lại trang) phải thấy đơn mới.
+  await page.goto("/bookings");
+  await expect(page.getByText("Bạn chưa có đơn đặt chỗ nào")).toBeVisible();
+  await markPage(page);
+  await page.getByRole("link", { name: "Khám phá tour" }).click();
+  await page.getByRole("link", { name: `Xem chi tiết tour ${bookable.tour.title}` }).first().click();
+  await expect(page).toHaveURL(new RegExp(`/tours/${bookable.tour.slug}$`));
+
+  const code = await bookTwoSeats(page, bookable, user);
 
   await expect(page.getByText("Trạng thái đơn: Chờ xác nhận")).toBeVisible();
   await expect(page.getByText("Thanh toán: Chưa thanh toán")).toBeVisible();
   const transfer = page.getByRole("region", { name: "Hướng dẫn chuyển khoản" });
   await expect(transfer).toContainText(code); // nội dung chuyển khoản = mã đơn
-  await expect(transfer).toContainText("17.980.000");
+  await expect(transfer).toContainText(money(departure.price * 2));
 
-  await page.goto("/bookings");
-  const item = page.getByRole("listitem").filter({ hasText: code });
-  await expect(item).toContainText("Phú Quốc 4N3Đ");
+  await page.getByRole("link", { name: "Tất cả đơn đặt chỗ" }).click();
+  await expect(page).toHaveURL(/\/bookings$/);
+  const item = bookingRow(page, code);
+  await expect(item).toContainText(bookable.tour.title);
   await expect(item).toContainText("Chờ xác nhận");
   await item.getByRole("link", { name: `Xem chi tiết đơn ${code}` }).click();
   await expect(page).toHaveURL(new RegExp(`/bookings/${code}$`));
+
+  // Số chỗ mới: API đã trừ, và trang tour mở bằng liên kết trong đơn hiện đúng số mới (cache đã được làm mới).
+  const after = await apiGet<TourDetailResponse>(request, `/tours/${bookable.tour.slug}`);
+  expect(after.departures.find((d) => d.id === departure.id)!.seatsLeft).toBeLessThanOrEqual(departure.seatsLeft - 2);
+  await page.getByRole("link", { name: bookable.tour.title, exact: true }).click();
+  await expect(page).toHaveURL(new RegExp(`/tours/${bookable.tour.slug}$`));
+  await expect(async () => {
+    const latest = await apiGet<TourDetailResponse>(request, `/tours/${bookable.tour.slug}`);
+    const current = latest.departures.find((d) => d.id === departure.id)!;
+    await expect(
+      page
+        .getByRole("region", { name: "Lịch khởi hành" })
+        .getByRole("listitem")
+        .filter({ hasText: formatDate(departure.departureDate) }),
+    ).toContainText(formatSeatsLeft(current), { timeout: 2000 });
+  }).toPass();
+  await expectNotReloaded(page);
 });
 
 test("'Chọn ngày này' chọn chuyến trong thẻ Đặt tour; chưa đăng nhập → đăng nhập → về đúng bước Thông tin", async ({
   page,
+  request,
   user,
 }) => {
-  await page.goto(`/tours/${SLUG}`);
-  // Chuyến gần nhất còn chỗ được chọn sẵn ngay trong HTML prerender.
-  await expect(bookingCard(page).getByRole("combobox", { name: "Ngày khởi hành" })).toContainText("14/01/2027");
-  await expect(page.getByRole("button", { name: "Đã chọn (14/01/2027)" })).toBeVisible();
+  const { tour, open } = await pickTour(request);
+  const [first, second] = [open[0]!, open[1]!];
+  await page.goto(`/tours/${tour.slug}`);
+  // Chuyến gần nhất còn chỗ được chọn sẵn ngay trong HTML.
+  await expect(bookingCard(page).getByRole("combobox", { name: "Ngày khởi hành" })).toContainText(
+    formatDate(first.departureDate),
+  );
+  await expect(page.getByRole("button", { name: `Đã chọn (${formatDate(first.departureDate)})` })).toBeVisible();
 
   // Lặp lại tới khi hydrate xong: lần bấm trước khi hydrate không có tác dụng.
+  const secondDate = formatDate(second.departureDate);
   await expect(async () => {
-    await page.getByRole("button", { name: /\(25\/02\/2027\)$/ }).click();
-    await expect(page.getByRole("button", { name: "Đã chọn (25/02/2027)" })).toBeVisible({ timeout: 1000 });
+    await page.getByRole("button", { name: `Chọn ngày này (${secondDate})` }).click({ timeout: 1000 });
+    await expect(page.getByRole("button", { name: `Đã chọn (${secondDate})` })).toBeVisible({ timeout: 1000 });
   }).toPass();
   const trigger = bookingCard(page).getByRole("combobox", { name: "Ngày khởi hành" });
-  await expect(trigger).toContainText("25/02/2027");
+  await expect(trigger).toContainText(secondDate);
   await expect(trigger).toBeFocused();
-  await expect(bookingCard(page)).toContainText("Chỉ còn 4 chỗ");
-  await expect(page).toHaveURL(new RegExp(`/tours/${SLUG}\\?departure=9$`));
+  if (second.isAlmostFull) await expect(bookingCard(page)).toContainText("Chỉ còn");
+  await expect(page).toHaveURL(new RegExp(`/tours/${tour.slug}\\?departure=${second.id}$`));
 
   await bookingCard(page).getByRole("button", { name: "Tăng số khách" }).click();
-  await expect(page).toHaveURL(/departure=9&guests=2$/);
-  await expect(bookingCard(page)).toContainText("18.980.000");
+  await expect(page).toHaveURL(new RegExp(`departure=${second.id}&guests=2$`));
+  await expect(bookingCard(page)).toContainText(money(second.price * 2));
   await bookingCard(page).getByRole("button", { name: "Đặt tour" }).click();
 
   await expect(page).toHaveURL(/\/login\?next=/);
   await submitLoginForm(page, user);
 
-  await expect(page).toHaveURL(new RegExp(`/tours/${SLUG}/book\\?departure=9&guests=2$`));
+  await expect(page).toHaveURL(new RegExp(`/tours/${tour.slug}/book\\?departure=${second.id}&guests=2$`));
   await expect(page.getByRole("heading", { level: 2, name: "Thông tin người liên hệ và người đi" })).toBeVisible();
   await expect(page.locator("#booking-traveler-1-name")).toBeVisible(); // 2 dòng người đi
 });
 
-test("đổi chuyến bằng hộp thoại 'Thay đổi' không mất thông tin đã nhập", async ({ page, user }) => {
+test("đổi chuyến bằng hộp thoại 'Thay đổi' không mất thông tin đã nhập", async ({ page, request, user }) => {
+  const { tour, open } = await pickTour(request);
+  const [first, second, third] = [open[0]!, open[1]!, open[2]!];
   await loginAs(page, user);
-  await page.goto(`/tours/${SLUG}/book?departure=10`);
-  await expect(summaryCard(page)).toContainText("08/04/2027");
+  await page.goto(`/tours/${tour.slug}/book?departure=${third.id}`);
+  await expect(summaryCard(page)).toContainText(formatDate(third.departureDate));
 
   const phone = page.locator("#booking-contact-phone");
   await expect(async () => {
@@ -122,86 +200,90 @@ test("đổi chuyến bằng hộp thoại 'Thay đổi' không mất thông tin
   }).toPass();
 
   const dialog = page.getByRole("dialog", { name: "Thay đổi chuyến đi" });
-  await chooseDepartureIn(page, dialog, "25/02/2027");
+  await chooseDepartureIn(page, dialog, formatDate(second.departureDate));
   await dialog.getByRole("button", { name: "Tăng số khách" }).click();
-  await expect(dialog).toContainText("18.980.000");
+  await expect(dialog).toContainText(money(second.price * 2));
   await dialog.getByRole("button", { name: "Áp dụng" }).click();
 
   await expect(dialog).toBeHidden();
-  await expect(page).toHaveURL(new RegExp(`/book\\?departure=9&guests=2$`));
-  await expect(summaryCard(page)).toContainText("25/02/2027");
+  await expect(page).toHaveURL(new RegExp(`/book\\?departure=${second.id}&guests=2$`));
+  await expect(summaryCard(page)).toContainText(formatDate(second.departureDate));
   await expect(summaryCard(page)).toContainText("2 khách");
   await expect(phone).toHaveValue("0901 234 567");
   await expect(page.locator("#booking-traveler-1-name")).toBeVisible();
 
   // "Huỷ" thì giữ nguyên lựa chọn.
   await summaryCard(page).getByRole("button", { name: /^Thay đổi/ }).click();
-  await chooseDepartureIn(page, dialog, "14/01/2027");
+  await chooseDepartureIn(page, dialog, formatDate(first.departureDate));
   await dialog.getByRole("button", { name: "Huỷ" }).click();
-  await expect(summaryCard(page)).toContainText("25/02/2027");
+  await expect(summaryCard(page)).toContainText(formatDate(second.departureDate));
 });
 
-test("quay lại trang chi tiết chọn ngày khác: trang đặt tour luôn theo ngày vừa chọn", async ({ page, user }) => {
+test("quay lại trang chi tiết chọn ngày khác: trang đặt tour luôn theo ngày vừa chọn", async ({ page, request, user }) => {
   // Lỗi cũ: Next dùng lại form của lần vào trước nên ngày chọn ở lần đầu bị giữ, bỏ qua `?departure=` mới.
+  const { tour, open } = await pickTour(request);
+  const [second, third] = [open[1]!, open[2]!];
   await loginAs(page, user);
-  await page.goto(`/tours/${SLUG}`);
-  await chooseDepartureIn(page, bookingCard(page), "08/04/2027");
+  await page.goto(`/tours/${tour.slug}`);
+  await chooseDepartureIn(page, bookingCard(page), formatDate(third.departureDate));
   await bookingCard(page).getByRole("button", { name: "Đặt tour" }).click();
-  await expect(page).toHaveURL(/book\?departure=10$/);
-  await expect(summaryCard(page)).toContainText("08/04/2027");
+  await expect(page).toHaveURL(new RegExp(`book\\?departure=${third.id}$`));
+  await expect(summaryCard(page)).toContainText(formatDate(third.departureDate));
 
   // Back: thẻ Đặt tour vẫn giữ ngày đã chọn (lựa chọn nằm trên URL trang chi tiết).
   await page.goBack();
-  await expect(page).toHaveURL(new RegExp(`/tours/${SLUG}\\?departure=10$`));
-  await expect(bookingCard(page).getByRole("combobox", { name: "Ngày khởi hành" })).toContainText("08/04/2027");
+  await expect(page).toHaveURL(new RegExp(`/tours/${tour.slug}\\?departure=${third.id}$`));
+  await expect(bookingCard(page).getByRole("combobox", { name: "Ngày khởi hành" })).toContainText(
+    formatDate(third.departureDate),
+  );
 
-  await page.getByRole("button", { name: "Chọn ngày này (25/02/2027)" }).click();
+  await page.getByRole("button", { name: `Chọn ngày này (${formatDate(second.departureDate)})` }).click();
   await bookingCard(page).getByRole("button", { name: "Đặt tour" }).click();
-  await expect(page).toHaveURL(/book\?departure=9$/);
-  await expect(summaryCard(page)).toContainText("25/02/2027");
+  await expect(page).toHaveURL(new RegExp(`book\\?departure=${second.id}$`));
+  await expect(summaryCard(page)).toContainText(formatDate(second.departureDate));
 });
 
-test("mở trang đặt tour thiếu chuyến hoặc chuyến không đặt được → về thẻ Đặt tour, giữ số khách", async ({ page }) => {
-  await page.goto(`/tours/${SLUG}/book`);
-  await expect(page).toHaveURL(new RegExp(`/tours/${SLUG}#dat-tour$`));
+test("mở trang đặt tour thiếu chuyến hoặc chuyến không đặt được → về thẻ Đặt tour, giữ số khách", async ({
+  page,
+  request,
+}) => {
+  const { tour, open } = await pickTour(request);
+  await page.goto(`/tours/${tour.slug}/book`);
+  await expect(page).toHaveURL(new RegExp(`/tours/${tour.slug}#dat-tour$`));
 
-  await page.goto(`/tours/${SLUG}/book?departure=999&guests=3`);
-  await expect(page).toHaveURL(new RegExp(`/tours/${SLUG}\\?guests=3#dat-tour$`));
+  await page.goto(`/tours/${tour.slug}/book?departure=999999&guests=3`);
+  await expect(page).toHaveURL(new RegExp(`/tours/${tour.slug}\\?guests=3#dat-tour$`));
   // Chuyến lạ → chọn chuyến gần nhất còn chỗ, số khách theo URL.
-  await expect(bookingCard(page).getByRole("combobox", { name: "Ngày khởi hành" })).toContainText("14/01/2027");
+  await expect(bookingCard(page).getByRole("combobox", { name: "Ngày khởi hành" })).toContainText(
+    formatDate(open[0]!.departureDate),
+  );
   await expect(bookingCard(page)).toContainText("× 3 khách");
 });
 
-test("mở thẳng bước Xác nhận khi chưa nhập thông tin → về bước Thông tin", async ({ page, user }) => {
+test("mở thẳng bước Xác nhận khi chưa nhập thông tin → về bước Thông tin", async ({ page, request, user }) => {
+  const { tour, open } = await pickTour(request);
   await loginAs(page, user);
-  await page.goto(`/tours/${SLUG}/book?departure=${DEPARTURE_ID}&step=xac-nhan`);
+  await page.goto(`/tours/${tour.slug}/book?departure=${open[0]!.id}&step=xac-nhan`);
   await expect(page.getByRole("heading", { level: 2, name: "Thông tin người liên hệ và người đi" })).toBeVisible();
-  await expect(page).toHaveURL(new RegExp(`/book\\?departure=${DEPARTURE_ID}$`));
+  await expect(page).toHaveURL(new RegExp(`/book\\?departure=${open[0]!.id}$`));
 });
 
-test("mô phỏng nhân viên: đánh dấu đã thanh toán → xác nhận → huỷ", async ({ page, user }) => {
-  await loginAs(page, user);
-  await createBooking(page, user);
+test("lịch sử đơn cần đăng nhập; mã đơn không có hoặc không phải của mình → 404", async ({ page, request, user }) => {
+  // Đơn của người khác, tạo thẳng qua API (đặt phòng ngày xa ngẫu nhiên, không đụng chỗ của test khác).
+  const other = await createTestUser(request);
+  const checkIn = randomFutureDate();
+  const hotel = await apiGet<{ roomTypes: { id: number }[] }>(request, "/hotels/villa-thong-xanh-da-lat");
+  const others = await apiPost(request, "/bookings/hotels", await apiLogin(request, other), {
+    roomTypeId: hotel.roomTypes[0]!.id,
+    checkIn,
+    checkOut: addDays(checkIn, 1),
+    guests: 1,
+    rooms: 1,
+    contact: testContact,
+    guestName: "Người Khác",
+  });
+  expect(others.status, JSON.stringify(others.body)).toBe(201);
 
-  const simulator = page.getByRole("region", { name: "Mô phỏng nhân viên" });
-  // Chưa thu tiền thì chưa xác nhận được.
-  await expect(simulator.getByRole("button", { name: "Xác nhận đơn" })).toBeDisabled();
-
-  await simulator.getByRole("button", { name: "Đánh dấu đã thanh toán" }).click();
-  await expect(page.getByText("Thanh toán: Đã thanh toán")).toBeVisible();
-  await expect(page.getByRole("region", { name: "Hướng dẫn chuyển khoản" })).toHaveCount(0);
-
-  await simulator.getByRole("button", { name: "Xác nhận đơn" }).click();
-  await expect(page.getByText("Trạng thái đơn: Đã xác nhận")).toBeVisible();
-
-  await simulator.getByRole("button", { name: "Huỷ đơn" }).click();
-  await page.getByRole("dialog").getByRole("button", { name: "Huỷ đơn" }).click();
-  await expect(page.getByText("Trạng thái đơn: Đã huỷ")).toBeVisible();
-  await expect(page.getByText("GoTrips sẽ hoàn tiền thủ công")).toBeVisible();
-  await expect(simulator.getByRole("button", { name: "Huỷ đơn" })).toBeDisabled();
-});
-
-test("lịch sử đơn cần đăng nhập; mã đơn không có hoặc không phải của mình → 404", async ({ page, user }) => {
   await page.goto("/bookings");
   await expect(page).toHaveURL(/\/login\?next=%2Fbookings$/);
 
@@ -209,8 +291,14 @@ test("lịch sử đơn cần đăng nhập; mã đơn không có hoặc không 
   await page.goto("/bookings");
   await expect(page.getByText("Bạn chưa có đơn đặt chỗ nào")).toBeVisible();
 
-  for (const code of ["GTXXXXXX", "khong-hop-le"]) {
+  for (const code of [String(others.body.code), "GTXXXXXX", "khong-hop-le"]) {
     await page.goto(`/bookings/${code}`);
     await expect(page.getByRole("heading", { level: 1, name: "Không tìm thấy trang bạn cần" })).toBeVisible();
   }
+});
+
+test("phiên hỏng: mở đơn thì đưa về đăng nhập kèm đích quay lại", async ({ page, context }) => {
+  await context.addCookies([{ name: "gotrips_session", value: "khong.phai.token", url: "http://localhost:3100" }]);
+  await page.goto("/bookings/GT222222");
+  await expect(page).toHaveURL(/\/login\?next=%2Fbookings%2FGT222222$/);
 });

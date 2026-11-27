@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { getTodayInVietnam } from "@/lib/data/tour-view";
-import { isIsoDate } from "@/lib/iso-date";
-import type { HotelRoomType } from "@/lib/types";
+import { diffInDays, isIsoDate } from "@/lib/iso-date";
+import type { HotelRoomTypeView } from "@/lib/types";
 import { BOOKING_STEPS, contactSchema, DEFAULT_BOOKING_STEP, noteSchema, personNameSchema, type BookingStep } from "./booking";
 import { checkStayDates, HOTEL_MAX_GUESTS, HOTEL_MAX_ROOMS } from "./hotel-search";
 
@@ -21,6 +21,9 @@ const DATE_FORMAT_MESSAGE = "Ngày chưa đúng định dạng.";
 const ROOM_MESSAGE = "Vui lòng chọn loại phòng.";
 const GUESTS_MESSAGE = `Số khách phải từ 1 đến ${HOTEL_MAX_GUESTS}.`;
 const ROOMS_MESSAGE = `Số phòng phải từ 1 đến ${HOTEL_MAX_ROOMS}.`;
+/** Đặt trực tuyến chỉ nhận phòng từ ngày mai (tìm kiếm vẫn cho chọn hôm nay). Cùng câu với API. */
+export const SAME_DAY_CHECK_IN_MESSAGE =
+  "Đặt phòng trực tuyến chỉ nhận phòng từ ngày mai. Bạn vui lòng chọn ngày khác.";
 
 const first = (value: unknown) => (Array.isArray(value) ? value[0] : value);
 
@@ -100,14 +103,20 @@ const stayShape = {
 
 type StayValues = { roomTypeId: number; checkIn: string; checkOut: string; guests: number; rooms: number };
 
-/** Kiểm chéo lựa chọn lưu trú với loại phòng của khách sạn. Dùng chung cho form và Server Action. */
+/**
+ * Kiểm chéo lựa chọn lưu trú với loại phòng của khách sạn. Dùng chung cho form và Server Action; gotrips-api kiểm lại
+ * cùng luật khi tạo đơn (và kiểm phòng trống).
+ */
 function checkStay(
   value: StayValues,
   ctx: z.RefinementCtx,
-  roomTypes: Pick<HotelRoomType, "id" | "maxGuests">[],
+  roomTypes: Pick<HotelRoomTypeView, "id" | "maxGuests">[],
   today: string,
 ) {
   checkStayDates(value, ctx, today);
+  if (isIsoDate(value.checkIn) && diffInDays(value.checkIn, today) === 0) {
+    ctx.addIssue({ code: "custom", path: ["checkIn"], message: SAME_DAY_CHECK_IN_MESSAGE });
+  }
   if (value.rooms > value.guests) {
     ctx.addIssue({ code: "custom", path: ["rooms"], message: "Số phòng không được nhiều hơn số khách." });
   }
@@ -128,7 +137,7 @@ function checkStay(
  * loại phòng (để kiểm "chọn đúng phòng của khách sạn này" và sức chứa) và `today` (lấy lúc validate, test truyền cố định).
  */
 export function createHotelStaySchema(
-  roomTypes: Pick<HotelRoomType, "id" | "maxGuests">[],
+  roomTypes: Pick<HotelRoomTypeView, "id" | "maxGuests">[],
   today: string = getTodayInVietnam(),
 ) {
   return z.object(stayShape).superRefine((value, ctx) => checkStay(value, ctx, roomTypes, today));
@@ -160,10 +169,10 @@ export type HotelBookingFormValues = z.input<typeof hotelBookingFormSchema>;
 
 /**
  * Dữ liệu `createHotelBookingAction` nhận: form + lựa chọn lưu trú + slug. Là hàm vì cần loại phòng của khách sạn (server
- * tìm khách sạn theo slug trước, rồi mới dựng schema). Không có trường giá: server tự tính.
+ * tìm khách sạn theo slug trước, rồi mới dựng schema). Không có trường giá: API tự tính.
  */
 export function createHotelBookingRequestSchema(
-  roomTypes: Pick<HotelRoomType, "id" | "maxGuests">[],
+  roomTypes: Pick<HotelRoomTypeView, "id" | "maxGuests">[],
   today: string = getTodayInVietnam(),
 ) {
   return z

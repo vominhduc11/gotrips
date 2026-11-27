@@ -5,7 +5,7 @@ const nextConfig: NextConfig = {
   output: "standalone", // image Docker gọn nhẹ (chạy bằng node server.js)
   cacheComponents: true,
   partialPrefetching: true,
-  // Ảnh mock của prototype lấy từ Unsplash (xem lib/mock/images.ts).
+  // Ảnh danh mục do gotrips-api trả về (dữ liệu seed) và banner (lib/site-content.ts) đang lấy từ Unsplash.
   images: {
     remotePatterns: [
       {
