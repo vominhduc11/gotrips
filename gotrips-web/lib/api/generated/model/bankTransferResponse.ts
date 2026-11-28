@@ -14,4 +14,11 @@ export interface BankTransferResponse {
   accountName: string;
   /** Nội dung chuyển khoản = mã đơn */
   content: string;
+  /** Số tiền còn phải chuyển (VND): tổng tiền trừ phần đã nhận; 0 khi đơn không còn nhận tiền */
+  amountDue: number;
+  /**
+     * Ảnh mã VietQR điền sẵn tài khoản, số tiền còn thiếu và nội dung; null khi chưa cấu hình mã ngân hàng hoặc không còn phải chuyển
+     * @nullable
+     */
+  qrImageUrl: string | null;
 }

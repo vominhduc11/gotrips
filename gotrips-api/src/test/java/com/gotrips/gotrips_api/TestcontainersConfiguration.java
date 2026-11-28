@@ -39,8 +39,13 @@ public class TestcontainersConfiguration {
             registry.add("gotrips.payment.bank-transfer.bank-name", () -> "Ngân hàng Test");
             registry.add("gotrips.payment.bank-transfer.account-number", () -> "1234 5678");
             registry.add("gotrips.payment.bank-transfer.account-name", () -> "CONG TY TEST");
+            registry.add("gotrips.payment.bank-transfer.qr-bank-code", () -> "VCB");
+            registry.add("gotrips.payment.sepay.webhook-secret", () -> SEPAY_WEBHOOK_SECRET);
         };
     }
+
+    /** Secret Key HMAC của webhook SePay trong test; test ký request bằng khoá này. */
+    public static final String SEPAY_WEBHOOK_SECRET = "chi-dung-cho-test-webhook-sepay-0123456789";
 
     /** Thời điểm cố định của mọi test: 01:30 sáng 25/11/2026 giờ Việt Nam (lúc đó theo UTC vẫn là 24/11). */
     public static final Instant NOW = Instant.parse("2026-11-24T18:30:00Z");

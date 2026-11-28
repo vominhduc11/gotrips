@@ -7,6 +7,7 @@
 import type {
   AirportResponse,
   BookingDetailResponse,
+  BookingPaymentStatusResponse,
   BookingSummaryResponse,
   CreateFlightBookingRequest,
   CreateHotelBookingRequest,
@@ -764,6 +765,43 @@ export const getGetMyBookingUrl = (code: string,) => {
 export const getMyBooking = async (code: string, options?: Parameters<typeof customFetch>[1]): Promise<getMyBookingResponse> => {
 
   return customFetch<getMyBookingResponse>(getGetMyBookingUrl(code),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+export type getMyBookingPaymentStatusResponse200 = {
+  data: BookingPaymentStatusResponse
+  status: 200
+}
+
+export type getMyBookingPaymentStatusResponseSuccess = (getMyBookingPaymentStatusResponse200) & {
+  headers: Headers;
+};
+;
+
+export type getMyBookingPaymentStatusResponse = (getMyBookingPaymentStatusResponseSuccess)
+
+export const getGetMyBookingPaymentStatusUrl = (code: string,) => {
+
+
+
+
+  return `/bookings/${code}/payment-status`
+}
+
+/**
+ * Trang chi tiết đơn hỏi lại định kỳ để thấy ngay khi chuyển khoản được ghi nhận. Lỗi: 401; 404 khi mã không có hoặc không phải đơn của người gọi.
+ * @summary Trạng thái thanh toán của một đơn của tôi
+ */
+export const getMyBookingPaymentStatus = async (code: string, options?: Parameters<typeof customFetch>[1]): Promise<getMyBookingPaymentStatusResponse> => {
+
+  return customFetch<getMyBookingPaymentStatusResponse>(getGetMyBookingPaymentStatusUrl(code),
   {
     ...options,
     method: 'GET'

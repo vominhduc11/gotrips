@@ -20,6 +20,7 @@ const summary: BookingSummaryResponse = {
   status: "PENDING",
   paymentStatus: "UNPAID",
   totalAmount: 1_380_000,
+  receivedAmount: 0,
   createdAt: "2026-11-23T03:00:00Z",
   hotel: {
     roomTypeId: 3,

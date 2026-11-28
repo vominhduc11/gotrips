@@ -10,12 +10,16 @@ import "server-only";
  * 5xx) ném ra để nơi gọi hiện trạng thái lỗi cục bộ. KHÔNG dựa vào `getCurrentUser` để biết đã đăng nhập chưa: khi API
  * sập nó coi như khách, khách sẽ bị đẩy sang trang đăng nhập thay vì thấy thông báo lỗi.
  */
-import { getMyBooking as getMyBookingApi, listMyBookings } from "@/lib/api/generated";
+import {
+  getMyBooking as getMyBookingApi,
+  getMyBookingPaymentStatus as getMyBookingPaymentStatusApi,
+  listMyBookings,
+} from "@/lib/api/generated";
 import { ApiError } from "@/lib/api/http";
 import { bearerRequestInit } from "@/lib/auth/bearer";
 import { getSessionToken } from "@/lib/auth/session";
 import { isBookingCode } from "@/lib/booking/booking-code-format";
-import type { BookingDetailView, BookingSummaryView } from "@/lib/types";
+import type { BookingDetailView, BookingPaymentStatusView, BookingSummaryView } from "@/lib/types";
 import { toBookingDetailView, toBookingSummaryView } from "./booking-view";
 
 /** Kết quả đọc đơn: cần đăng nhập, hoặc có dữ liệu. */
@@ -47,6 +51,23 @@ export function getMyBooking(code: string): Promise<OwnBookingsResult<BookingDet
     try {
       const { data } = await getMyBookingApi(code, init);
       return toBookingDetailView(data);
+    } catch (error) {
+      if (error instanceof ApiError && error.status === 404) return null;
+      throw error;
+    }
+  });
+}
+
+/**
+ * Trạng thái thanh toán của một đơn, cho Route Handler mà trang chi tiết đơn hỏi lại định kỳ (webhook SePay ghi nhận
+ * tiền ở API, trình duyệt không tự biết). Cùng luật 404 với {@link getMyBooking}.
+ */
+export function getMyBookingPaymentStatus(code: string): Promise<OwnBookingsResult<BookingPaymentStatusView | null>> {
+  return withSession(async (init) => {
+    if (!isBookingCode(code)) return null;
+    try {
+      const { data } = await getMyBookingPaymentStatusApi(code, init);
+      return data;
     } catch (error) {
       if (error instanceof ApiError && error.status === 404) return null;
       throw error;

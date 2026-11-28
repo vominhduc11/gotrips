@@ -12,6 +12,8 @@ import { getGetAdminBookingQueryOptions } from '@/lib/api/generated/api'
 import type { AdminBookingDetailResponse, CabinClass, PassengerType } from '@/lib/api/generated/model'
 import { ApiError } from '@/lib/api/http'
 import { formatDate, formatDateTime, formatVND } from '@/lib/format'
+import { BookingTransactions } from '@/features/payments/booking-transactions'
+import { paymentsOfBookingHref } from '@/features/payments/payment-filters'
 import { BookingActions } from './booking-actions'
 import { isBookingCode } from './booking-filters'
 
@@ -126,10 +128,17 @@ function BookingPayment({ booking }: { booking: AdminBookingDetailResponse }) {
         <Values items={[
           ['Tổng tiền', <span className="tabular-nums">{formatVND(booking.totalAmount)}</span>],
           ['Trạng thái', <StatusBadge group="payment" value={booking.paymentStatus} />],
+          // Tiền SePay báo về, cộng dồn qua các lần chuyển; thu bằng tay (đánh dấu đã nhận) không đổi số này.
+          ['Đã nhận qua chuyển khoản', <span className="tabular-nums">{formatVND(booking.receivedAmount)}</span>],
+          ...(booking.paymentStatus === 'UNPAID' && booking.receivedAmount > 0
+            ? [['Còn thiếu', <span className="font-semibold text-warning tabular-nums">
+              {formatVND(booking.totalAmount - booking.receivedAmount)}</span>] as const]
+            : []),
           ['Nội dung chuyển khoản', <span className="font-mono">{booking.bankTransfer.content}</span>],
           ['Thời điểm thu', booking.paidAt ? formatDateTime(booking.paidAt) : '—'],
         ]} />
       </DetailCard>
+      <BookingTransactions code={booking.code} />
       <DetailCard title="Dòng thời gian">
         <ol className="space-y-3 border-l pl-3 text-sm">
           {events.map(([label, date]) => date && (
@@ -188,6 +197,14 @@ export function BookingDetailPage() {
       {booking.status === 'CANCELLED' && booking.paymentStatus === 'PAID' && (
         <p role="status" className="rounded-md bg-warning-surface px-4 py-3 text-sm text-warning">
           <strong>Cần hoàn tiền.</strong> Đơn đã huỷ và đã nhận tiền. Hãy hoàn tiền thủ công cho khách.
+        </p>
+      )}
+      {booking.status === 'CANCELLED' && booking.paymentStatus === 'CANCELLED' && booking.receivedAmount > 0 && (
+        <p role="status" className="rounded-md bg-warning-surface px-4 py-3 text-sm text-warning">
+          <strong>Cần hoàn tiền.</strong> Đơn đã huỷ khi mới nhận {formatVND(booking.receivedAmount)}. Hãy hoàn lại
+          cho khách rồi đánh dấu đã xử lý ở{' '}
+          <Link className="font-medium underline underline-offset-4" to={paymentsOfBookingHref(booking.code)}>
+            Giao dịch ngân hàng</Link>.
         </p>
       )}
       <div className="grid gap-4 lg:grid-cols-[minmax(0,2fr)_minmax(0,1fr)]">

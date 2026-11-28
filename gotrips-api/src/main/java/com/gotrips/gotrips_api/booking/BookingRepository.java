@@ -50,4 +50,12 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
     @Lock(LockModeType.PESSIMISTIC_WRITE)
     @Query("select b from Booking b where b.code = :code")
     Optional<Booking> lockByCode(@Param("code") String code);
+
+    /** Trong các mã ứng viên (đọc từ nội dung chuyển khoản), mã nào là đơn có thật. */
+    @Query("select b.code from Booking b where b.code in :codes")
+    List<String> findExistingCodes(@Param("codes") Collection<String> codes);
+
+    /** Trạng thái thanh toán của đơn CỦA người gọi (trang chi tiết đơn hỏi lại định kỳ, không cần người đi). */
+    @Query("select b from Booking b join fetch b.payment where b.code = :code and b.userId = :userId")
+    Optional<Booking> findWithPaymentByCodeAndUser(@Param("code") String code, @Param("userId") UUID userId);
 }

@@ -22,13 +22,21 @@ function makeBooking(patch: Partial<BookingDetailResponse> & Pick<BookingDetailR
     status: "PENDING",
     paymentStatus: "UNPAID",
     totalAmount: 17_980_000,
+    receivedAmount: 0,
     createdAt: "2026-11-23T03:00:00Z",
     contact: { fullName: "Nguyễn Minh Anh", email: "minhanh@example.com", phone: "0901 234 567" },
     note: null,
     paidAt: null,
     confirmedAt: null,
     cancelledAt: null,
-    bankTransfer: { bankName: "NH Test", accountNumber: "0000 1111", accountName: "GOTRIPS", content: "GT7K4Q2M" },
+    bankTransfer: {
+      bankName: "NH Test",
+      accountNumber: "0000 1111",
+      accountName: "GOTRIPS",
+      content: "GT7K4Q2M",
+      amountDue: 17_980_000,
+      qrImageUrl: null,
+    },
     ...patch,
   };
 }
@@ -136,6 +144,7 @@ describe("đơn tour", () => {
       status: "PENDING",
       paymentStatus: "UNPAID",
       totalAmount: 17_980_000,
+      receivedAmount: 0,
       createdAt: "2026-11-23T03:00:00Z",
       title: "Phú Quốc 4N3Đ",
       productHref: "/tours/phu-quoc-4n3d",
@@ -168,13 +177,16 @@ describe("đơn tour", () => {
     expect(view.contact.phone).toBe("0901 234 567");
   });
 
-  it("needsRefund chỉ khi đơn đã huỷ mà khoản thanh toán đã thu", () => {
+  it("needsRefund chỉ khi đơn đã huỷ mà khách đã chuyển tiền (đủ hoặc một phần)", () => {
     const view = (patch: Partial<BookingDetailResponse>) => toBookingDetailView({ ...booking, ...patch });
     const paidAt = "2026-11-23T05:00:00Z";
 
     expect(view({ status: "CANCELLED", paymentStatus: "PAID", paidAt }).needsRefund).toBe(true);
     expect(view({ status: "CONFIRMED", paymentStatus: "PAID", paidAt }).needsRefund).toBe(false);
     expect(view({ status: "CANCELLED", paymentStatus: "CANCELLED" }).needsRefund).toBe(false);
+    // Huỷ khi mới chuyển một phần: khoản thành CANCELLED nhưng tiền đã nhận vẫn phải hoàn.
+    expect(view({ status: "CANCELLED", paymentStatus: "CANCELLED", receivedAmount: 5_000_000 }).needsRefund).toBe(true);
+    expect(view({ status: "PENDING", paymentStatus: "UNPAID", receivedAmount: 5_000_000 }).needsRefund).toBe(false);
     expect(view({ status: "CANCELLED", paymentStatus: "PAID", paidAt }).paidAt).toBe(paidAt);
   });
 

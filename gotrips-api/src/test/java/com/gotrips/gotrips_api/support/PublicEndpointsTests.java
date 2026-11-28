@@ -53,7 +53,9 @@ class PublicEndpointsTests extends CatalogApiTest {
     @ParameterizedTest
     @ValueSource(strings = { "/flights/1/seats", "/flights/1/book", "/bookings", "/bookings/me", "/bookings/GT222222",
             "/admin", "/admin/bookings", "/admin/bookings/GT222222", "/admin/airlines", "/admin/airports",
-            "/admin/flight-schedules", "/admin/flight-schedules/1", "/admin/flight-routes" })
+            "/admin/flight-schedules", "/admin/flight-schedules/1", "/admin/flight-routes",
+            "/bookings/GT222222/payment-status", "/admin/bank-transactions", "/payments/sepay/webhook",
+            "/payments/sepay" })
     void bookingAndAdminPathsAndSubPathsOfAFlightStayProtected(String path) throws Exception {
         mvc.perform(get(path)).andExpect(status().isUnauthorized());
     }
@@ -62,7 +64,8 @@ class PublicEndpointsTests extends CatalogApiTest {
     @ValueSource(strings = { "/flights", "/bookings/tours", "/bookings/hotels", "/bookings/flights",
             "/admin/bookings/GT222222/mark-paid", "/admin/bookings/GT222222/confirm",
             "/admin/bookings/GT222222/cancel", "/admin/airlines", "/admin/airports",
-            "/admin/flight-schedules", "/admin/flight-routes" })
+            "/admin/flight-schedules", "/admin/flight-routes", "/admin/bank-transactions/1/assign",
+            "/admin/bank-transactions/1/resolve", "/payments/sepay", "/payments/sepay/webhook/extra" })
     void writingAlwaysNeedsAToken(String path) throws Exception {
         // Chỉ GET /flights công khai: POST cùng đường dẫn vẫn đòi token.
         mvc.perform(post(path).contentType(MediaType.APPLICATION_JSON).content("{}"))

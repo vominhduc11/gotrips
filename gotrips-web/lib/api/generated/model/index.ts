@@ -13,6 +13,7 @@ export * from './bookingContactResponse';
 export * from './bookingDetailResponse';
 export * from './bookingKind';
 export * from './bookingPassengerResponse';
+export * from './bookingPaymentStatusResponse';
 export * from './bookingStatus';
 export * from './bookingSummaryResponse';
 export * from './bookingTravelerResponse';

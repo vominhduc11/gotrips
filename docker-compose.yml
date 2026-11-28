@@ -57,6 +57,10 @@ services:
       GOTRIPS_BANK_NAME:
       GOTRIPS_BANK_ACCOUNT_NUMBER:
       GOTRIPS_BANK_ACCOUNT_NAME:
+      # Thanh toán qua SePay (tuỳ chọn, để trống giá trị như trên): mã ngân hàng cho ảnh VietQR, và Secret Key HMAC của
+      # webhook. Không đặt khoá thì API tắt nhận webhook, nhân viên vẫn đánh dấu đã thu bằng tay.
+      GOTRIPS_BANK_QR_CODE:
+      GOTRIPS_SEPAY_WEBHOOK_SECRET:
       # Cũng cố ý để trống giá trị: không đặt thì API dùng danh sách nguồn ảnh mặc định.
       GOTRIPS_CATALOG_ALLOWED_IMAGE_PREFIXES:
       GOTRIPS_WEB_REVALIDATE_URL: ${GOTRIPS_WEB_REVALIDATE_URL:-}
@@ -84,6 +88,9 @@ services:
     build:
       context: ./gotrips-admin
       dockerfile: Dockerfile
+      args:
+        # Nhúng vào admin lúc build (liên kết "Xem trên website"); đổi giá trị thì phải build lại image.
+        VITE_WEB_URL: ${VITE_WEB_URL:-http://localhost:3000}
 
     restart: unless-stopped
 

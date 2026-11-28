@@ -23,6 +23,8 @@ export interface BookingDetailResponse {
   paymentStatus: PaymentStatus;
   /** Tổng tiền (VND) */
   totalAmount: number;
+  /** Tiền chuyển khoản đã nhận, cộng dồn, không vượt tổng tiền (VND) */
+  receivedAmount: number;
   createdAt: string;
   contact: BookingContactResponse;
   /** @nullable */

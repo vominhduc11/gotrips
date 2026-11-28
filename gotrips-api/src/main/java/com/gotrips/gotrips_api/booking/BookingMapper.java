@@ -95,6 +95,7 @@ public interface BookingMapper {
     @Mapping(target = "status", source = "booking.status")
     @Mapping(target = "paymentStatus", source = "booking.payment.status")
     @Mapping(target = "totalAmount", source = "booking.totalAmount")
+    @Mapping(target = "receivedAmount", source = "booking.payment.receivedAmount")
     @Mapping(target = "createdAt", source = "booking.createdAt")
     @Mapping(target = "tour", source = "tour")
     @Mapping(target = "hotel", source = "hotel")
@@ -108,6 +109,7 @@ public interface BookingMapper {
     @Mapping(target = "status", source = "summary.status")
     @Mapping(target = "paymentStatus", source = "summary.paymentStatus")
     @Mapping(target = "totalAmount", source = "summary.totalAmount")
+    @Mapping(target = "receivedAmount", source = "summary.receivedAmount")
     @Mapping(target = "createdAt", source = "summary.createdAt")
     @Mapping(target = "tour", source = "summary.tour")
     @Mapping(target = "hotel", source = "summary.hotel")
@@ -119,6 +121,10 @@ public interface BookingMapper {
     @Mapping(target = "cancelledAt", source = "booking.cancelledAt")
     @Mapping(target = "bankTransfer", source = "bankTransfer")
     BookingDetailResponse toDetail(BookingSummaryResponse summary, Booking booking, BankTransferResponse bankTransfer);
+
+    @Mapping(target = "paymentStatus", source = "payment.status")
+    @Mapping(target = "receivedAmount", source = "payment.receivedAmount")
+    BookingPaymentStatusResponse toPaymentStatus(Booking booking);
 
     @Mapping(target = ".", source = "summary")
     @Mapping(target = "availableActions", source = "actions")

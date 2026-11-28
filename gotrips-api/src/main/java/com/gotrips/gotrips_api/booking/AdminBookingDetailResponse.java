@@ -16,6 +16,7 @@ public record AdminBookingDetailResponse(
         @Schema(requiredMode = REQUIRED) BookingStatus status,
         @Schema(requiredMode = REQUIRED) PaymentStatus paymentStatus,
         @Schema(requiredMode = REQUIRED) long totalAmount,
+        @Schema(requiredMode = REQUIRED) long receivedAmount,
         @Schema(requiredMode = REQUIRED) Instant createdAt,
         @Schema(requiredMode = REQUIRED) BookingContactResponse contact,
         @Schema(requiredMode = REQUIRED) List<BookingTransitions.Action> availableActions,

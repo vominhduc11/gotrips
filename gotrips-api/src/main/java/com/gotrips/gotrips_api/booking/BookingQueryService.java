@@ -18,6 +18,7 @@ public class BookingQueryService {
     private final BookingRepository bookingRepository;
     private final BookingAssembler assembler;
     private final BookingAccounts accounts;
+    private final BookingMapper mapper;
 
     @Transactional(readOnly = true)
     public List<BookingSummaryResponse> listMine(UUID userId) {
@@ -34,6 +35,18 @@ public class BookingQueryService {
         }
         return bookingRepository.findByCodeAndUser(code, userId)
                 .map(assembler::detail)
+                .orElseThrow(BookingQueryService::notFound);
+    }
+
+    /** Cùng luật 404 với {@link #getMine}; chỉ đọc đơn và khoản thanh toán (được gọi vài giây một lần). */
+    @Transactional(readOnly = true)
+    public BookingPaymentStatusResponse getMyPaymentStatus(UUID userId, String code) {
+        accounts.requireExisting(userId);
+        if (!BookingCodeGenerator.isValid(code)) {
+            throw notFound();
+        }
+        return bookingRepository.findWithPaymentByCodeAndUser(code, userId)
+                .map(mapper::toPaymentStatus)
                 .orElseThrow(BookingQueryService::notFound);
     }
 

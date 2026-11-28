@@ -11,6 +11,7 @@ import type {
   BankTransferResponse,
   BookingContactResponse,
   BookingKind as ApiBookingKind,
+  BookingPaymentStatusResponse,
   BookingStatus as ApiBookingStatus,
   DestinationResponse,
   FlightFaresResponse,
@@ -214,9 +215,14 @@ export interface BookingSummaryView {
   coverImageAlt: string;
   highlights: BookingHighlight[];
   totalAmount: number;
+  /** Tiền chuyển khoản API đã ghi nhận (cộng dồn qua webhook SePay), không vượt tổng tiền. */
+  receivedAmount: number;
   /** ISO 8601. */
   createdAt: string;
 }
+
+/** Trạng thái thanh toán mà trang chi tiết đơn hỏi lại định kỳ. */
+export type BookingPaymentStatusView = BookingPaymentStatusResponse;
 
 /** Một dòng tính tiền ở khối "Thanh toán", ví dụ "8.990.000 ₫ × 2 khách" → 17.980.000. */
 export interface BookingPriceLine {
@@ -242,7 +248,7 @@ interface BookingDetailBase extends BookingSummaryView {
   paidAt: string | null;
   confirmedAt: string | null;
   cancelledAt: string | null;
-  /** Đơn đã huỷ sau khi khách chuyển tiền: nhân viên phải hoàn tiền thủ công. */
+  /** Đơn đã huỷ sau khi khách chuyển tiền (đủ hoặc một phần): nhân viên phải hoàn tiền thủ công. */
   needsRefund: boolean;
   bankTransfer: BankTransferInfo;
 }

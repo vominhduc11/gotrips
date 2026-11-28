@@ -25,7 +25,7 @@ const data = {
 } satisfies AdminDashboardResponse
 
 const tasks = {
-  items: [{ code: 'GT222222', kind: 'TOUR', status: 'PENDING', paymentStatus: 'UNPAID', totalAmount: 1,
+  items: [{ code: 'GT222222', kind: 'TOUR', status: 'PENDING', paymentStatus: 'UNPAID', totalAmount: 1, receivedAmount: 0,
     createdAt: '2026-11-01T04:00:00Z', contact: { fullName: 'Khách', email: 'a@example.com', phone: '0901' },
     availableActions: [], customerId: 'customer-id' }],
   page: 1, size: 5, totalItems: 1, totalPages: 1,

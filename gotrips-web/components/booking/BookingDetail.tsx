@@ -22,6 +22,7 @@ import type { BookingKind } from "@/lib/types";
 import { BankTransferInfo } from "./BankTransferInfo";
 import { BookingHighlights } from "./BookingHighlights";
 import { BookingStatusBadges } from "./BookingStatusBadges";
+import { PaymentStatusWatcher } from "./PaymentStatusWatcher";
 
 const sectionClass = "rounded-card bg-surface p-5 shadow-card";
 
@@ -194,7 +195,19 @@ export async function BookingDetail({ params }: { params: Promise<{ code: string
             </dl>
 
             <div className="mt-4 space-y-3 text-sm">
-              {awaitingPayment ? <BankTransferInfo bank={booking.bankTransfer} amount={booking.totalAmount} /> : null}
+              {awaitingPayment ? (
+                <>
+                  <BankTransferInfo bank={booking.bankTransfer} receivedAmount={booking.receivedAmount} />
+                  <PaymentStatusWatcher
+                    code={booking.code}
+                    initial={{
+                      status: booking.status,
+                      paymentStatus: booking.paymentStatus,
+                      receivedAmount: booking.receivedAmount,
+                    }}
+                  />
+                </>
+              ) : null}
               {booking.paidAt ? (
                 <p className="text-success-700">
                   Đã nhận thanh toán lúc <time dateTime={booking.paidAt}>{formatDateTime(booking.paidAt)}</time>.

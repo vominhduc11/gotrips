@@ -8,7 +8,9 @@ import { getGetAdminCustomerQueryKey, getGetAdminDashboardQueryKey, getListAdmin
 import { BookingActions } from './booking-actions'
 
 type Booking = ComponentProps<typeof BookingActions>['booking']
-const booking: Booking = { code: 'GT7K4Q2M', totalAmount: 2_490_000, paymentStatus: 'UNPAID', availableActions: [] }
+const booking: Booking = {
+  code: 'GT7K4Q2M', totalAmount: 2_490_000, receivedAmount: 0, paymentStatus: 'UNPAID', availableActions: [],
+}
 
 function renderActions(data: Partial<Booking>, client = createAppQueryClient()) {
   render(<QueryClientProvider client={client}>
@@ -61,5 +63,12 @@ describe('Thao tác của nhân viên trên đơn', () => {
     renderActions({ paymentStatus: 'PAID', availableActions: ['CANCEL'] })
     await userEvent.setup().click(screen.getByRole('button', { name: 'Huỷ đơn' }))
     expect(await screen.findByRole('alertdialog')).toHaveTextContent('Cần hoàn tiền thủ công cho khách.')
+  })
+
+  it('cảnh báo hoàn số đã nhận khi huỷ một đơn mới chuyển khoản một phần', async () => {
+    renderActions({ receivedAmount: 1_000_000, availableActions: ['CANCEL'] })
+    await userEvent.setup().click(screen.getByRole('button', { name: 'Huỷ đơn' }))
+    expect(await screen.findByRole('alertdialog'))
+      .toHaveTextContent(/Đã nhận 1\.000\.000.*qua chuyển khoản, cần hoàn lại cho khách\./)
   })
 })

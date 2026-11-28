@@ -1,4 +1,4 @@
-import { BedDouble, Building2, ClipboardList, Map, MapPin, MapPinned, Plane, Route, UserRoundCog, UsersRound, type LucideIcon } from 'lucide-react'
+import { BedDouble, Building2, ClipboardList, Landmark, Map, MapPin, MapPinned, Plane, Route, UserRoundCog, UsersRound, type LucideIcon } from 'lucide-react'
 
 export interface NavigationItem {
   to: string
@@ -15,6 +15,7 @@ export function visibleNavigation(items: NavigationItem[], isAdmin: boolean) {
 export const adminNavigation: NavigationItem[] = [
   { to: '/', label: 'Tổng quan' },
   { to: '/bookings', label: 'Đơn đặt chỗ', group: 'Vận hành', icon: ClipboardList },
+  { to: '/payments', label: 'Giao dịch ngân hàng', group: 'Vận hành', icon: Landmark },
   { to: '/customers', label: 'Khách hàng', group: 'Vận hành', icon: UsersRound },
   { to: '/tours', label: 'Tour', group: 'Danh mục', icon: Map },
   { to: '/destinations', label: 'Điểm đến', group: 'Danh mục', icon: MapPin },

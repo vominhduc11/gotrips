@@ -123,6 +123,18 @@ public class Booking {
         status = next.status();
         payment.changeStatus(next.paymentStatus());
     }
+
+    /**
+     * Cộng một khoản chuyển khoản vào khoản cần thu theo {@link BankTransferAllocation}. Chỉ cộng tiền; việc đánh dấu
+     * đã thanh toán và xác nhận đơn khi đủ tiền do {@code BookingPaymentService} quyết định.
+     */
+    BankTransferAllocation.Result receiveBankTransfer(long amount) {
+        BankTransferAllocation.Result result = BankTransferAllocation.allocate(state(), totalAmount,
+                payment.getReceivedAmount(), amount);
+        payment.addReceived(result.appliedAmount());
+        return result;
+    }
+
     BookingTransitions.State state() {
         return new BookingTransitions.State(status, payment.getStatus());
     }

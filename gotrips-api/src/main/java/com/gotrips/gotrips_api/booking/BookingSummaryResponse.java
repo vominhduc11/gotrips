@@ -20,6 +20,8 @@ public record BookingSummaryResponse(
         @Schema(requiredMode = REQUIRED) BookingStatus status,
         @Schema(requiredMode = REQUIRED) PaymentStatus paymentStatus,
         @Schema(requiredMode = REQUIRED, description = "Tổng tiền (VND)") long totalAmount,
+        @Schema(requiredMode = REQUIRED, description = "Tiền chuyển khoản đã nhận, cộng dồn, không vượt tổng tiền (VND)")
+        long receivedAmount,
         @Schema(requiredMode = REQUIRED) Instant createdAt,
         @JsonInclude(JsonInclude.Include.NON_NULL) TourBookingResponse tour,
         @JsonInclude(JsonInclude.Include.NON_NULL) HotelBookingResponse hotel,

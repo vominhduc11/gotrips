@@ -19,6 +19,7 @@ export interface AdminBookingSummaryResponse {
   status: BookingStatus;
   paymentStatus: PaymentStatus;
   totalAmount: number;
+  receivedAmount: number;
   createdAt: string;
   contact: BookingContactResponse;
   availableActions: AdminBookingSummaryResponseAvailableActionsItem[];

@@ -4,6 +4,6 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
-@EnableConfigurationProperties(BankTransferProperties.class)
+@EnableConfigurationProperties({ BankTransferProperties.class, SepayProperties.class })
 public class PaymentConfig {
 }

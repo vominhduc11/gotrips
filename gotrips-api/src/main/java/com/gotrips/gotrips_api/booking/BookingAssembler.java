@@ -7,6 +7,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Component;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import com.gotrips.gotrips_api.config.BankTransferProperties;
 import com.gotrips.gotrips_api.flight.FlightFareCalculator;
@@ -58,8 +59,28 @@ class BookingAssembler {
 
     BookingDetailResponse detail(Booking booking) {
         BookingSummaryResponse summary = summaries(List.of(booking)).get(0);
-        return mapper.toDetail(summary, booking, new BankTransferResponse(bankTransfer.bankName(),
-                bankTransfer.accountNumber(), bankTransfer.accountName(), booking.getCode()));
+        return mapper.toDetail(summary, booking, bankTransfer(booking));
+    }
+
+    /** Ảnh VietQR do dịch vụ của SePay vẽ (docs.sepay.vn, "Tạo QR Code VietQR động"); web chỉ hiển thị ảnh. */
+    private static final String VIETQR_IMAGE = "https://vietqr.app/img";
+
+    private BankTransferResponse bankTransfer(Booking booking) {
+        Payment payment = booking.getPayment();
+        boolean payable = booking.getStatus() == BookingStatus.PENDING && payment.getStatus() == PaymentStatus.UNPAID;
+        long amountDue = payable ? Math.max(0, booking.getTotalAmount() - payment.getReceivedAmount()) : 0;
+        String qrImageUrl = amountDue > 0 && bankTransfer.hasQrBankCode()
+                ? UriComponentsBuilder.fromUriString(VIETQR_IMAGE)
+                        .queryParam("acc", bankTransfer.normalizedAccountNumber())
+                        .queryParam("bank", bankTransfer.qrBankCode())
+                        .queryParam("amount", amountDue)
+                        // Nội dung = mã đơn, đúng chuỗi mà webhook SePay dùng để tìm đơn.
+                        .queryParam("des", booking.getCode())
+                        .queryParam("template", "compact")
+                        .encode().build().toUriString()
+                : null;
+        return new BankTransferResponse(bankTransfer.bankName(), bankTransfer.accountNumber(),
+                bankTransfer.accountName(), booking.getCode(), amountDue, qrImageUrl);
     }
 
     private static Map<Long, Booking> ofKind(List<Booking> bookings, BookingKind kind) {

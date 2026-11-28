@@ -19,6 +19,8 @@ public record BookingDetailResponse(
         @Schema(requiredMode = REQUIRED) BookingStatus status,
         @Schema(requiredMode = REQUIRED) PaymentStatus paymentStatus,
         @Schema(requiredMode = REQUIRED, description = "Tổng tiền (VND)") long totalAmount,
+        @Schema(requiredMode = REQUIRED, description = "Tiền chuyển khoản đã nhận, cộng dồn, không vượt tổng tiền (VND)")
+        long receivedAmount,
         @Schema(requiredMode = REQUIRED) Instant createdAt,
         @Schema(requiredMode = REQUIRED) BookingContactResponse contact,
         @Schema(requiredMode = REQUIRED, nullable = true) String note,

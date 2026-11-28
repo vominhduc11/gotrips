@@ -26,6 +26,8 @@ import type {
 import type {
   AdminAirportResponse,
   AdminAmenityResponse,
+  AdminBankTransactionPageResponse,
+  AdminBankTransactionResponse,
   AdminBookingDetailResponse,
   AdminBookingPageResponse,
   AdminChangePasswordRequest,
@@ -63,13 +65,16 @@ import type {
   AdminUpdateHotelRequest,
   AdminUpdateTourRequest,
   AirlineResponse,
+  AssignBankTransactionRequest,
   GetAdminDashboardParams,
+  ListAdminBankTransactionsParams,
   ListAdminBookingsParams,
   ListAdminCustomersParams,
   ListAdminFlightSchedulesParams,
   ListAdminHotelsParams,
   ListAdminToursParams,
   LoginRequest,
+  ResolveBankTransactionRequest,
   UserResponse
 } from './model';
 
@@ -4047,6 +4052,160 @@ export const useCancelBooking = <TError = unknown,
       return useMutation(getCancelBookingMutationOptions(options), queryClient);
     }
 
+export const getResolveAdminBankTransactionUrl = (id: number,) => {
+
+
+
+
+  return `/admin/bank-transactions/${id}/resolve`
+}
+
+/**
+ * Lỗi: 400 thiếu ghi chú, 401, 403 thiếu quyền hoặc CSRF, 404 không có giao dịch, 409 giao dịch không cần xử lý hoặc đã được xử lý.
+ * @summary Đánh dấu đã xử lý phần tiền lệch
+ */
+export const resolveAdminBankTransaction = async (id: number,
+    resolveBankTransactionRequest: ResolveBankTransactionRequest, options?: Parameters<typeof apiFetch>[1]): Promise<AdminBankTransactionResponse> => {
+
+  return apiFetch<AdminBankTransactionResponse>(getResolveAdminBankTransactionUrl(id),
+  {
+    ...options,
+    method: 'POST',
+    headers: getHeaders({ 'Content-Type': 'application/json' }, options?.headers),
+    body: JSON.stringify(resolveBankTransactionRequest)
+  }
+);}
+
+
+
+
+
+export const getResolveAdminBankTransactionMutationKey = () => ['resolveAdminBankTransaction'] as const;
+
+export const getResolveAdminBankTransactionMutationOptions = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof resolveAdminBankTransaction>>, TError,ResolveAdminBankTransactionMutationVariables, TContext>, request?: SecondParameter<typeof apiFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof resolveAdminBankTransaction>>, TError,ResolveAdminBankTransactionMutationVariables, TContext> => {
+
+const mutationKey = getResolveAdminBankTransactionMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof resolveAdminBankTransaction>>, ResolveAdminBankTransactionMutationVariables> = (props) => {
+          const {id,data} = props ?? {};
+
+          return  resolveAdminBankTransaction(id,data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type ResolveAdminBankTransactionMutationResult = NonNullable<Awaited<ReturnType<typeof resolveAdminBankTransaction>>>
+    export type ResolveAdminBankTransactionMutationBody = ResolveBankTransactionRequest
+    export type ResolveAdminBankTransactionMutationError = unknown
+    export type ResolveAdminBankTransactionMutationVariables = {id: number;data: ResolveBankTransactionRequest}
+
+    /**
+ * Lỗi: 400 thiếu ghi chú, 401, 403 thiếu quyền hoặc CSRF, 404 không có giao dịch, 409 giao dịch không cần xử lý hoặc đã được xử lý.
+ * @summary Đánh dấu đã xử lý phần tiền lệch
+ */
+export const useResolveAdminBankTransaction = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof resolveAdminBankTransaction>>, TError,ResolveAdminBankTransactionMutationVariables, TContext>, request?: SecondParameter<typeof apiFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof resolveAdminBankTransaction>>,
+        TError,
+        ResolveAdminBankTransactionMutationVariables,
+        TContext
+      > => {
+      return useMutation(getResolveAdminBankTransactionMutationOptions(options), queryClient);
+    }
+
+export const getAssignAdminBankTransactionUrl = (id: number,) => {
+
+
+
+
+  return `/admin/bank-transactions/${id}/assign`
+}
+
+/**
+ * Tính tiền vào đơn như khi tự gắn: cộng dồn, đủ tiền thì tự xác nhận. Lỗi: 400 mã đơn sai hoặc không có (errors[bookingCode]), 401, 403 thiếu quyền hoặc CSRF, 404 không có giao dịch, 409 giao dịch đã có đơn hoặc đã được xử lý.
+ * @summary Gắn giao dịch chưa có đơn vào một đơn
+ */
+export const assignAdminBankTransaction = async (id: number,
+    assignBankTransactionRequest: AssignBankTransactionRequest, options?: Parameters<typeof apiFetch>[1]): Promise<AdminBankTransactionResponse> => {
+
+  return apiFetch<AdminBankTransactionResponse>(getAssignAdminBankTransactionUrl(id),
+  {
+    ...options,
+    method: 'POST',
+    headers: getHeaders({ 'Content-Type': 'application/json' }, options?.headers),
+    body: JSON.stringify(assignBankTransactionRequest)
+  }
+);}
+
+
+
+
+
+export const getAssignAdminBankTransactionMutationKey = () => ['assignAdminBankTransaction'] as const;
+
+export const getAssignAdminBankTransactionMutationOptions = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof assignAdminBankTransaction>>, TError,AssignAdminBankTransactionMutationVariables, TContext>, request?: SecondParameter<typeof apiFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof assignAdminBankTransaction>>, TError,AssignAdminBankTransactionMutationVariables, TContext> => {
+
+const mutationKey = getAssignAdminBankTransactionMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof assignAdminBankTransaction>>, AssignAdminBankTransactionMutationVariables> = (props) => {
+          const {id,data} = props ?? {};
+
+          return  assignAdminBankTransaction(id,data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type AssignAdminBankTransactionMutationResult = NonNullable<Awaited<ReturnType<typeof assignAdminBankTransaction>>>
+    export type AssignAdminBankTransactionMutationBody = AssignBankTransactionRequest
+    export type AssignAdminBankTransactionMutationError = unknown
+    export type AssignAdminBankTransactionMutationVariables = {id: number;data: AssignBankTransactionRequest}
+
+    /**
+ * Tính tiền vào đơn như khi tự gắn: cộng dồn, đủ tiền thì tự xác nhận. Lỗi: 400 mã đơn sai hoặc không có (errors[bookingCode]), 401, 403 thiếu quyền hoặc CSRF, 404 không có giao dịch, 409 giao dịch đã có đơn hoặc đã được xử lý.
+ * @summary Gắn giao dịch chưa có đơn vào một đơn
+ */
+export const useAssignAdminBankTransaction = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof assignAdminBankTransaction>>, TError,AssignAdminBankTransactionMutationVariables, TContext>, request?: SecondParameter<typeof apiFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof assignAdminBankTransaction>>,
+        TError,
+        AssignAdminBankTransactionMutationVariables,
+        TContext
+      > => {
+      return useMutation(getAssignAdminBankTransactionMutationOptions(options), queryClient);
+    }
+
 export const getAdminLogoutUrl = () => {
 
 
@@ -5312,6 +5471,127 @@ export function useGetAdminBooking<TData = Awaited<ReturnType<typeof getAdminBoo
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
   const queryOptions = getGetAdminBookingQueryOptions(code,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export const getListAdminBankTransactionsUrl = (params?: ListAdminBankTransactionsParams,) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : String(value))
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0 ? `/admin/bank-transactions?${stringifiedParams}` : `/admin/bank-transactions`
+}
+
+/**
+ * Lỗi: 400 bộ lọc không hợp lệ, 401 chưa đăng nhập, 403 thiếu quyền.
+ * @summary Tìm và phân trang giao dịch, mới nhất trước
+ */
+export const listAdminBankTransactions = async (params?: ListAdminBankTransactionsParams, options?: Parameters<typeof apiFetch>[1]): Promise<AdminBankTransactionPageResponse> => {
+
+  return apiFetch<AdminBankTransactionPageResponse>(getListAdminBankTransactionsUrl(params),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getListAdminBankTransactionsQueryKey = (params?: ListAdminBankTransactionsParams,) => {
+    return [
+    `/admin/bank-transactions`, ...(params ? [params] : [])
+    ] as const;
+    }
+
+
+export const getListAdminBankTransactionsQueryOptions = <TData = Awaited<ReturnType<typeof listAdminBankTransactions>>, TError = unknown>(params?: ListAdminBankTransactionsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listAdminBankTransactions>>, TError, TData>>, request?: SecondParameter<typeof apiFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getListAdminBankTransactionsQueryKey(params);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof listAdminBankTransactions>>> = ({ signal }) => listAdminBankTransactions(params, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof listAdminBankTransactions>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type ListAdminBankTransactionsQueryResult = NonNullable<Awaited<ReturnType<typeof listAdminBankTransactions>>>
+export type ListAdminBankTransactionsQueryError = unknown
+
+
+/**
+ * Lỗi: 400 bộ lọc không hợp lệ, 401 chưa đăng nhập, 403 thiếu quyền.
+ * @summary Tìm và phân trang giao dịch, mới nhất trước
+ */
+export function useListAdminBankTransactions<TData = Awaited<ReturnType<typeof listAdminBankTransactions>>, TError = unknown>(
+ params: undefined |  ListAdminBankTransactionsParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof listAdminBankTransactions>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof listAdminBankTransactions>>,
+          TError,
+          Awaited<ReturnType<typeof listAdminBankTransactions>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof apiFetch>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * Lỗi: 400 bộ lọc không hợp lệ, 401 chưa đăng nhập, 403 thiếu quyền.
+ * @summary Tìm và phân trang giao dịch, mới nhất trước
+ */
+export function useListAdminBankTransactions<TData = Awaited<ReturnType<typeof listAdminBankTransactions>>, TError = unknown>(
+ params?: ListAdminBankTransactionsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listAdminBankTransactions>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof listAdminBankTransactions>>,
+          TError,
+          Awaited<ReturnType<typeof listAdminBankTransactions>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof apiFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * Lỗi: 400 bộ lọc không hợp lệ, 401 chưa đăng nhập, 403 thiếu quyền.
+ * @summary Tìm và phân trang giao dịch, mới nhất trước
+ */
+export function useListAdminBankTransactions<TData = Awaited<ReturnType<typeof listAdminBankTransactions>>, TError = unknown>(
+ params?: ListAdminBankTransactionsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listAdminBankTransactions>>, TError, TData>>, request?: SecondParameter<typeof apiFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * Lỗi: 400 bộ lọc không hợp lệ, 401 chưa đăng nhập, 403 thiếu quyền.
+ * @summary Tìm và phân trang giao dịch, mới nhất trước
+ */
+export function useListAdminBankTransactions<TData = Awaited<ReturnType<typeof listAdminBankTransactions>>, TError = unknown>(
+ params?: ListAdminBankTransactionsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listAdminBankTransactions>>, TError, TData>>, request?: SecondParameter<typeof apiFetch>}
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getListAdminBankTransactionsQueryOptions(params,options)
 
   const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 

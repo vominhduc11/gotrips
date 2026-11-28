@@ -1,5 +1,6 @@
 package com.gotrips.gotrips_api.common.error;
 
+import java.util.Comparator;
 import java.util.List;
 
 import org.springframework.core.MethodParameter;
@@ -17,6 +18,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.HandlerMethodValidationException;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
+
+import jakarta.validation.ConstraintViolationException;
 
 /**
  * Xử lý lỗi tập trung cho toàn bộ API, trả về {@link ProblemDetail} (RFC 9457).
@@ -52,6 +55,20 @@ public class GlobalExceptionHandler {
                 .flatMap(result -> result.getResolvableErrors().stream()
                         .map(error -> new FieldViolation(parameterName(result.getMethodParameter()),
                                 error.getDefaultMessage())))
+                .toList();
+
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(invalidDataProblem(errors));
+    }
+
+    /**
+     * Validate bằng {@code Validator} trong code (body phải đọc thô trước, như webhook SePay cần kiểm chữ ký): 400 cùng
+     * format {@code errors[]}, field = đường dẫn thuộc tính.
+     */
+    @ExceptionHandler(ConstraintViolationException.class)
+    public ResponseEntity<ProblemDetail> handleConstraintViolation(ConstraintViolationException ex) {
+        List<FieldViolation> errors = ex.getConstraintViolations().stream()
+                .map(violation -> new FieldViolation(violation.getPropertyPath().toString(), violation.getMessage()))
+                .sorted(Comparator.comparing(FieldViolation::field))
                 .toList();
 
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(invalidDataProblem(errors));

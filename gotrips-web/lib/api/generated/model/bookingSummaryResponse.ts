@@ -21,6 +21,8 @@ export interface BookingSummaryResponse {
   paymentStatus: PaymentStatus;
   /** Tổng tiền (VND) */
   totalAmount: number;
+  /** Tiền chuyển khoản đã nhận, cộng dồn, không vượt tổng tiền (VND) */
+  receivedAmount: number;
   createdAt: string;
   tour?: TourBookingResponse;
   hotel?: HotelBookingResponse;

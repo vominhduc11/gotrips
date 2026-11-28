@@ -191,6 +191,7 @@ function summaryOf(booking: BookingSummaryResponse, view: KindView): BookingSumm
     status: booking.status,
     paymentStatus: booking.paymentStatus,
     totalAmount: booking.totalAmount,
+    receivedAmount: booking.receivedAmount,
     createdAt: booking.createdAt,
     title: view.title,
     productHref: view.productHref,
@@ -219,8 +220,10 @@ export function toBookingDetailView(booking: BookingDetailResponse): BookingDeta
     paidAt: booking.paidAt,
     confirmedAt: booking.confirmedAt,
     cancelledAt: booking.cancelledAt,
-    // Huỷ đơn đã trả tiền: khoản thu vẫn PAID để nhân viên hoàn tiền thủ công.
-    needsRefund: booking.status === "CANCELLED" && booking.paymentStatus === "PAID",
+    // Huỷ đơn đã trả tiền: khoản thu vẫn PAID để nhân viên hoàn tiền thủ công. Huỷ khi mới chuyển một phần thì khoản
+    // thành CANCELLED nhưng tiền đã nhận (receivedAmount) vẫn phải hoàn.
+    needsRefund:
+      booking.status === "CANCELLED" && (booking.paymentStatus === "PAID" || booking.receivedAmount > 0),
     bankTransfer: booking.bankTransfer,
   };
 }

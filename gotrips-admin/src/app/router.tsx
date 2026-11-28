@@ -39,6 +39,11 @@ export function createAdminRoutes(queryClient: QueryClient): RouteObject[] {
           ],
         },
         {
+          path: 'payments',
+          handle: { breadcrumb: 'Giao dịch ngân hàng' },
+          lazy: { Component: async () => (await import('@/features/payments/payment-list-page')).PaymentListPage },
+        },
+        {
           path: 'customers',
           handle: { breadcrumb: 'Khách hàng' },
           children: [

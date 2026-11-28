@@ -83,4 +83,13 @@ public class BookingController {
             @Parameter(description = "Mã đơn, ví dụ GT7K4Q2M") @PathVariable String code) {
         return bookingQueryService.getMine(JwtUserId.from(jwt), code);
     }
+
+    @Operation(operationId = "getMyBookingPaymentStatus", summary = "Trạng thái thanh toán của một đơn của tôi",
+            description = "Trang chi tiết đơn hỏi lại định kỳ để thấy ngay khi chuyển khoản được ghi nhận. "
+                    + "Lỗi: 401; 404 khi mã không có hoặc không phải đơn của người gọi.")
+    @GetMapping("/{code}/payment-status")
+    public BookingPaymentStatusResponse paymentStatus(@AuthenticationPrincipal Jwt jwt,
+            @Parameter(description = "Mã đơn, ví dụ GT7K4Q2M") @PathVariable String code) {
+        return bookingQueryService.getMyPaymentStatus(JwtUserId.from(jwt), code);
+    }
 }

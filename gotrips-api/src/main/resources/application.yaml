@@ -44,6 +44,12 @@ gotrips:
       bank-name: ${GOTRIPS_BANK_NAME:}
       account-number: ${GOTRIPS_BANK_ACCOUNT_NUMBER:}
       account-name: ${GOTRIPS_BANK_ACCOUNT_NAME:}
+      # Mã ngân hàng cho ảnh VietQR (ví dụ VCB, 970436). Để trống thì trang đơn không hiện mã QR.
+      qr-bank-code: ${GOTRIPS_BANK_QR_CODE:}
+    # Webhook SePay báo tiền vào tài khoản trên (POST /payments/sepay/webhook, xác thực HMAC-SHA256). Khoá phải trùng
+    # Secret Key đặt ở SePay. Để trống thì tắt nhận webhook (endpoint trả 404), nhân viên vẫn đánh dấu đã thu bằng tay.
+    sepay:
+      webhook-secret: ${GOTRIPS_SEPAY_WEBHOOK_SECRET:}
 
   web-revalidation:
     url: ${GOTRIPS_WEB_REVALIDATE_URL:}

@@ -47,6 +47,9 @@ public class SecurityConfig {
                 .requestMatchers(HttpMethod.GET, "/flights", "/flights/*").permitAll()
                 // Đăng ký nhận ưu đãi (form ở Trang chủ, khách chưa đăng nhập).
                 .requestMatchers(HttpMethod.POST, "/newsletter/subscriptions").permitAll()
+                // Webhook của SePay: không có token của GoTrips, mỗi request được kiểm bằng chữ ký HMAC-SHA256 ở
+                // SepayWebhookController. Đúng một đường dẫn.
+                .requestMatchers(HttpMethod.POST, "/payments/sepay/webhook").permitAll()
                 // Còn lại (gồm /bookings/**) mặc định cần đăng nhập; khi thêm endpoint công khai cho website phải mở rõ
                 // ràng ở đây.
                 .anyRequest().authenticated())

@@ -40,10 +40,42 @@ class BookingOpenApiTests extends CatalogApiTest {
             "/admin/bookings/{code}, get, getAdminBooking",
             "/admin/bookings/{code}/mark-paid, post, markBookingPaid",
             "/admin/bookings/{code}/confirm, post, confirmBooking",
-            "/admin/bookings/{code}/cancel, post, cancelBooking" })
+            "/admin/bookings/{code}/cancel, post, cancelBooking",
+            "/bookings/{code}/payment-status, get, getMyBookingPaymentStatus",
+            "/admin/bank-transactions, get, listAdminBankTransactions",
+            "/admin/bank-transactions/{id}/assign, post, assignAdminBankTransaction",
+            "/admin/bank-transactions/{id}/resolve, post, resolveAdminBankTransaction" })
     void operationIdsMatchTheNamesTheWebClientUses(String path, String method, String operationId) throws Exception {
         mvc.perform(get("/v3/api-docs"))
                 .andExpect(jsonPath("$.paths['" + path + "']." + method + ".operationId").value(operationId));
+    }
+
+    @Test
+    void paymentFieldsAndBankTransactionsHaveTheTypesTheClientsExpect() throws Exception {
+        String params = "$.paths['/admin/bank-transactions'].get.parameters";
+        mvc.perform(get("/v3/api-docs"))
+                // Webhook SePay không thuộc client nào (ẩn khỏi spec).
+                .andExpect(jsonPath("$.paths['/payments/sepay/webhook']").doesNotExist())
+                .andExpect(jsonPath("$.paths['/admin/bank-transactions'].get.tags[0]")
+                        .value("Quản trị giao dịch ngân hàng"))
+                .andExpect(jsonPath(params + "[?(@.name=='needsReview')].schema.type").value("boolean"))
+                .andExpect(jsonPath(params + "[?(@.name=='page')].schema.type").value("integer"))
+                .andExpect(jsonPath(params + "[?(@.name=='size')].schema.type").value("integer"))
+                .andExpect(jsonPath(params + "[?(@.name=='outcome')].schema['$ref']")
+                        .value("#/components/schemas/BankTransactionOutcome"))
+                .andExpect(jsonPath(SCHEMAS + "BankTransferResponse.required", hasItems("amountDue", "qrImageUrl")))
+                .andExpect(jsonPath(SCHEMAS + "BankTransferResponse.properties.qrImageUrl.type",
+                        containsInAnyOrder("string", "null")))
+                .andExpect(jsonPath(SCHEMAS + "BookingSummaryResponse.required", hasItem("receivedAmount")))
+                .andExpect(jsonPath(SCHEMAS + "AdminBookingDetailResponse.required", hasItem("receivedAmount")))
+                .andExpect(jsonPath(SCHEMAS + "AdminBankTransactionResponse.required",
+                        hasItems("bookingCode", "reviewReason", "reviewAmount", "needsReview", "availableActions",
+                                "resolvedAt", "resolutionNote")))
+                .andExpect(jsonPath(SCHEMAS + "AdminBankTransactionResponse.properties.bookingCode.type",
+                        containsInAnyOrder("string", "null")))
+                .andExpect(jsonPath(SCHEMAS + "BankTransactionReviewReason.enum", hasItems("NONE", "BOOKING_CANCELLED")))
+                .andExpect(jsonPath(SCHEMAS + "AdminBankTransactionPageResponse.required",
+                        hasItems("items", "page", "totalItems")));
     }
 
     @Test

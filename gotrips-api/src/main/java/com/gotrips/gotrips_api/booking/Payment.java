@@ -44,9 +44,16 @@ public class Payment {
     @Column(nullable = false, length = 10)
     private PaymentStatus status;
 
-    /** Thời điểm nhân viên đánh dấu đã nhận tiền. */
+    /** Thời điểm khoản được đánh dấu đã thu đủ (nhân viên bấm tay, hoặc hệ thống khi webhook SePay báo đủ tiền). */
     @Column(name = "paid_at")
     private Instant paidAt;
+
+    /**
+     * Tổng tiền chuyển khoản đã tính vào khoản này (cộng dồn qua các giao dịch SePay), không vượt {@link #amount}. Nhân
+     * viên đánh dấu đã thu bằng tay (tiền mặt, giao dịch SePay không báo) thì giá trị này không đổi.
+     */
+    @Column(name = "received_amount", nullable = false)
+    private long receivedAmount;
 
     static Payment unpaid(Booking booking, long amount) {
         Payment payment = new Payment();
@@ -63,5 +70,10 @@ public class Payment {
 
     void changeStatus(PaymentStatus next) {
         status = next;
+    }
+
+    /** Phần tiền đã được {@link BankTransferAllocation} giới hạn sẵn, nên tổng không vượt {@link #amount}. */
+    void addReceived(long applied) {
+        receivedAmount += applied;
     }
 }

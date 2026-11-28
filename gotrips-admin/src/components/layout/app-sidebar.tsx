@@ -5,6 +5,7 @@ import {
   SidebarMenu, SidebarMenuButton, SidebarMenuItem,
 } from '@/components/ui/sidebar'
 import { PendingBookingsBadge } from '@/features/bookings/pending-bookings-badge'
+import { ReviewTransactionsBadge } from '@/features/payments/review-transactions-badge'
 import { TooltipProvider } from '@/components/ui/tooltip'
 import { visibleNavigation, type NavigationItem } from './navigation'
 
@@ -33,6 +34,7 @@ export function AppSidebar({ items, isAdmin }: { items: NavigationItem[]; isAdmi
                         </NavLink>
                       </SidebarMenuButton>
                       {to === '/bookings' && <PendingBookingsBadge />}
+                      {to === '/payments' && <ReviewTransactionsBadge />}
                     </SidebarMenuItem>
                   ))}
                 </SidebarMenu>

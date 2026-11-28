@@ -1,17 +1,24 @@
+import Image from "next/image";
 import { formatVND } from "@/lib/format";
 import type { BankTransferInfo as BankTransferInfoData } from "@/lib/types";
 import { CopyButton } from "./CopyButton";
 
 /**
- * Hướng dẫn chuyển khoản thủ công: khách chuyển đúng số tiền với nội dung là MÃ ĐƠN, nhân viên đối chiếu sao kê rồi
- * đánh dấu đã thanh toán. (MVP chưa tích hợp cổng thanh toán.) Tài khoản nhận và nội dung đến từ chi tiết đơn của API.
+ * Hướng dẫn chuyển khoản: khách quét mã VietQR (nếu đã cấu hình) hoặc tự chuyển đúng số tiền với nội dung là MÃ ĐƠN.
+ * SePay báo tiền vào cho gotrips-api, API cộng dồn các lần chuyển và tự xác nhận đơn khi đủ. Tài khoản nhận, số tiền còn
+ * thiếu và ảnh QR đều đến từ chi tiết đơn của API.
  */
-export function BankTransferInfo({ bank, amount }: { bank: BankTransferInfoData; amount: number }) {
+export function BankTransferInfo({ bank, receivedAmount }: { bank: BankTransferInfoData; receivedAmount: number }) {
   const rows = [
     { label: "Ngân hàng", value: bank.bankName },
     { label: "Số tài khoản", value: bank.accountNumber, copy: bank.accountNumber.replace(/\s/g, "") },
     { label: "Chủ tài khoản", value: bank.accountName },
-    { label: "Số tiền", value: formatVND(amount), copy: String(amount) },
+    ...(receivedAmount > 0 ? [{ label: "Đã nhận", value: formatVND(receivedAmount) }] : []),
+    {
+      label: receivedAmount > 0 ? "Số tiền còn thiếu" : "Số tiền",
+      value: formatVND(bank.amountDue),
+      copy: String(bank.amountDue),
+    },
     { label: "Nội dung chuyển khoản", value: bank.content, copy: bank.content, emphasis: true },
   ];
 
@@ -21,8 +28,22 @@ export function BankTransferInfo({ bank, amount }: { bank: BankTransferInfoData;
         Hướng dẫn chuyển khoản
       </h3>
       <p className="mt-1 text-sm text-ink-muted">
-        Chuyển đúng số tiền và ghi đúng nội dung bên dưới. Nhân viên GoTrips đối chiếu rồi xác nhận đơn cho bạn.
+        {bank.qrImageUrl ? "Quét mã QR bằng ứng dụng ngân hàng, hoặc chuyển" : "Chuyển"} đúng số tiền và ghi đúng nội
+        dung bên dưới. GoTrips tự xác nhận đơn khi nhận đủ tiền, thường chỉ sau vài phút.
       </p>
+      {bank.qrImageUrl ? (
+        // Ảnh do dịch vụ VietQR của SePay vẽ sẵn: không qua bộ tối ưu ảnh của Next (ảnh nhỏ, mỗi đơn một ảnh khác).
+        // Tải ngay thay vì lazy: đây là việc khách cần làm tiếp, và ở màn hẹp khối thanh toán nằm đầu trang.
+        <Image
+          src={bank.qrImageUrl}
+          alt={`Mã VietQR chuyển ${formatVND(bank.amountDue)} vào tài khoản ${bank.accountNumber}, nội dung ${bank.content}`}
+          width={240}
+          height={240}
+          unoptimized
+          loading="eager"
+          className="mx-auto mt-3 h-auto w-60 rounded-control bg-surface"
+        />
+      ) : null}
       <dl className="mt-3 divide-y divide-line text-sm">
         {rows.map((row) => (
           <div key={row.label} className="py-2">
