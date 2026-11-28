@@ -57,7 +57,7 @@ export const getCurrentUser = cache(async (): Promise<SessionUser | null> => {
       headers: { Authorization: `Bearer ${token}` },
       cache: "no-store", // dữ liệu theo từng người dùng: tuyệt đối không để cache dùng chung
     });
-    return { name: data.fullName, email: data.email };
+    return { name: data.fullName, email: data.email, phone: data.phone };
   } catch (error) {
     // Lỗi nội bộ của Next (vd fetch bị ngắt khi lượt prerender/prefetch kết thúc) phải được ném lại để Next xử lý.
     // Nuốt nó thì lượt render đó sẽ coi người đã đăng nhập là khách.

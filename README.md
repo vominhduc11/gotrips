@@ -17,7 +17,7 @@ Web và admin không tự giữ dữ liệu: mọi thứ (danh mục, giá, ch�
 
 ## Chức năng đã có
 
-- **Website:** Trang chủ với ô tìm kiếm tour, khách sạn, vé máy bay; danh sách và chi tiết tour, khách sạn; tìm vé một chiều và khứ hồi; đặt chỗ hai bước; đăng ký, đăng nhập; xem đơn của tôi kèm hướng dẫn chuyển khoản và mã VietQR, trang đơn tự cập nhật khi tiền về; đăng ký nhận ưu đãi.
+- **Website:** Trang chủ với ô tìm kiếm tour, khách sạn, vé máy bay; danh sách và chi tiết tour, khách sạn; tìm vé một chiều và khứ hồi; đặt chỗ hai bước, điền sẵn số liên hệ từ hồ sơ; đăng ký, đăng nhập; trang tài khoản để sửa họ tên, lưu số điện thoại và đổi mật khẩu; xem đơn của tôi kèm hướng dẫn chuyển khoản và mã VietQR, trang đơn tự cập nhật khi tiền về; đăng ký nhận ưu đãi.
 - **Thanh toán chuyển khoản qua SePay:** webhook báo tiền vào, hệ thống cộng dồn các lần chuyển và tự xác nhận đơn khi đủ tiền (xem [Thanh toán qua SePay](#thanh-toán-qua-sepay-tuỳ-chọn)).
 - **Trang quản trị:** Tổng quan (KPI, biểu đồ, việc cần làm); quản lý đơn (đánh dấu đã thu tiền, xác nhận, huỷ); giao dịch ngân hàng do SePay báo (gắn vào đơn, đánh dấu đã xử lý); điểm đến, tour, lịch khởi hành; khách sạn, loại phòng; hãng bay, sân bay, lịch bay, chặng phổ biến; tra cứu khách hàng; quản lý nhân viên (chỉ ADMIN); đổi mật khẩu.
 - **Chưa có:** thanh toán thẻ hoặc ví điện tử, hoàn tiền tự động, hạn giữ chỗ cho đơn chưa trả tiền, quên mật khẩu, xác minh email, giới hạn số lần đăng nhập sai.
@@ -181,5 +181,10 @@ SePay phải gọi tới được API, nên máy local cần một đường h�
 ## Tài liệu khác
 
 - [`CLAUDE.md`](CLAUDE.md): mô tả chi tiết kiến trúc, luật nghiệp vụ, quy ước code và quy tắc dùng thư viện. Ai sửa code cũng nên đọc. [`AGENTS.md`](AGENTS.md) có cùng nội dung.
-- [`GoTrips_ERD_V9_Corrected.drawio`](GoTrips_ERD_V9_Corrected.drawio): sơ đồ cơ sở dữ liệu, mở bằng [draw.io](https://app.diagrams.net).
+- Các sơ đồ ở gốc repo, mở bằng [draw.io](https://app.diagrams.net):
+  - [`GoTrips_ERD_V9_Corrected.drawio`](GoTrips_ERD_V9_Corrected.drawio): cơ sở dữ liệu.
+  - [`GoTrips_Kien_truc.drawio`](GoTrips_Kien_truc.drawio): tổng thể hệ thống, triển khai Docker, đăng nhập và làm mới cache.
+  - [`GoTrips_Chuc_nang.drawio`](GoTrips_Chuc_nang.drawio): ai làm được gì, các màn hình website và trang quản trị.
+  - [`GoTrips_Luong_nghiep_vu.drawio`](GoTrips_Luong_nghiep_vu.drawio): đặt tour, đặt phòng, đặt vé và nhân viên xử lý đơn.
+  - [`GoTrips_Trang_thai.drawio`](GoTrips_Trang_thai.drawio): vòng đời đơn và thanh toán, tour, khách sạn, chuyến khởi hành, loại phòng và lịch bay.
 - Swagger UI của API đang chạy: http://localhost:8080/swagger-ui.html

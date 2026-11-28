@@ -1,5 +1,7 @@
 package com.gotrips.gotrips_api.booking;
 
+import com.gotrips.gotrips_api.common.validation.PhoneRules;
+
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
@@ -23,8 +25,8 @@ public record ContactRequest(
 
         @Schema(example = "0901 234 567")
         @NotBlank(message = "Vui lòng nhập số điện thoại.")
-        @Size(max = 30, message = "Số điện thoại không được quá 30 ký tự.")
-        @Pattern(regexp = BookingValidation.VIETNAM_PHONE, message = "Số điện thoại chưa đúng, ví dụ: 0901 234 567.")
+        @Size(max = PhoneRules.MAX_LENGTH, message = PhoneRules.LENGTH_MESSAGE)
+        @Pattern(regexp = PhoneRules.VIETNAM_PHONE, message = PhoneRules.FORMAT_MESSAGE)
         String phone) {
 
     public ContactRequest {

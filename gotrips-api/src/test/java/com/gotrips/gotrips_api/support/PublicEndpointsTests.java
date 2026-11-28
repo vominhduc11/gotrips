@@ -2,6 +2,7 @@ package com.gotrips.gotrips_api.support;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -69,6 +70,16 @@ class PublicEndpointsTests extends CatalogApiTest {
     void writingAlwaysNeedsAToken(String path) throws Exception {
         // Chỉ GET /flights công khai: POST cùng đường dẫn vẫn đòi token.
         mvc.perform(post(path).contentType(MediaType.APPLICATION_JSON).content("{}"))
+                .andExpect(status().isUnauthorized());
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = { "/auth/me", "/auth/me/password" })
+    void accountWritesRequireAValidBearerToken(String path) throws Exception {
+        mvc.perform(put(path).contentType(MediaType.APPLICATION_JSON).content("{}"))
+                .andExpect(status().isUnauthorized());
+        mvc.perform(put(path).header("Authorization", "Bearer khong.phai.token")
+                .contentType(MediaType.APPLICATION_JSON).content("{}"))
                 .andExpect(status().isUnauthorized());
     }
 

@@ -117,7 +117,7 @@ export function FlightBookingWizard({
         options,
       )) as Resolver<FlightBookingFormValues>,
     defaultValues: {
-      contact: { fullName: user.name, email: user.email, phone: "" },
+      contact: { fullName: user.name, email: user.email, phone: user.phone ?? "" },
       // Hành khách đầu tiên (người lớn) điền sẵn là chính người đặt — trường hợp phổ biến nhất; khách sửa được.
       passengers: types.map((type, index) => ({
         type,

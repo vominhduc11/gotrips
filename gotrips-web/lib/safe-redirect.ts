@@ -18,8 +18,15 @@ export function getSafeRedirectPath(value: unknown, fallback = "/"): string {
   return value;
 }
 
-/** `/login?next=<đường dẫn>` (đường dẫn đã mã hoá). Đường dẫn không an toàn thì bỏ `next`. */
-export function buildLoginHref(next: string): string {
+export type AuthPath = "/login" | "/register";
+
+/** `<trang>?next=<đường dẫn>` (đường dẫn đã mã hoá). Không có `next` hoặc đường dẫn không an toàn thì bỏ `next`. */
+export function buildAuthHref(page: AuthPath, next: unknown): string {
   const safe = getSafeRedirectPath(next, "");
-  return safe ? `/login?next=${encodeURIComponent(safe)}` : "/login";
+  return safe ? `${page}?next=${encodeURIComponent(safe)}` : page;
+}
+
+/** `/login?next=<đường dẫn>`, xem `buildAuthHref`. */
+export function buildLoginHref(next: string): string {
+  return buildAuthHref("/login", next);
 }

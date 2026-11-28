@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { buildLoginHref, getSafeRedirectPath } from "./safe-redirect";
+import { buildAuthHref, buildLoginHref, getSafeRedirectPath } from "./safe-redirect";
 
 describe("getSafeRedirectPath", () => {
   it.each(["/", "/bookings", "/tours/phu-quoc/book?departure=8&guests=2&step=thong-tin", "/#tim-tour"])(
@@ -38,5 +38,19 @@ describe("buildLoginHref", () => {
 
   it("đích không an toàn thì bỏ next", () => {
     expect(buildLoginHref("//gia-mao.com")).toBe("/login");
+  });
+});
+
+describe("buildAuthHref", () => {
+  it("giữ đích quay lại khi sang trang đăng ký", () => {
+    expect(buildAuthHref("/register", "/tours/a/book?departure=8&guests=2")).toBe(
+      "/register?next=%2Ftours%2Fa%2Fbook%3Fdeparture%3D8%26guests%3D2",
+    );
+  });
+
+  // `URLSearchParams.get` trả null khi URL không có `next`.
+  it.each([null, "", "https://gia-mao.com", "//gia-mao.com"])("next = %j → liên kết trơn", (next) => {
+    expect(buildAuthHref("/register", next)).toBe("/register");
+    expect(buildAuthHref("/login", next)).toBe("/login");
   });
 });

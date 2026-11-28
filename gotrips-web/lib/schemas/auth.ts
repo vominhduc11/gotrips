@@ -26,27 +26,31 @@ export const loginSchema = z.object({
 
 export type LoginFormValues = z.infer<typeof loginSchema>;
 
+export const fullNameSchema = z
+  .string()
+  .trim()
+  .min(1, "Vui lòng nhập họ và tên.")
+  .min(2, "Họ và tên cần có ít nhất 2 ký tự.")
+  .max(100, "Họ và tên không được quá 100 ký tự.");
+
+export const newPasswordSchema = z
+  .string()
+  .min(1, "Vui lòng nhập mật khẩu.")
+  .min(PASSWORD_MIN_LENGTH, `Mật khẩu cần có ít nhất ${PASSWORD_MIN_LENGTH} ký tự.`)
+  .max(PASSWORD_MAX_LENGTH, `Mật khẩu không được quá ${PASSWORD_MAX_LENGTH} ký tự.`)
+  .refine(
+    (value) => utf8Encoder.encode(value).length <= PASSWORD_MAX_BYTES,
+    `Mật khẩu quá dài (tối đa ${PASSWORD_MAX_BYTES} byte; chữ có dấu chiếm nhiều byte hơn chữ không dấu).`,
+  )
+  .regex(/\p{L}/u, "Mật khẩu cần có ít nhất một chữ cái.")
+  .regex(/\d/, "Mật khẩu cần có ít nhất một chữ số.");
+
 /** Đăng ký: mật khẩu tối thiểu 8 ký tự, có cả chữ và số. */
 export const registerSchema = z
   .object({
-    fullName: z
-      .string()
-      .trim()
-      .min(1, "Vui lòng nhập họ và tên.")
-      .min(2, "Họ và tên cần có ít nhất 2 ký tự.")
-      .max(100, "Họ và tên không được quá 100 ký tự."),
+    fullName: fullNameSchema,
     email: emailSchema,
-    password: z
-      .string()
-      .min(1, "Vui lòng nhập mật khẩu.")
-      .min(PASSWORD_MIN_LENGTH, `Mật khẩu cần có ít nhất ${PASSWORD_MIN_LENGTH} ký tự.`)
-      .max(PASSWORD_MAX_LENGTH, `Mật khẩu không được quá ${PASSWORD_MAX_LENGTH} ký tự.`)
-      .refine(
-        (value) => utf8Encoder.encode(value).length <= PASSWORD_MAX_BYTES,
-        `Mật khẩu quá dài (tối đa ${PASSWORD_MAX_BYTES} byte; chữ có dấu chiếm nhiều byte hơn chữ không dấu).`,
-      )
-      .regex(/\p{L}/u, "Mật khẩu cần có ít nhất một chữ cái.")
-      .regex(/\d/, "Mật khẩu cần có ít nhất một chữ số."),
+    password: newPasswordSchema,
     confirmPassword: z.string().min(1, "Vui lòng nhập lại mật khẩu."),
     // Checkbox chưa tích là `false`; refine để báo lỗi tiếng Việt thay vì lỗi kiểu của Zod.
     acceptTerms: z.boolean().refine((value) => value, "Bạn cần đồng ý với điều khoản để tạo tài khoản."),

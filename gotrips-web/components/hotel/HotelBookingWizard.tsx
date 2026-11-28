@@ -69,7 +69,7 @@ export function HotelBookingWizard({
   const form = useForm<HotelBookingFormValues>({
     resolver: zodResolver(hotelBookingFormSchema),
     defaultValues: {
-      contact: { fullName: user.name, email: user.email, phone: "" },
+      contact: { fullName: user.name, email: user.email, phone: user.phone ?? "" },
       // Thường người đặt cũng là người nhận phòng; khách sửa được khi đặt hộ.
       guestName: user.name,
       note: "",

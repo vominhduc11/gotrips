@@ -79,7 +79,7 @@ export function BookingWizard({
     defaultValues: {
       departureId: urlSelection.departureId,
       guests: urlSelection.guests,
-      contact: { fullName: user?.name ?? "", email: user?.email ?? "", phone: "" },
+      contact: { fullName: user?.name ?? "", email: user?.email ?? "", phone: user?.phone ?? "" },
       // Điền sẵn người đi đầu tiên là chính người đặt — trường hợp phổ biến nhất; khách sửa được.
       travelers: Array.from({ length: urlSelection.guests }, (_, i) => ({
         fullName: i === 0 ? (user?.name ?? "") : "",

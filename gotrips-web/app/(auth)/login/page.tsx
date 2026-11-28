@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
-import { AppLink } from "@/components/common/AppLink";
 import { AuthShell } from "@/components/auth/AuthShell";
+import { AuthSwitchLink } from "@/components/auth/AuthSwitchLink";
 import { LoginForm } from "@/components/auth/LoginForm";
 
 export const metadata: Metadata = {
@@ -18,9 +18,9 @@ export default function LoginPage() {
       footer={
         <>
           Chưa có tài khoản?{" "}
-          <AppLink href="/register" className="font-semibold text-primary-800 underline underline-offset-4">
+          <AuthSwitchLink to="/register" className="font-semibold text-primary-800 underline underline-offset-4">
             Đăng ký ngay
-          </AppLink>
+          </AuthSwitchLink>
         </>
       }
     >

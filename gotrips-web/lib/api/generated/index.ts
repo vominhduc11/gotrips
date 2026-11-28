@@ -9,6 +9,7 @@ import type {
   BookingDetailResponse,
   BookingPaymentStatusResponse,
   BookingSummaryResponse,
+  ChangePasswordRequest,
   CreateFlightBookingRequest,
   CreateHotelBookingRequest,
   CreateTourBookingRequest,
@@ -33,6 +34,7 @@ import type {
   TourCardResponse,
   TourDetailResponse,
   TourSearchResponse,
+  UpdateProfileRequest,
   UserResponse
 } from './model';
 
@@ -57,6 +59,117 @@ const getHeaders = (...sources: (RequestInit['headers'] | Record<string, string 
   }
   return Object.fromEntries(layers.reverse().flat()) as Extract<RequestInit['headers'], Record<string, unknown>>;
 };
+
+export type getMeResponse200 = {
+  data: UserResponse
+  status: 200
+}
+
+export type getMeResponseSuccess = (getMeResponse200) & {
+  headers: Headers;
+};
+;
+
+export type getMeResponse = (getMeResponseSuccess)
+
+export const getGetMeUrl = () => {
+
+
+
+
+  return `/auth/me`
+}
+
+/**
+ * Lỗi: 401 thiếu token, token sai/hết hạn hoặc tài khoản không còn tồn tại.
+ * @summary Thông tin người dùng đang đăng nhập
+ */
+export const getMe = async ( options?: Parameters<typeof customFetch>[1]): Promise<getMeResponse> => {
+
+  return customFetch<getMeResponse>(getGetMeUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+export type updateMeResponse200 = {
+  data: UserResponse
+  status: 200
+}
+
+export type updateMeResponseSuccess = (updateMeResponse200) & {
+  headers: Headers;
+};
+;
+
+export type updateMeResponse = (updateMeResponseSuccess)
+
+export const getUpdateMeUrl = () => {
+
+
+
+
+  return `/auth/me`
+}
+
+/**
+ * Thay toàn bộ hồ sơ có thể sửa. Bỏ trường phone, gửi null hoặc để trống sẽ xoá số đã lưu. Lỗi: 400 dữ liệu không hợp lệ (kèm errors[] theo field), 401 thiếu token, token không hợp lệ hoặc tài khoản không còn tồn tại.
+ * @summary Cập nhật hồ sơ của người dùng đang đăng nhập
+ */
+export const updateMe = async (updateProfileRequest: UpdateProfileRequest, options?: Parameters<typeof customFetch>[1]): Promise<updateMeResponse> => {
+
+  return customFetch<updateMeResponse>(getUpdateMeUrl(),
+  {
+    ...options,
+    method: 'PUT',
+    headers: getHeaders({ 'Content-Type': 'application/json' }, options?.headers),
+    body: JSON.stringify(updateProfileRequest)
+  }
+);}
+
+
+
+export type changeMyPasswordResponse204 = {
+  data: void
+  status: 204
+}
+
+export type changeMyPasswordResponseSuccess = (changeMyPasswordResponse204) & {
+  headers: Headers;
+};
+;
+
+export type changeMyPasswordResponse = (changeMyPasswordResponseSuccess)
+
+export const getChangeMyPasswordUrl = () => {
+
+
+
+
+  return `/auth/me/password`
+}
+
+/**
+ * Lỗi: 400 dữ liệu không hợp lệ hoặc sai mật khẩu hiện tại (kèm errors[] theo field), 401 thiếu token, token không hợp lệ hoặc tài khoản không còn tồn tại.
+ * @summary Đổi mật khẩu của người dùng đang đăng nhập
+ */
+export const changeMyPassword = async (changePasswordRequest: ChangePasswordRequest, options?: Parameters<typeof customFetch>[1]): Promise<changeMyPasswordResponse> => {
+
+  return customFetch<changeMyPasswordResponse>(getChangeMyPasswordUrl(),
+  {
+    ...options,
+    method: 'PUT',
+    headers: getHeaders({ 'Content-Type': 'application/json' }, options?.headers),
+    body: JSON.stringify(changePasswordRequest)
+  }
+);}
+
+
 
 export type subscribeNewsletterResponse204 = {
   data: void
@@ -839,43 +952,6 @@ export const getListMyBookingsUrl = () => {
 export const listMyBookings = async ( options?: Parameters<typeof customFetch>[1]): Promise<listMyBookingsResponse> => {
 
   return customFetch<listMyBookingsResponse>(getListMyBookingsUrl(),
-  {
-    ...options,
-    method: 'GET'
-
-
-  }
-);}
-
-
-
-export type getMeResponse200 = {
-  data: UserResponse
-  status: 200
-}
-
-export type getMeResponseSuccess = (getMeResponse200) & {
-  headers: Headers;
-};
-;
-
-export type getMeResponse = (getMeResponseSuccess)
-
-export const getGetMeUrl = () => {
-
-
-
-
-  return `/auth/me`
-}
-
-/**
- * Lỗi: 401 thiếu token, token sai/hết hạn hoặc tài khoản không còn tồn tại.
- * @summary Thông tin người dùng đang đăng nhập
- */
-export const getMe = async ( options?: Parameters<typeof customFetch>[1]): Promise<getMeResponse> => {
-
-  return customFetch<getMeResponse>(getGetMeUrl(),
   {
     ...options,
     method: 'GET'

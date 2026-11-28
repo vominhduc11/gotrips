@@ -21,6 +21,31 @@ test.describe("đăng nhập", () => {
     await expect(email).toBeFocused();
   });
 
+  test("next trỏ ra ngoài site: liên kết sang đăng ký không mang theo", async ({ page }) => {
+    await page.goto("/login?next=https%3A%2F%2Fgia-mao.com");
+    // Lỗi theo ô chỉ hiện khi form đã hydrate; trước đó liên kết nào cũng còn trơn nên kiểm sẽ vô nghĩa.
+    await expect(async () => {
+      await page.getByRole("button", { name: "Đăng nhập", exact: true }).click();
+      await expect(page.getByRole("alert").filter({ hasText: "Vui lòng nhập mật khẩu." })).toBeVisible({
+        timeout: 1000,
+      });
+    }).toPass();
+
+    await expect(page.getByRole("link", { name: "Đăng ký ngay" })).toHaveAttribute("href", "/register");
+  });
+
+  test("bấm 'Đăng nhập' trên Header (bỏ next) rồi sang đăng ký: không còn mang next cũ", async ({ page }) => {
+    await page.goto("/login?next=%2Fbookings");
+    const toRegister = page.getByRole("main").getByRole("link", { name: "Đăng ký ngay" });
+    await expect(toRegister).toHaveAttribute("href", "/register?next=%2Fbookings");
+
+    await page.getByRole("banner").getByRole("link", { name: "Đăng nhập" }).click();
+    await expect(page).toHaveURL(/\/login$/);
+    await toRegister.click();
+
+    await expect(page).toHaveURL(/\/register$/);
+  });
+
   test("nút hiện/ẩn đổi kiểu ô mật khẩu", async ({ page }) => {
     await page.goto("/login");
 

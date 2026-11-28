@@ -11,5 +11,6 @@ public record UserResponse(
         @Schema(requiredMode = Schema.RequiredMode.REQUIRED) UUID id,
         @Schema(requiredMode = Schema.RequiredMode.REQUIRED, example = "ban@example.com") String email,
         @Schema(requiredMode = Schema.RequiredMode.REQUIRED, example = "Nguyễn Văn An") String fullName,
+        @Schema(requiredMode = Schema.RequiredMode.REQUIRED, nullable = true, example = "0901 234 567") String phone,
         @Schema(requiredMode = Schema.RequiredMode.REQUIRED) Set<RoleName> roles) {
 }

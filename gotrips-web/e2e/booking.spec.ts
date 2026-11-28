@@ -1,4 +1,5 @@
 import type { APIRequestContext, Page } from "@playwright/test";
+import { randomUUID } from "node:crypto";
 import type { TourDepartureResponse, TourDetailResponse, TourSearchResponse } from "../lib/api/generated/model";
 import { formatDate, formatSeatsLeft } from "../lib/format";
 import {
@@ -183,6 +184,51 @@ test("'Chọn ngày này' chọn chuyến trong thẻ Đặt tour; chưa đăng 
   await expect(page).toHaveURL(new RegExp(`/tours/${tour.slug}/book\\?departure=${second.id}&guests=2$`));
   await expect(page.getByRole("heading", { level: 2, name: "Thông tin người liên hệ và người đi" })).toBeVisible();
   await expect(page.locator("#booking-traveler-1-name")).toBeVisible(); // 2 dòng người đi
+});
+
+test("khách chưa có tài khoản: Đặt tour → đăng nhập → đăng ký → đăng nhập → về đúng trang đặt tour", async ({
+  page,
+  request,
+}) => {
+  const { tour, open } = await pickTour(request);
+  const second = open[1]!;
+  const bookingPath = `/tours/${tour.slug}/book?departure=${second.id}`;
+  const nextQuery = `?next=${encodeURIComponent(bookingPath)}`;
+  // Header cũng có liên kết "Đăng nhập" nên chỉ tìm trong nội dung chính.
+  const toRegister = page.getByRole("main").getByRole("link", { name: "Đăng ký ngay" });
+  const toLogin = page.getByRole("main").getByRole("link", { name: "Đăng nhập", exact: true });
+
+  await page.goto(`/tours/${tour.slug}`);
+  await chooseDepartureIn(page, bookingCard(page), formatDate(second.departureDate));
+  await bookingCard(page).getByRole("button", { name: "Đặt tour" }).click();
+  await expect(page).toHaveURL((url) => url.pathname === "/login" && url.searchParams.get("next") === bookingPath);
+
+  // Đi qua lại hai trang: lần quay lại là trang Next đã giữ sẵn trong DOM, liên kết vẫn phải đúng.
+  await expect(toRegister).toHaveAttribute("href", `/register${nextQuery}`);
+  await toRegister.click();
+  await expect(toLogin).toHaveAttribute("href", `/login${nextQuery}`);
+  await toLogin.click();
+  await expect(page).toHaveURL((url) => url.pathname === "/login" && url.searchParams.get("next") === bookingPath);
+  await expect(toRegister).toHaveAttribute("href", `/register${nextQuery}`);
+  await toRegister.click();
+  await expect(page).toHaveURL((url) => url.pathname === "/register" && url.searchParams.get("next") === bookingPath);
+
+  const account = { email: `e2e-${randomUUID()}@example.com`, password: "matkhau123" };
+  await page.locator("#register-fullName").fill("Minh Anh");
+  await page.locator("#register-email").fill(account.email);
+  await page.locator("#register-password").fill(account.password);
+  await page.locator("#register-confirmPassword").fill(account.password);
+  await page.locator("#register-acceptTerms").click();
+  await page.getByRole("button", { name: "Tạo tài khoản" }).click();
+
+  await expect(page.getByText("Tạo tài khoản thành công")).toBeVisible();
+  await expect(page).toHaveURL((url) => url.pathname === "/login" && url.searchParams.get("next") === bookingPath);
+  await submitLoginForm(page, account);
+
+  await expect(page).toHaveURL(new RegExp(`/tours/${tour.slug}/book\\?departure=${second.id}$`));
+  await expect(page.getByRole("heading", { level: 2, name: "Thông tin người liên hệ và người đi" })).toBeVisible();
+  await expect(summaryCard(page)).toContainText(formatDate(second.departureDate));
+  await expect(page.locator("#booking-contact-email")).toHaveValue(account.email);
 });
 
 test("đổi chuyến bằng hộp thoại 'Thay đổi' không mất thông tin đã nhập", async ({ page, request, user }) => {

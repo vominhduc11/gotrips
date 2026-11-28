@@ -1,5 +1,6 @@
 "use server";
 
+import { redirect } from "next/navigation";
 import { login, register } from "@/lib/api/generated";
 import { ApiError } from "@/lib/api/http";
 import { createSession, destroySession } from "@/lib/auth/session";
@@ -59,8 +60,10 @@ export async function loginAction(values: unknown, next?: unknown): Promise<Auth
 }
 
 /** Đăng xuất: xoá cookie phiên. Next tự làm mới giao diện vì cookie đổi trong Server Action. */
-export async function logoutAction(): Promise<void> {
+export async function logoutAction(fromAccount?: boolean): Promise<void> {
   await destroySession();
+  // Chuyển trang ngay trong action để Next không giữ cây /account vừa render kèm lệnh chuyển hướng do mất phiên.
+  if (fromAccount === true) redirect(buildLoginHref("/account"));
 }
 
 /** @param next giữ nguyên đích quay lại khi khách đi từ `/login?next=...` sang đăng ký rồi quay về đăng nhập. */

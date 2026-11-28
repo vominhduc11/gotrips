@@ -1,0 +1,522 @@
+<?xml version='1.0' encoding='utf-8'?>
+<mxfile host="Electron" compressed="false" version="29.0.3" pages="4">
+  <diagram name="01 · Tổng thể hệ thống" id="p1-trang">
+    <mxGraphModel dx="1200" dy="800" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="0" pageScale="1" math="0" shadow="0" pageWidth="2050" pageHeight="1110">
+      <root>
+        <mxCell id="p1-0" />
+        <mxCell id="p1-1" parent="p1-0" />
+        <mxCell id="p1-tieu-de" parent="p1-1" vertex="1" value="GoTrips — Tổng thể hệ thống" style="text;html=1;strokeColor=none;fillColor=none;whiteSpace=wrap;align=left;verticalAlign=middle;spacing=6;fontSize=24;fontColor=#0F172A;fontStyle=1;">
+          <mxGeometry x="40" y="20" width="1970" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="p1-phu-de" parent="p1-1" vertex="1" value="Từ trình duyệt đến ứng dụng, API và cơ sở dữ liệu · 28/11/2026" style="text;html=1;strokeColor=none;fillColor=none;whiteSpace=wrap;align=left;verticalAlign=middle;spacing=6;fontSize=14;fontColor=#475569;">
+          <mxGeometry x="40" y="100" width="1970" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="p1-cach-doc" parent="p1-1" vertex="1" value="&lt;b&gt;Cách đọc&lt;/b&gt;&lt;br&gt;&lt;span style=&quot;background-color:#E0F2FE;color:#0369A1;font-weight:700;&quot;&gt;&amp;nbsp;Xanh dương · Web&amp;nbsp;&lt;/span&gt;&amp;nbsp; · &amp;nbsp;&lt;span style=&quot;background-color:#F3E8FF;color:#7E22CE;font-weight:700;&quot;&gt;&amp;nbsp;Tím · Admin&amp;nbsp;&lt;/span&gt;&amp;nbsp; · &amp;nbsp;&lt;span style=&quot;background-color:#DCFCE7;color:#15803D;font-weight:700;&quot;&gt;&amp;nbsp;Xanh lá · API&amp;nbsp;&lt;/span&gt;&amp;nbsp; · &amp;nbsp;&lt;span style=&quot;background-color:#E5E7EB;color:#334155;font-weight:700;&quot;&gt;&amp;nbsp;Xám · PostgreSQL&amp;nbsp;&lt;/span&gt;&amp;nbsp; · &amp;nbsp;&lt;span style=&quot;background-color:#FEF3C7;color:#B45309;font-weight:700;&quot;&gt;&amp;nbsp;Vàng · Ghi chú&amp;nbsp;&lt;/span&gt;&amp;nbsp; · &amp;nbsp;&lt;span style=&quot;background-color:#FFFFFF;color:#334155;font-weight:700;&quot;&gt;&amp;nbsp;Trắng · Người dùng / hệ thống ngoài&amp;nbsp;&lt;/span&gt; &amp;nbsp;|&amp;nbsp; Nét liền: luồng hiện có. Nét đứt: tích hợp tuỳ chọn, hệ thống ngoài hoặc chức năng chưa có." style="rounded=0;html=1;whiteSpace=wrap;overflow=visible;strokeWidth=1.5;align=left;verticalAlign=middle;spacing=10;fontSize=12;fontColor=#0F172A;fillColor=#FEF3C7;strokeColor=#B45309;">
+          <mxGeometry x="40" y="170" width="1970" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="p1-cot-nguoi-dung" parent="p1-1" vertex="1" value="&lt;b&gt;Người dùng&lt;/b&gt;" style="text;html=1;strokeColor=none;fillColor=none;whiteSpace=wrap;align=left;verticalAlign=middle;spacing=6;fontSize=16;fontColor=#0F172A;">
+          <mxGeometry x="40" y="270" width="220" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="p1-cot-ung-dung" parent="p1-1" vertex="1" value="&lt;b&gt;Ứng dụng&lt;/b&gt;" style="text;html=1;strokeColor=none;fillColor=none;whiteSpace=wrap;align=left;verticalAlign=middle;spacing=6;fontSize=16;fontColor=#0F172A;">
+          <mxGeometry x="490" y="270" width="340" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="p1-cot-api" parent="p1-1" vertex="1" value="&lt;b&gt;API&lt;/b&gt;" style="text;html=1;strokeColor=none;fillColor=none;whiteSpace=wrap;align=left;verticalAlign=middle;spacing=6;fontSize=16;fontColor=#0F172A;">
+          <mxGeometry x="1070" y="270" width="520" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="p1-cot-du-lieu" parent="p1-1" vertex="1" value="&lt;b&gt;Dữ liệu&lt;/b&gt;" style="text;html=1;strokeColor=none;fillColor=none;whiteSpace=wrap;align=left;verticalAlign=middle;spacing=6;fontSize=16;fontColor=#0F172A;">
+          <mxGeometry x="1730" y="270" width="280" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="p1-khach" parent="p1-1" vertex="1" value="" style="rounded=0;html=1;whiteSpace=wrap;overflow=visible;strokeWidth=1.5;align=center;verticalAlign=middle;spacing=10;fontSize=14;fontColor=#0F172A;fillColor=#FFFFFF;strokeColor=#CBD5E1;shape=umlActor;strokeWidth=2;">
+          <mxGeometry x="120" y="380" width="60" height="90" as="geometry" />
+        </mxCell>
+        <mxCell id="p1-vai-tro-khach" parent="p1-1" vertex="1" value="&lt;b&gt;Khách&lt;/b&gt;&lt;br&gt;Khách vãng lai hoặc&lt;br&gt;khách hàng (CUSTOMER)" style="text;html=1;strokeColor=none;fillColor=none;whiteSpace=wrap;align=center;verticalAlign=middle;spacing=6;fontSize=14;fontColor=#475569;">
+          <mxGeometry x="40" y="510" width="220" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="p1-nhan-vien" parent="p1-1" vertex="1" value="" style="rounded=0;html=1;whiteSpace=wrap;overflow=visible;strokeWidth=1.5;align=center;verticalAlign=middle;spacing=10;fontSize=14;fontColor=#0F172A;fillColor=#FFFFFF;strokeColor=#CBD5E1;shape=umlActor;strokeWidth=2;">
+          <mxGeometry x="120" y="690" width="60" height="90" as="geometry" />
+        </mxCell>
+        <mxCell id="p1-vai-tro-nhan-vien" parent="p1-1" vertex="1" value="&lt;b&gt;Nhân viên / Quản trị&lt;/b&gt;&lt;br&gt;STAFF và ADMIN" style="text;html=1;strokeColor=none;fillColor=none;whiteSpace=wrap;align=center;verticalAlign=middle;spacing=6;fontSize=14;fontColor=#475569;">
+          <mxGeometry x="40" y="820" width="220" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="p1-web" parent="p1-1" vertex="1" value="&lt;b&gt;gotrips-web · Website khách hàng&lt;/b&gt;&lt;br&gt;Next.js 16 (App Router) · React 19 · Cổng 3000&lt;br&gt;Tour, khách sạn, vé máy bay, đơn đặt chỗ&lt;br&gt;Server Component đọc · Server Action ghi&lt;br&gt;Cache danh mục trong bộ nhớ" style="rounded=0;html=1;whiteSpace=wrap;overflow=visible;strokeWidth=1.5;align=center;verticalAlign=middle;spacing=10;fontSize=14;fontColor=#0F172A;fillColor=#E0F2FE;strokeColor=#0369A1;">
+          <mxGeometry x="490" y="360" width="340" height="130" as="geometry" />
+        </mxCell>
+        <mxCell id="p1-admin" parent="p1-1" vertex="1" value="&lt;b&gt;gotrips-admin · Trang quản trị&lt;/b&gt;&lt;br&gt;React 19 + Vite 8 · Cổng 8081 → 80&lt;br&gt;SPA chạy trong trình duyệt nhân viên&lt;br&gt;nginx phục vụ tệp tĩnh và chuyển tiếp /api/" style="rounded=0;html=1;whiteSpace=wrap;overflow=visible;strokeWidth=1.5;align=center;verticalAlign=middle;spacing=10;fontSize=14;fontColor=#0F172A;fillColor=#F3E8FF;strokeColor=#7E22CE;">
+          <mxGeometry x="490" y="670" width="340" height="130" as="geometry" />
+        </mxCell>
+        <mxCell id="p1-api" parent="p1-1" vertex="1" value="&lt;b&gt;gotrips-api · API REST&lt;/b&gt;&lt;br&gt;Spring Boot 4.1 · Java 25 · Cổng 8080" style="swimlane;html=1;whiteSpace=wrap;horizontal=1;rounded=0;collapsible=0;startSize=70;align=left;spacingLeft=16;verticalAlign=middle;fontSize=16;fontColor=#0F172A;fillColor=#DCFCE7;swimlaneFillColor=#F0FDF4;strokeColor=#15803D;strokeWidth=1.5;">
+          <mxGeometry x="1070" y="350" width="520" height="480" as="geometry" />
+        </mxCell>
+        <mxCell id="p1-m1" parent="p1-api" vertex="1" value="&lt;b&gt;M1 · Tài khoản &amp;amp; Phân quyền&lt;/b&gt;&lt;br&gt;auth, user" style="rounded=0;html=1;whiteSpace=wrap;overflow=visible;strokeWidth=1.5;align=center;verticalAlign=middle;spacing=10;fontSize=12;fontColor=#0F172A;fillColor=#FFFFFF;strokeColor=#15803D;">
+          <mxGeometry x="40" y="110" width="200" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="p1-m2" parent="p1-api" vertex="1" value="&lt;b&gt;M2 · Điểm đến &amp;amp; Tour&lt;/b&gt;&lt;br&gt;destination, tour" style="rounded=0;html=1;whiteSpace=wrap;overflow=visible;strokeWidth=1.5;align=center;verticalAlign=middle;spacing=10;fontSize=12;fontColor=#0F172A;fillColor=#FFFFFF;strokeColor=#15803D;">
+          <mxGeometry x="280" y="110" width="200" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="p1-m3" parent="p1-api" vertex="1" value="&lt;b&gt;M3 · Khách sạn&lt;/b&gt;&lt;br&gt;hotel" style="rounded=0;html=1;whiteSpace=wrap;overflow=visible;strokeWidth=1.5;align=center;verticalAlign=middle;spacing=10;fontSize=12;fontColor=#0F172A;fillColor=#FFFFFF;strokeColor=#15803D;">
+          <mxGeometry x="40" y="200" width="200" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="p1-m4" parent="p1-api" vertex="1" value="&lt;b&gt;M4 · Hàng không&lt;/b&gt;&lt;br&gt;flight" style="rounded=0;html=1;whiteSpace=wrap;overflow=visible;strokeWidth=1.5;align=center;verticalAlign=middle;spacing=10;fontSize=12;fontColor=#0F172A;fillColor=#FFFFFF;strokeColor=#15803D;">
+          <mxGeometry x="280" y="200" width="200" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="p1-m5" parent="p1-api" vertex="1" value="&lt;b&gt;M5 · Đơn đặt chỗ &amp;amp; Thanh toán&lt;/b&gt;&lt;br&gt;booking, payment" style="rounded=0;html=1;whiteSpace=wrap;overflow=visible;strokeWidth=1.5;align=center;verticalAlign=middle;spacing=10;fontSize=12;fontColor=#0F172A;fillColor=#FFFFFF;strokeColor=#15803D;">
+          <mxGeometry x="40" y="290" width="200" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="p1-m6" parent="p1-api" vertex="1" value="&lt;b&gt;M6 · Tiếp thị&lt;/b&gt;&lt;br&gt;newsletter, testimonial" style="rounded=0;html=1;whiteSpace=wrap;overflow=visible;strokeWidth=1.5;align=center;verticalAlign=middle;spacing=10;fontSize=12;fontColor=#0F172A;fillColor=#FFFFFF;strokeColor=#15803D;">
+          <mxGeometry x="280" y="290" width="200" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="p1-dashboard" parent="p1-api" vertex="1" value="&lt;b&gt;Tổng quan quản trị&lt;/b&gt;&lt;br&gt;dashboard" style="rounded=0;html=1;whiteSpace=wrap;overflow=visible;strokeWidth=1.5;align=center;verticalAlign=middle;spacing=10;fontSize=12;fontColor=#0F172A;fillColor=#FFFFFF;strokeColor=#15803D;">
+          <mxGeometry x="40" y="380" width="200" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="p1-chung" parent="p1-api" vertex="1" value="&lt;b&gt;Dùng chung&lt;/b&gt;&lt;br&gt;catalog, common, config" style="rounded=0;html=1;whiteSpace=wrap;overflow=visible;strokeWidth=1.5;align=center;verticalAlign=middle;spacing=10;fontSize=12;fontColor=#0F172A;fillColor=#FFFFFF;strokeColor=#15803D;">
+          <mxGeometry x="280" y="380" width="200" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="p1-postgresql" parent="p1-1" vertex="1" value="&lt;b&gt;PostgreSQL 17&lt;/b&gt;&lt;br&gt;Flyway quản lý schema V1 đến V10&lt;br&gt;Cổng máy chủ 127.0.0.1:5432" style="rounded=0;html=1;whiteSpace=wrap;overflow=visible;strokeWidth=1.5;align=center;verticalAlign=middle;spacing=10;fontSize=14;fontColor=#0F172A;fillColor=#E5E7EB;strokeColor=#6B7280;shape=cylinder3;">
+          <mxGeometry x="1730" y="510" width="280" height="150" as="geometry" />
+        </mxCell>
+        <mxCell id="p1-erd" parent="p1-1" vertex="1" value="&lt;b&gt;Chi tiết bảng&lt;/b&gt;&lt;br&gt;GoTrips_ERD_V9_Corrected.drawio" style="rounded=0;html=1;whiteSpace=wrap;overflow=visible;strokeWidth=1.5;align=left;verticalAlign=middle;spacing=10;fontSize=13;fontColor=#0F172A;fillColor=#FEF3C7;strokeColor=#B45309;">
+          <mxGeometry x="1730" y="700" width="280" height="70" as="geometry" />
+        </mxCell>
+        <mxCell id="p1-khach-web" parent="p1-1" edge="1" source="p1-khach" target="p1-web" value="1 · Xem trang, gửi biểu mẫu&lt;br&gt;HTTP" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;labelBackgroundColor=#FFFFFF;fontColor=#0F172A;fontSize=13;strokeColor=#475569;strokeWidth=1.5;endArrow=block;endFill=1;exitX=1;exitY=0.5;entryX=0;entryY=0.5;exitPerimeter=0;entryPerimeter=0;">
+          <mxGeometry x="0" relative="1" as="geometry">
+            <mxPoint x="0" y="-25" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="p1-web-api" parent="p1-1" edge="1" source="p1-web" target="p1-api" value="2 · JSON qua API_URL từ máy chủ&lt;br&gt;Authorization: Bearer &amp;lt;JWT&amp;gt;&lt;br&gt;JWT lấy từ gotrips_session" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;labelBackgroundColor=#FFFFFF;fontColor=#0F172A;fontSize=13;strokeColor=#0369A1;strokeWidth=1.5;endArrow=block;endFill=1;exitX=1;exitY=0.38461538461538464;entryX=0;entryY=0.125;exitPerimeter=0;entryPerimeter=0;">
+          <mxGeometry x="0" relative="1" as="geometry">
+            <mxPoint x="0" y="-33" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="p1-nhan-vien-admin" parent="p1-1" edge="1" source="p1-nhan-vien" target="p1-admin" value="3 · Tải SPA qua nginx&lt;br&gt;4a · Gửi yêu cầu tới /api/" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;labelBackgroundColor=#FFFFFF;fontColor=#0F172A;fontSize=13;strokeColor=#7E22CE;strokeWidth=1.5;endArrow=block;endFill=1;exitX=1;exitY=0.5;entryX=0;entryY=0.5;exitPerimeter=0;entryPerimeter=0;">
+          <mxGeometry x="0" relative="1" as="geometry">
+            <mxPoint x="0" y="-25" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="p1-admin-api" parent="p1-1" edge="1" source="p1-admin" target="p1-api" value="4b · nginx bỏ tiền tố /api&lt;br&gt;Cookie gotrips_admin_session&lt;br&gt;Lệnh ghi thêm X-XSRF-TOKEN" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;labelBackgroundColor=#FFFFFF;fontColor=#0F172A;fontSize=13;strokeColor=#7E22CE;strokeWidth=1.5;endArrow=block;endFill=1;exitX=1;exitY=0.5;entryX=0;entryY=0.8020833333333334;exitPerimeter=0;entryPerimeter=0;">
+          <mxGeometry x="0" relative="1" as="geometry">
+            <mxPoint x="0" y="-33" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="p1-api-db" parent="p1-1" edge="1" source="p1-api" target="p1-postgresql" value="5 · JPA, Flyway" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;labelBackgroundColor=#FFFFFF;fontColor=#0F172A;fontSize=13;strokeColor=#15803D;strokeWidth=1.5;endArrow=block;endFill=1;exitX=1;exitY=0.4895833333333333;entryX=0;entryY=0.5;exitPerimeter=0;entryPerimeter=0;">
+          <mxGeometry x="0" relative="1" as="geometry">
+            <mxPoint x="0" y="-15" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="p1-api-web" parent="p1-1" edge="1" source="p1-api" target="p1-web" value="6 · POST /api/revalidate&lt;br&gt;Tuỳ chọn qua&lt;br&gt;GOTRIPS_WEB_REVALIDATE_URL" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;labelBackgroundColor=#FFFFFF;fontColor=#0F172A;fontSize=12;strokeColor=#15803D;strokeWidth=1.5;endArrow=block;endFill=0;exitX=0;exitY=0.23958333333333334;entryX=1;entryY=0.8076923076923077;exitPerimeter=0;entryPerimeter=0;dashed=1;dashPattern=6 4;">
+          <mxGeometry x="0" relative="1" as="geometry">
+            <mxPoint x="0" y="34" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="p1-ngan-hang" parent="p1-1" vertex="1" value="&lt;b&gt;Ngân hàng và SePay · Ngoài hệ thống&lt;/b&gt;&lt;br&gt;Khách chuyển khoản, nội dung là mã đơn. Trang đơn có thể hiện ảnh VietQR.&lt;br&gt;SePay báo tiền vào, API tự ghi nhận vào đơn theo mã đơn.&lt;br&gt;Giao dịch lệch hoặc khi tắt SePay: nhân viên xử lý trên admin." style="rounded=0;html=1;whiteSpace=wrap;overflow=visible;strokeWidth=1.5;align=left;verticalAlign=middle;spacing=10;fontSize=14;fontColor=#0F172A;fillColor=#FFFFFF;strokeColor=#CBD5E1;dashed=1;dashPattern=6 4;">
+          <mxGeometry x="40" y="920" width="540" height="130" as="geometry" />
+        </mxCell>
+        <mxCell id="p1-sepay-api" parent="p1-1" edge="1" source="p1-ngan-hang" target="p1-api" value="7 · SePay báo tiền vào · tuỳ chọn&lt;br&gt;POST /payments/sepay/webhook · HMAC-SHA256" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;labelBackgroundColor=#FFFFFF;fontColor=#0F172A;fontSize=12;strokeColor=#475569;strokeWidth=1.5;endArrow=block;endFill=0;exitX=0.9629629629629629;exitY=0;entryX=0.5;entryY=1;exitPerimeter=0;entryPerimeter=0;dashed=1;dashPattern=6 4;">
+          <mxGeometry x="0" relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="560" y="870" />
+              <mxPoint x="1330" y="870" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="p1-diem-can-nho" parent="p1-1" vertex="1" value="&lt;b&gt;Điểm cần nhớ&lt;/b&gt;&lt;br&gt;API quyết định giá, chỗ trống, trạng thái đơn và giữ dữ liệu nghiệp vụ.&lt;br&gt;Web và admin hiển thị dữ liệu và gửi yêu cầu đến API.&lt;br&gt;Trình duyệt khách chỉ gọi gotrips-web, trừ ảnh VietQR tải từ vietqr.app." style="rounded=0;html=1;whiteSpace=wrap;overflow=visible;strokeWidth=1.5;align=left;verticalAlign=middle;spacing=10;fontSize=13;fontColor=#0F172A;fillColor=#FEF3C7;strokeColor=#B45309;">
+          <mxGeometry x="620" y="920" width="660" height="130" as="geometry" />
+        </mxCell>
+        <mxCell id="p1-chua-co" parent="p1-1" vertex="1" value="&lt;b&gt;Chưa có&lt;/b&gt;&lt;br&gt;Thanh toán thẻ/ví điện tử, chức năng hoàn tiền, API sửa danh mục tiện ích.&lt;br&gt;Ngừng bán lịch bay còn đơn tương lai, giới hạn lần nhập sai mật khẩu.&lt;br&gt;Xác minh email, quên mật khẩu, trang điều khoản, thu hồi hoặc làm mới JWT.&lt;br&gt;Giới hạn gửi hoặc huỷ đăng ký nhận ưu đãi." style="rounded=0;html=1;whiteSpace=wrap;overflow=visible;strokeWidth=1.5;align=left;verticalAlign=middle;spacing=10;fontSize=13;fontColor=#0F172A;fillColor=#FEF3C7;strokeColor=#B45309;dashed=1;dashPattern=6 4;">
+          <mxGeometry x="1320" y="920" width="690" height="130" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+  <diagram name="02 · Triển khai Docker" id="p2-trang">
+    <mxGraphModel dx="1200" dy="800" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="0" pageScale="1" math="0" shadow="0" pageWidth="2040" pageHeight="1550">
+      <root>
+        <mxCell id="p2-0" />
+        <mxCell id="p2-1" parent="p2-0" />
+        <mxCell id="p2-tieu-de" parent="p2-1" vertex="1" value="GoTrips — Triển khai Docker" style="text;html=1;strokeColor=none;fillColor=none;whiteSpace=wrap;align=left;verticalAlign=middle;spacing=6;fontSize=24;fontColor=#0F172A;fontStyle=1;">
+          <mxGeometry x="40" y="20" width="1960" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="p2-phu-de" parent="p2-1" vertex="1" value="Các container, cấu hình và thứ tự khởi động với Docker Compose · 28/11/2026" style="text;html=1;strokeColor=none;fillColor=none;whiteSpace=wrap;align=left;verticalAlign=middle;spacing=6;fontSize=14;fontColor=#475569;">
+          <mxGeometry x="40" y="100" width="1960" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="p2-cach-doc" parent="p2-1" vertex="1" value="&lt;b&gt;Cách đọc&lt;/b&gt;&lt;br&gt;&lt;span style=&quot;background-color:#E0F2FE;color:#0369A1;font-weight:700;&quot;&gt;&amp;nbsp;Xanh dương · Web&amp;nbsp;&lt;/span&gt;&amp;nbsp; · &amp;nbsp;&lt;span style=&quot;background-color:#F3E8FF;color:#7E22CE;font-weight:700;&quot;&gt;&amp;nbsp;Tím · Admin&amp;nbsp;&lt;/span&gt;&amp;nbsp; · &amp;nbsp;&lt;span style=&quot;background-color:#DCFCE7;color:#15803D;font-weight:700;&quot;&gt;&amp;nbsp;Xanh lá · API&amp;nbsp;&lt;/span&gt;&amp;nbsp; · &amp;nbsp;&lt;span style=&quot;background-color:#E5E7EB;color:#334155;font-weight:700;&quot;&gt;&amp;nbsp;Xám · PostgreSQL&amp;nbsp;&lt;/span&gt;&amp;nbsp; · &amp;nbsp;&lt;span style=&quot;background-color:#FEF3C7;color:#B45309;font-weight:700;&quot;&gt;&amp;nbsp;Vàng · Ghi chú&amp;nbsp;&lt;/span&gt;&amp;nbsp; · &amp;nbsp;&lt;span style=&quot;background-color:#FFFFFF;color:#334155;font-weight:700;&quot;&gt;&amp;nbsp;Trắng · Người dùng / hệ thống ngoài&amp;nbsp;&lt;/span&gt; &amp;nbsp;|&amp;nbsp; Nét liền: thành phần và phụ thuộc khởi động hiện có. Nét đứt: thành phần tuỳ chọn hoặc chưa có." style="rounded=0;html=1;whiteSpace=wrap;overflow=visible;strokeWidth=1.5;align=left;verticalAlign=middle;spacing=10;fontSize=12;fontColor=#0F172A;fillColor=#FEF3C7;strokeColor=#B45309;">
+          <mxGeometry x="40" y="170" width="1960" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="p2-compose" parent="p2-1" vertex="1" value="&lt;b&gt;Docker Compose · Dự án gotrips&lt;/b&gt;" style="swimlane;html=1;whiteSpace=wrap;horizontal=1;rounded=0;collapsible=0;startSize=50;align=left;spacingLeft=16;verticalAlign=middle;fontSize=16;fontColor=#0F172A;fillColor=#F8FAFC;swimlaneFillColor=#F8FAFC;strokeColor=#CBD5E1;strokeWidth=1.5;">
+          <mxGeometry x="40" y="270" width="1960" height="890" as="geometry" />
+        </mxCell>
+        <mxCell id="p2-network" parent="p2-compose" vertex="1" value="&lt;b&gt;gotrips-network · Mạng bridge&lt;/b&gt;" style="swimlane;html=1;whiteSpace=wrap;horizontal=1;rounded=0;collapsible=0;startSize=50;align=left;spacingLeft=16;verticalAlign=middle;fontSize=16;fontColor=#0F172A;fillColor=#FFFFFF;swimlaneFillColor=#F8FAFC;strokeColor=#CBD5E1;strokeWidth=1.5;">
+          <mxGeometry x="40" y="90" width="1880" height="750" as="geometry" />
+        </mxCell>
+        <mxCell id="p2-postgres-data" parent="p2-network" vertex="1" value="&lt;b&gt;postgres_data · Ổ dữ liệu&lt;/b&gt;&lt;br&gt;Gắn tại /var/lib/postgresql/data" style="rounded=0;html=1;whiteSpace=wrap;overflow=visible;strokeWidth=1.5;align=center;verticalAlign=middle;spacing=10;fontSize=14;fontColor=#0F172A;fillColor=#E5E7EB;strokeColor=#6B7280;">
+          <mxGeometry x="40" y="70" width="320" height="70" as="geometry" />
+        </mxCell>
+        <mxCell id="p2-db" parent="p2-network" vertex="1" value="&lt;b&gt;gotrips-db · PostgreSQL 17&lt;/b&gt;&lt;br&gt;postgres:17-alpine · Lệnh mặc định của image&lt;br&gt;127.0.0.1:5432 → 5432&lt;br&gt;Kiểm tra: pg_isready" style="rounded=0;html=1;whiteSpace=wrap;overflow=visible;strokeWidth=1.5;align=center;verticalAlign=middle;spacing=10;fontSize=13;fontColor=#0F172A;fillColor=#E5E7EB;strokeColor=#6B7280;shape=cylinder3;spacingTop=30;">
+          <mxGeometry x="40" y="180" width="320" height="110" as="geometry" />
+        </mxCell>
+        <mxCell id="p2-api" parent="p2-network" vertex="1" value="&lt;b&gt;gotrips-api · 8080 → 8080&lt;/b&gt;&lt;br&gt;builder: eclipse-temurin:25-jdk · Maven Wrapper&lt;br&gt;Chạy: eclipse-temurin:25-jre-noble · Người dùng spring&lt;br&gt;java -jar app.jar&lt;br&gt;Kiểm tra: /actuator/health → UP · start_period: 40 giây" style="rounded=0;html=1;whiteSpace=wrap;overflow=visible;strokeWidth=1.5;align=center;verticalAlign=middle;spacing=10;fontSize=13;fontColor=#0F172A;fillColor=#DCFCE7;strokeColor=#15803D;">
+          <mxGeometry x="490" y="180" width="400" height="110" as="geometry" />
+        </mxCell>
+        <mxCell id="p2-admin" parent="p2-network" vertex="1" value="&lt;b&gt;gotrips-admin · 8081 → 80&lt;/b&gt;&lt;br&gt;builder: node:24-alpine · npm ci → npm run build&lt;br&gt;Chạy: nginx:stable-alpine · nginx -g &quot;daemon off;&quot;" style="rounded=0;html=1;whiteSpace=wrap;overflow=visible;strokeWidth=1.5;align=center;verticalAlign=middle;spacing=10;fontSize=14;fontColor=#0F172A;fillColor=#F3E8FF;strokeColor=#7E22CE;">
+          <mxGeometry x="1200" y="70" width="620" height="110" as="geometry" />
+        </mxCell>
+        <mxCell id="p2-web" parent="p2-network" vertex="1" value="&lt;b&gt;gotrips-web · 3000 → 3000&lt;/b&gt;&lt;br&gt;deps → builder → runner: node:24-alpine&lt;br&gt;npm ci → npm run build → node server.js&lt;br&gt;Đầu ra standalone · Người dùng nextjs" style="rounded=0;html=1;whiteSpace=wrap;overflow=visible;strokeWidth=1.5;align=center;verticalAlign=middle;spacing=10;fontSize=14;fontColor=#0F172A;fillColor=#E0F2FE;strokeColor=#0369A1;">
+          <mxGeometry x="1200" y="440" width="620" height="110" as="geometry" />
+        </mxCell>
+        <mxCell id="p2-db-env" parent="p2-network" vertex="1" value="&lt;b&gt;Biến môi trường · Cơ sở dữ liệu&lt;/b&gt;&lt;br&gt;POSTGRES_DB (bắt buộc)&lt;br&gt;POSTGRES_USER (bắt buộc)&lt;br&gt;POSTGRES_PASSWORD (bắt buộc)" style="rounded=0;html=1;whiteSpace=wrap;overflow=visible;strokeWidth=1.5;align=left;verticalAlign=middle;spacing=10;fontSize=13;fontColor=#0F172A;fillColor=#FEF3C7;strokeColor=#B45309;">
+          <mxGeometry x="40" y="330" width="320" height="110" as="geometry" />
+        </mxCell>
+        <mxCell id="p2-api-env" parent="p2-network" vertex="1" value="&lt;b&gt;Biến môi trường · API&lt;/b&gt;&lt;br&gt;GOTRIPS_JWT_SECRET (bắt buộc, ít nhất 32 byte)&lt;br&gt;SPRING_DATASOURCE_URL (Compose ghép từ POSTGRES_DB)&lt;br&gt;SPRING_DATASOURCE_USERNAME (từ POSTGRES_USER)&lt;br&gt;SPRING_DATASOURCE_PASSWORD (từ POSTGRES_PASSWORD)&lt;br&gt;SERVER_PORT (Compose: 8080)&lt;br&gt;SPRING_PROFILES_ACTIVE (mặc định Compose: seed)&lt;br&gt;GOTRIPS_JWT_ADMIN_EXPIRATION (mặc định: 8h)&lt;br&gt;GOTRIPS_ADMIN_COOKIE_SECURE (Compose: false, API: true)&lt;br&gt;GOTRIPS_BANK_NAME (bắt buộc ngoài seed)&lt;br&gt;GOTRIPS_BANK_ACCOUNT_NUMBER (bắt buộc ngoài seed)&lt;br&gt;GOTRIPS_BANK_ACCOUNT_NAME (bắt buộc ngoài seed)&lt;br&gt;GOTRIPS_BANK_QR_CODE (tuỳ chọn)&lt;br&gt;GOTRIPS_SEPAY_WEBHOOK_SECRET (tuỳ chọn)&lt;br&gt;GOTRIPS_CATALOG_ALLOWED_IMAGE_PREFIXES (tuỳ chọn)&lt;br&gt;GOTRIPS_WEB_REVALIDATE_URL (tuỳ chọn)&lt;br&gt;GOTRIPS_REVALIDATE_SECRET (bắt buộc khi bật webhook)&lt;br&gt;GOTRIPS_JWT_EXPIRATION (mặc định API: 7d)&lt;br&gt;GOTRIPS_CORS_ORIGINS (tuỳ chọn)&lt;br&gt;SPRINGDOC_ENABLED (mặc định: true)&lt;br&gt;Ba biến cuối cùng do API đọc, Compose hiện chưa truyền vào." style="rounded=0;html=1;whiteSpace=wrap;overflow=visible;strokeWidth=1.5;align=left;verticalAlign=middle;spacing=10;fontSize=12;fontColor=#0F172A;fillColor=#FEF3C7;strokeColor=#B45309;">
+          <mxGeometry x="490" y="330" width="400" height="380" as="geometry" />
+        </mxCell>
+        <mxCell id="p2-admin-env" parent="p2-network" vertex="1" value="&lt;b&gt;Biến môi trường · Admin&lt;/b&gt;&lt;br&gt;Lúc build: VITE_API_URL (mặc định: /api)&lt;br&gt;VITE_WEB_URL (tuỳ chọn): Compose truyền qua ARG VITE_WEB_URL lúc build.&lt;br&gt;Mặc định http://localhost:3000 cho liên kết “Xem trên website”.&lt;br&gt;Compose không truyền biến lúc chạy.&lt;br&gt;Dockerfile giữ người dùng của image nginx và không khai báo healthcheck." style="rounded=0;html=1;whiteSpace=wrap;overflow=visible;strokeWidth=1.5;align=left;verticalAlign=middle;spacing=10;fontSize=13;fontColor=#0F172A;fillColor=#FEF3C7;strokeColor=#B45309;">
+          <mxGeometry x="1200" y="220" width="620" height="120" as="geometry" />
+        </mxCell>
+        <mxCell id="p2-web-env" parent="p2-network" vertex="1" value="&lt;b&gt;Biến môi trường · Web&lt;/b&gt;&lt;br&gt;API_URL (Compose: http://gotrips-api:8080, đọc lúc chạy)&lt;br&gt;GOTRIPS_REVALIDATE_SECRET (bắt buộc khi bật webhook, dùng chung với API)&lt;br&gt;NODE_ENV, NEXT_TELEMETRY_DISABLED, PORT, HOSTNAME (do Dockerfile đặt)&lt;br&gt;Compose không khai báo healthcheck riêng cho web." style="rounded=0;html=1;whiteSpace=wrap;overflow=visible;strokeWidth=1.5;align=left;verticalAlign=middle;spacing=10;fontSize=13;fontColor=#0F172A;fillColor=#FEF3C7;strokeColor=#B45309;">
+          <mxGeometry x="1200" y="590" width="620" height="120" as="geometry" />
+        </mxCell>
+        <mxCell id="p2-db-volume" parent="p2-network" edge="1" source="p2-db" target="p2-postgres-data" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;labelBackgroundColor=#FFFFFF;fontColor=#0F172A;fontSize=13;strokeColor=#6B7280;strokeWidth=1.5;endArrow=none;endFill=1;exitX=0.5;exitY=0;entryX=0.5;entryY=1;exitPerimeter=0;entryPerimeter=0;">
+          <mxGeometry x="0" relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="p2-start-db-api" parent="p2-network" edge="1" source="p2-db" target="p2-api" value="1 · DB sẵn sàng&lt;br&gt;pg_isready" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;labelBackgroundColor=#FFFFFF;fontColor=#0F172A;fontSize=13;strokeColor=#475569;strokeWidth=1.5;endArrow=block;endFill=1;exitX=1;exitY=0.5;entryX=0;entryY=0.5;exitPerimeter=0;entryPerimeter=0;">
+          <mxGeometry x="0" relative="1" as="geometry">
+            <mxPoint x="0" y="-26" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="p2-start-api-admin" parent="p2-network" edge="1" source="p2-api" target="p2-admin" value="2 · API đạt UP&lt;br&gt;3 · Admin khởi động" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;labelBackgroundColor=#FFFFFF;fontColor=#0F172A;fontSize=13;strokeColor=#7E22CE;strokeWidth=1.5;endArrow=block;endFill=1;exitX=1;exitY=0.2727272727272727;entryX=0;entryY=0.45454545454545453;exitPerimeter=0;entryPerimeter=0;">
+          <mxGeometry x="0.57" relative="1" as="geometry">
+            <mxPoint x="0" y="-27" as="offset" />
+            <Array as="points">
+              <mxPoint x="1030" y="210" />
+              <mxPoint x="1030" y="120" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="p2-start-api-web" parent="p2-network" edge="1" source="p2-api" target="p2-web" value="2 · API đạt UP&lt;br&gt;3 · Web khởi động" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;labelBackgroundColor=#FFFFFF;fontColor=#0F172A;fontSize=13;strokeColor=#0369A1;strokeWidth=1.5;endArrow=block;endFill=1;exitX=1;exitY=0.7272727272727273;entryX=0;entryY=0.5454545454545454;exitPerimeter=0;entryPerimeter=0;">
+          <mxGeometry x="0.72" relative="1" as="geometry">
+            <mxPoint x="0" y="-27" as="offset" />
+            <Array as="points">
+              <mxPoint x="1030" y="260" />
+              <mxPoint x="1030" y="500" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="p2-build-va-chay" parent="p2-1" vertex="1" value="&lt;b&gt;Build và chạy là hai giai đoạn&lt;/b&gt;&lt;br&gt;docker compose up --build dựng image trước khi khởi động container.&lt;br&gt;Lúc next build, API chưa chạy. loadSection dừng ở await io().&lt;br&gt;HTML dựng sẵn có khung Suspense. Nội dung được truyền dần khi có yêu cầu." style="rounded=0;html=1;whiteSpace=wrap;overflow=visible;strokeWidth=1.5;align=left;verticalAlign=middle;spacing=10;fontSize=13;fontColor=#0F172A;fillColor=#FEF3C7;strokeColor=#B45309;">
+          <mxGeometry x="40" y="1200" width="620" height="150" as="geometry" />
+        </mxCell>
+        <mxCell id="p2-phat-trien" parent="p2-1" vertex="1" value="&lt;b&gt;Chạy khi phát triển&lt;/b&gt;&lt;br&gt;DB: docker compose up gotrips-db&lt;br&gt;API: ./mvnw spring-boot:run · 8080 · Có thể bật profile seed&lt;br&gt;Admin: npm run dev · 5173 · Vite chuyển /api/ tới localhost:8080&lt;br&gt;Web: next dev -p 3100 khi container dùng cổng 3000." style="rounded=0;html=1;whiteSpace=wrap;overflow=visible;strokeWidth=1.5;align=left;verticalAlign=middle;spacing=10;fontSize=13;fontColor=#0F172A;fillColor=#FEF3C7;strokeColor=#B45309;">
+          <mxGeometry x="700" y="1200" width="620" height="150" as="geometry" />
+        </mxCell>
+        <mxCell id="p2-moi-truong-that" parent="p2-1" vertex="1" value="&lt;b&gt;Môi trường thật&lt;/b&gt;&lt;br&gt;Để SPRING_PROFILES_ACTIVE rỗng. Chạy sau HTTPS.&lt;br&gt;Đặt GOTRIPS_ADMIN_COOKIE_SECURE=true và đủ 3 biến GOTRIPS_BANK_*.&lt;br&gt;Mỗi môi trường dùng một GOTRIPS_JWT_SECRET riêng.&lt;br&gt;Cookie gotrips_session của web hiện chưa bật Secure." style="rounded=0;html=1;whiteSpace=wrap;overflow=visible;strokeWidth=1.5;align=left;verticalAlign=middle;spacing=10;fontSize=13;fontColor=#0F172A;fillColor=#FEF3C7;strokeColor=#B45309;">
+          <mxGeometry x="1360" y="1200" width="640" height="150" as="geometry" />
+        </mxCell>
+        <mxCell id="p2-diem-can-nho" parent="p2-1" vertex="1" value="&lt;b&gt;Điểm cần nhớ&lt;/b&gt;&lt;br&gt;API đợi DB sẵn sàng. Admin và web cùng đủ điều kiện khởi động khi API đạt UP.&lt;br&gt;Các container gọi nhau qua mạng bridge. Cổng PostgreSQL trên máy chủ chỉ mở tại 127.0.0.1.&lt;br&gt;Ổ postgres_data giữ dữ liệu khi container DB được tạo lại." style="rounded=0;html=1;whiteSpace=wrap;overflow=visible;strokeWidth=1.5;align=left;verticalAlign=middle;spacing=10;fontSize=13;fontColor=#0F172A;fillColor=#FEF3C7;strokeColor=#B45309;">
+          <mxGeometry x="40" y="1390" width="1960" height="110" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+  <diagram name="03 · Luồng đăng nhập" id="p3-trang">
+    <mxGraphModel dx="1200" dy="800" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="0" pageScale="1" math="0" shadow="0" pageWidth="2440" pageHeight="2080">
+      <root>
+        <mxCell id="p3-0" />
+        <mxCell id="p3-1" parent="p3-0" />
+        <mxCell id="p3-tieu-de" parent="p3-1" vertex="1" value="GoTrips — Luồng đăng nhập" style="text;html=1;strokeColor=none;fillColor=none;whiteSpace=wrap;align=left;verticalAlign=middle;spacing=6;fontSize=24;fontColor=#0F172A;fontStyle=1;">
+          <mxGeometry x="40" y="20" width="2360" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="p3-phu-de" parent="p3-1" vertex="1" value="Đăng nhập website, trang quản trị và quyền truy cập API · 28/11/2026" style="text;html=1;strokeColor=none;fillColor=none;whiteSpace=wrap;align=left;verticalAlign=middle;spacing=6;fontSize=14;fontColor=#475569;">
+          <mxGeometry x="40" y="100" width="2360" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="p3-cach-doc" parent="p3-1" vertex="1" value="&lt;b&gt;Cách đọc&lt;/b&gt;&lt;br&gt;&lt;span style=&quot;background-color:#E0F2FE;color:#0369A1;font-weight:700;&quot;&gt;&amp;nbsp;Xanh dương · Web&amp;nbsp;&lt;/span&gt;&amp;nbsp; · &amp;nbsp;&lt;span style=&quot;background-color:#F3E8FF;color:#7E22CE;font-weight:700;&quot;&gt;&amp;nbsp;Tím · Admin&amp;nbsp;&lt;/span&gt;&amp;nbsp; · &amp;nbsp;&lt;span style=&quot;background-color:#DCFCE7;color:#15803D;font-weight:700;&quot;&gt;&amp;nbsp;Xanh lá · API&amp;nbsp;&lt;/span&gt;&amp;nbsp; · &amp;nbsp;&lt;span style=&quot;background-color:#E5E7EB;color:#334155;font-weight:700;&quot;&gt;&amp;nbsp;Xám · PostgreSQL&amp;nbsp;&lt;/span&gt;&amp;nbsp; · &amp;nbsp;&lt;span style=&quot;background-color:#FEF3C7;color:#B45309;font-weight:700;&quot;&gt;&amp;nbsp;Vàng · Ghi chú&amp;nbsp;&lt;/span&gt;&amp;nbsp; · &amp;nbsp;&lt;span style=&quot;background-color:#FFFFFF;color:#334155;font-weight:700;&quot;&gt;&amp;nbsp;Trắng · Người dùng / hệ thống ngoài&amp;nbsp;&lt;/span&gt; &amp;nbsp;|&amp;nbsp; Đọc theo số từ trên xuống. Nét liền ngang: yêu cầu. Nét đứt ngang: phản hồi. Nét đứt dọc: trục thời gian." style="rounded=0;html=1;whiteSpace=wrap;overflow=visible;strokeWidth=1.5;align=left;verticalAlign=middle;spacing=10;fontSize=12;fontColor=#0F172A;fillColor=#FEF3C7;strokeColor=#B45309;">
+          <mxGeometry x="40" y="170" width="2360" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="p3-khach" parent="p3-1" vertex="1" value="&lt;b&gt;A · Khách hàng đăng nhập website&lt;/b&gt;" style="swimlane;html=1;whiteSpace=wrap;horizontal=1;rounded=0;collapsible=0;startSize=50;align=left;spacingLeft=16;verticalAlign=middle;fontSize=16;fontColor=#0F172A;fillColor=#E0F2FE;swimlaneFillColor=#F8FAFC;strokeColor=#0369A1;strokeWidth=1.5;">
+          <mxGeometry x="40" y="270" width="1160" height="1030" as="geometry" />
+        </mxCell>
+        <mxCell id="p3-nhan-vien" parent="p3-1" vertex="1" value="&lt;b&gt;B · Nhân viên đăng nhập admin&lt;/b&gt;" style="swimlane;html=1;whiteSpace=wrap;horizontal=1;rounded=0;collapsible=0;startSize=50;align=left;spacingLeft=16;verticalAlign=middle;fontSize=16;fontColor=#0F172A;fillColor=#F3E8FF;swimlaneFillColor=#FAF8FC;strokeColor=#7E22CE;strokeWidth=1.5;">
+          <mxGeometry x="1240" y="270" width="1160" height="1030" as="geometry" />
+        </mxCell>
+        <mxCell id="p3-trinh-duyet-khach" parent="p3-khach" vertex="1" value="&lt;b&gt;Trình duyệt khách&lt;/b&gt;" style="rounded=0;html=1;whiteSpace=wrap;overflow=visible;strokeWidth=1.5;align=center;verticalAlign=top;spacing=10;fontSize=14;fontColor=#0F172A;fillColor=#FFFFFF;strokeColor=#CBD5E1;shape=umlLifeline;size=60;perimeter=lifelinePerimeter;spacingTop=6;">
+          <mxGeometry x="40" y="90" width="160" height="900" as="geometry" />
+        </mxCell>
+        <mxCell id="p3-web" parent="p3-khach" vertex="1" value="&lt;b&gt;gotrips-web&lt;/b&gt;&lt;br&gt;Máy chủ Next.js" style="rounded=0;html=1;whiteSpace=wrap;overflow=visible;strokeWidth=1.5;align=center;verticalAlign=top;spacing=10;fontSize=14;fontColor=#0F172A;fillColor=#E0F2FE;strokeColor=#0369A1;shape=umlLifeline;size=60;perimeter=lifelinePerimeter;spacingTop=6;">
+          <mxGeometry x="340" y="90" width="160" height="900" as="geometry" />
+        </mxCell>
+        <mxCell id="p3-api-khach" parent="p3-khach" vertex="1" value="&lt;b&gt;gotrips-api&lt;/b&gt;" style="rounded=0;html=1;whiteSpace=wrap;overflow=visible;strokeWidth=1.5;align=center;verticalAlign=top;spacing=10;fontSize=14;fontColor=#0F172A;fillColor=#DCFCE7;strokeColor=#15803D;shape=umlLifeline;size=60;perimeter=lifelinePerimeter;spacingTop=6;">
+          <mxGeometry x="640" y="90" width="160" height="900" as="geometry" />
+        </mxCell>
+        <mxCell id="p3-db-khach" parent="p3-khach" vertex="1" value="&lt;b&gt;PostgreSQL&lt;/b&gt;" style="rounded=0;html=1;whiteSpace=wrap;overflow=visible;strokeWidth=1.5;align=center;verticalAlign=top;spacing=10;fontSize=14;fontColor=#0F172A;fillColor=#E5E7EB;strokeColor=#6B7280;shape=umlLifeline;size=60;perimeter=lifelinePerimeter;spacingTop=6;">
+          <mxGeometry x="940" y="90" width="160" height="900" as="geometry" />
+        </mxCell>
+        <mxCell id="p3-trinh-duyet-nhan-vien" parent="p3-nhan-vien" vertex="1" value="&lt;b&gt;Trình duyệt&lt;/b&gt;&lt;br&gt;Nhân viên (SPA)" style="rounded=0;html=1;whiteSpace=wrap;overflow=visible;strokeWidth=1.5;align=center;verticalAlign=top;spacing=10;fontSize=14;fontColor=#0F172A;fillColor=#FFFFFF;strokeColor=#CBD5E1;shape=umlLifeline;size=60;perimeter=lifelinePerimeter;spacingTop=6;">
+          <mxGeometry x="40" y="90" width="160" height="900" as="geometry" />
+        </mxCell>
+        <mxCell id="p3-nginx" parent="p3-nhan-vien" vertex="1" value="&lt;b&gt;nginx&lt;/b&gt;&lt;br&gt;gotrips-admin" style="rounded=0;html=1;whiteSpace=wrap;overflow=visible;strokeWidth=1.5;align=center;verticalAlign=top;spacing=10;fontSize=14;fontColor=#0F172A;fillColor=#F3E8FF;strokeColor=#7E22CE;shape=umlLifeline;size=60;perimeter=lifelinePerimeter;spacingTop=6;">
+          <mxGeometry x="340" y="90" width="160" height="900" as="geometry" />
+        </mxCell>
+        <mxCell id="p3-api-nhan-vien" parent="p3-nhan-vien" vertex="1" value="&lt;b&gt;gotrips-api&lt;/b&gt;" style="rounded=0;html=1;whiteSpace=wrap;overflow=visible;strokeWidth=1.5;align=center;verticalAlign=top;spacing=10;fontSize=14;fontColor=#0F172A;fillColor=#DCFCE7;strokeColor=#15803D;shape=umlLifeline;size=60;perimeter=lifelinePerimeter;spacingTop=6;">
+          <mxGeometry x="640" y="90" width="160" height="900" as="geometry" />
+        </mxCell>
+        <mxCell id="p3-db-nhan-vien" parent="p3-nhan-vien" vertex="1" value="&lt;b&gt;PostgreSQL&lt;/b&gt;" style="rounded=0;html=1;whiteSpace=wrap;overflow=visible;strokeWidth=1.5;align=center;verticalAlign=top;spacing=10;fontSize=14;fontColor=#0F172A;fillColor=#E5E7EB;strokeColor=#6B7280;shape=umlLifeline;size=60;perimeter=lifelinePerimeter;spacingTop=6;">
+          <mxGeometry x="940" y="90" width="160" height="900" as="geometry" />
+        </mxCell>
+        <mxCell id="p3-msg-a01" parent="p3-khach" edge="1" source="p3-trinh-duyet-khach" target="p3-web" value="1 · Gửi biểu mẫu vào loginAction" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;labelBackgroundColor=#FFFFFF;fontColor=#0F172A;fontSize=13;strokeColor=#475569;strokeWidth=1.5;endArrow=block;endFill=1;exitX=0.5;exitY=0.1222222222;entryX=0.5;entryY=0.1222222222;exitPerimeter=0;entryPerimeter=0;jettySize=0;">
+          <mxGeometry x="0" relative="1" as="geometry">
+            <mxPoint x="0" y="-15" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="p3-msg-a02" parent="p3-khach" edge="1" source="p3-web" target="p3-api-khach" value="2 · POST /auth/login" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;labelBackgroundColor=#FFFFFF;fontColor=#0F172A;fontSize=13;strokeColor=#475569;strokeWidth=1.5;endArrow=block;endFill=1;exitX=0.5;exitY=0.1777777778;entryX=0.5;entryY=0.1777777778;exitPerimeter=0;entryPerimeter=0;jettySize=0;">
+          <mxGeometry x="0" relative="1" as="geometry">
+            <mxPoint x="0" y="-15" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="p3-msg-a03a" parent="p3-khach" edge="1" source="p3-api-khach" target="p3-db-khach" value="3a · Tìm tài khoản theo email" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;labelBackgroundColor=#FFFFFF;fontColor=#0F172A;fontSize=13;strokeColor=#475569;strokeWidth=1.5;endArrow=block;endFill=1;exitX=0.5;exitY=0.2333333333;entryX=0.5;entryY=0.2333333333;exitPerimeter=0;entryPerimeter=0;jettySize=0;">
+          <mxGeometry x="0" relative="1" as="geometry">
+            <mxPoint x="0" y="-15" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="p3-msg-a03b" parent="p3-khach" edge="1" source="p3-db-khach" target="p3-api-khach" value="3b · Trả bản ghi để API so mật khẩu BCrypt" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;labelBackgroundColor=#FFFFFF;fontColor=#0F172A;fontSize=13;strokeColor=#475569;strokeWidth=1.5;endArrow=block;endFill=0;exitX=0.5;exitY=0.2888888889;entryX=0.5;entryY=0.2888888889;exitPerimeter=0;entryPerimeter=0;jettySize=0;dashed=1;dashPattern=6 4;">
+          <mxGeometry x="0" relative="1" as="geometry">
+            <mxPoint x="0" y="-15" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="p3-msg-a04" parent="p3-khach" edge="1" source="p3-api-khach" target="p3-web" value="4 · 200: accessToken và expiresIn&lt;br&gt;401: Email hoặc mật khẩu không đúng." style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;labelBackgroundColor=#FFFFFF;fontColor=#0F172A;fontSize=13;strokeColor=#475569;strokeWidth=1.5;endArrow=block;endFill=0;exitX=0.5;exitY=0.3666666667;entryX=0.5;entryY=0.3666666667;exitPerimeter=0;entryPerimeter=0;jettySize=0;dashed=1;dashPattern=6 4;">
+          <mxGeometry x="0" relative="1" as="geometry">
+            <mxPoint x="0" y="-23" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="p3-msg-a05" parent="p3-khach" edge="1" source="p3-web" target="p3-trinh-duyet-khach" value="5 · Set-Cookie: gotrips_session&lt;br&gt;HttpOnly · SameSite=Lax · Hạn bằng JWT" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;labelBackgroundColor=#FFFFFF;fontColor=#0F172A;fontSize=13;strokeColor=#475569;strokeWidth=1.5;endArrow=block;endFill=0;exitX=0.5;exitY=0.4444444444;entryX=0.5;entryY=0.4444444444;exitPerimeter=0;entryPerimeter=0;jettySize=0;dashed=1;dashPattern=6 4;">
+          <mxGeometry x="0" relative="1" as="geometry">
+            <mxPoint x="0" y="-23" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="p3-msg-a06" parent="p3-khach" edge="1" source="p3-trinh-duyet-khach" target="p3-web" value="6 · Form chuyển đến ?next= đã lọc&lt;br&gt;Mặc định về /" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;labelBackgroundColor=#FFFFFF;fontColor=#0F172A;fontSize=13;strokeColor=#475569;strokeWidth=1.5;endArrow=block;endFill=1;exitX=0.5;exitY=0.5111111111;entryX=0.5;entryY=0.5111111111;exitPerimeter=0;entryPerimeter=0;jettySize=0;">
+          <mxGeometry x="0" relative="1" as="geometry">
+            <mxPoint x="0" y="-23" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="p3-msg-a07" parent="p3-khach" edge="1" source="p3-trinh-duyet-khach" target="p3-web" value="7 · Mở trang cần đăng nhập&lt;br&gt;Trình duyệt tự gửi gotrips_session" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;labelBackgroundColor=#FFFFFF;fontColor=#0F172A;fontSize=13;strokeColor=#475569;strokeWidth=1.5;endArrow=block;endFill=1;exitX=0.5;exitY=0.6666666667;entryX=0.5;entryY=0.6666666667;exitPerimeter=0;entryPerimeter=0;jettySize=0;">
+          <mxGeometry x="0" relative="1" as="geometry">
+            <mxPoint x="0" y="-23" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="p3-msg-a08" parent="p3-khach" edge="1" source="p3-web" target="p3-api-khach" value="8 · Authorization: Bearer &amp;lt;JWT&amp;gt;&lt;br&gt;Web lấy JWT từ cookie" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;labelBackgroundColor=#FFFFFF;fontColor=#0F172A;fontSize=13;strokeColor=#475569;strokeWidth=1.5;endArrow=block;endFill=1;exitX=0.5;exitY=0.7333333333;entryX=0.5;entryY=0.7333333333;exitPerimeter=0;entryPerimeter=0;jettySize=0;">
+          <mxGeometry x="0" relative="1" as="geometry">
+            <mxPoint x="0" y="-23" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="p3-msg-a09" parent="p3-khach" edge="1" source="p3-api-khach" target="p3-web" value="9 · API kiểm HS256, hạn và issuer&lt;br&gt;Hợp lệ thì xử lý và trả kết quả" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;labelBackgroundColor=#FFFFFF;fontColor=#0F172A;fontSize=13;strokeColor=#475569;strokeWidth=1.5;endArrow=block;endFill=0;exitX=0.5;exitY=0.8111111111;entryX=0.5;entryY=0.8111111111;exitPerimeter=0;entryPerimeter=0;jettySize=0;dashed=1;dashPattern=6 4;">
+          <mxGeometry x="0" relative="1" as="geometry">
+            <mxPoint x="0" y="-23" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="p3-cac-request-sau" parent="p3-khach" vertex="1" value="&lt;b&gt;Các request sau&lt;/b&gt;" style="text;html=1;strokeColor=none;fillColor=none;whiteSpace=wrap;align=center;verticalAlign=middle;spacing=6;fontSize=14;fontColor=#0369A1;">
+          <mxGeometry x="200" y="600" width="140" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="p3-msg-b01" parent="p3-nhan-vien" edge="1" source="p3-trinh-duyet-nhan-vien" target="p3-nginx" value="1 · GET /api/admin/auth/me" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;labelBackgroundColor=#FFFFFF;fontColor=#0F172A;fontSize=13;strokeColor=#475569;strokeWidth=1.5;endArrow=block;endFill=1;exitX=0.5;exitY=0.1111111111;entryX=0.5;entryY=0.1111111111;exitPerimeter=0;entryPerimeter=0;jettySize=0;">
+          <mxGeometry x="0" relative="1" as="geometry">
+            <mxPoint x="0" y="-15" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="p3-msg-b02" parent="p3-nhan-vien" edge="1" source="p3-nginx" target="p3-api-nhan-vien" value="2 · GET /admin/auth/me&lt;br&gt;nginx đã bỏ /api" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;labelBackgroundColor=#FFFFFF;fontColor=#0F172A;fontSize=13;strokeColor=#475569;strokeWidth=1.5;endArrow=block;endFill=1;exitX=0.5;exitY=0.1666666667;entryX=0.5;entryY=0.1666666667;exitPerimeter=0;entryPerimeter=0;jettySize=0;">
+          <mxGeometry x="0" relative="1" as="geometry">
+            <mxPoint x="0" y="-23" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="p3-msg-b03a" parent="p3-nhan-vien" edge="1" source="p3-api-nhan-vien" target="p3-nginx" value="3a · 401 kèm cookie XSRF-TOKEN" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;labelBackgroundColor=#FFFFFF;fontColor=#0F172A;fontSize=13;strokeColor=#475569;strokeWidth=1.5;endArrow=block;endFill=0;exitX=0.5;exitY=0.2222222222;entryX=0.5;entryY=0.2222222222;exitPerimeter=0;entryPerimeter=0;jettySize=0;dashed=1;dashPattern=6 4;">
+          <mxGeometry x="0" relative="1" as="geometry">
+            <mxPoint x="0" y="-15" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="p3-msg-b03b" parent="p3-nhan-vien" edge="1" source="p3-nginx" target="p3-trinh-duyet-nhan-vien" value="3b · Chuyển tiếp 401 và XSRF-TOKEN&lt;br&gt;JavaScript đọc được cookie CSRF" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;labelBackgroundColor=#FFFFFF;fontColor=#0F172A;fontSize=13;strokeColor=#475569;strokeWidth=1.5;endArrow=block;endFill=0;exitX=0.5;exitY=0.2777777778;entryX=0.5;entryY=0.2777777778;exitPerimeter=0;entryPerimeter=0;jettySize=0;dashed=1;dashPattern=6 4;">
+          <mxGeometry x="0" relative="1" as="geometry">
+            <mxPoint x="0" y="-23" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="p3-msg-b04a" parent="p3-nhan-vien" edge="1" source="p3-trinh-duyet-nhan-vien" target="p3-nginx" value="4a · POST /api/admin/auth/login&lt;br&gt;Kèm X-XSRF-TOKEN" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;labelBackgroundColor=#FFFFFF;fontColor=#0F172A;fontSize=13;strokeColor=#475569;strokeWidth=1.5;endArrow=block;endFill=1;exitX=0.5;exitY=0.3444444444;entryX=0.5;entryY=0.3444444444;exitPerimeter=0;entryPerimeter=0;jettySize=0;">
+          <mxGeometry x="0" relative="1" as="geometry">
+            <mxPoint x="0" y="-23" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="p3-msg-b04b" parent="p3-nhan-vien" edge="1" source="p3-nginx" target="p3-api-nhan-vien" value="4b · POST /admin/auth/login&lt;br&gt;Chuyển tiếp X-XSRF-TOKEN" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;labelBackgroundColor=#FFFFFF;fontColor=#0F172A;fontSize=13;strokeColor=#475569;strokeWidth=1.5;endArrow=block;endFill=1;exitX=0.5;exitY=0.4111111111;entryX=0.5;entryY=0.4111111111;exitPerimeter=0;entryPerimeter=0;jettySize=0;">
+          <mxGeometry x="0" relative="1" as="geometry">
+            <mxPoint x="0" y="-23" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="p3-msg-b05" parent="p3-nhan-vien" edge="1" source="p3-api-nhan-vien" target="p3-db-nhan-vien" value="5 · API kiểm CSRF rồi tìm tài khoản&lt;br&gt;So BCrypt, kiểm vai trò STAFF/ADMIN" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;labelBackgroundColor=#FFFFFF;fontColor=#0F172A;fontSize=13;strokeColor=#475569;strokeWidth=1.5;endArrow=block;endFill=1;exitX=0.5;exitY=0.4777777778;entryX=0.5;entryY=0.4777777778;exitPerimeter=0;entryPerimeter=0;jettySize=0;">
+          <mxGeometry x="0" relative="1" as="geometry">
+            <mxPoint x="0" y="-23" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="p3-msg-b06a" parent="p3-nhan-vien" edge="1" source="p3-api-nhan-vien" target="p3-nginx" value="6a · 200: UserResponse và 2 cookie&lt;br&gt;401: sai thông tin&lt;br&gt;403: thiếu quyền hoặc CSRF sai" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;labelBackgroundColor=#FFFFFF;fontColor=#0F172A;fontSize=13;strokeColor=#475569;strokeWidth=1.5;endArrow=block;endFill=0;exitX=0.5;exitY=0.5666666667;entryX=0.5;entryY=0.5666666667;exitPerimeter=0;entryPerimeter=0;jettySize=0;dashed=1;dashPattern=6 4;">
+          <mxGeometry x="0" relative="1" as="geometry">
+            <mxPoint x="0" y="-31" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="p3-msg-b06b" parent="p3-nhan-vien" edge="1" source="p3-nginx" target="p3-trinh-duyet-nhan-vien" value="6b · Chuyển tiếp phản hồi&lt;br&gt;gotrips_admin_session và XSRF-TOKEN mới" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;labelBackgroundColor=#FFFFFF;fontColor=#0F172A;fontSize=13;strokeColor=#475569;strokeWidth=1.5;endArrow=block;endFill=0;exitX=0.5;exitY=0.6444444444;entryX=0.5;entryY=0.6444444444;exitPerimeter=0;entryPerimeter=0;jettySize=0;dashed=1;dashPattern=6 4;">
+          <mxGeometry x="0" relative="1" as="geometry">
+            <mxPoint x="0" y="-23" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="p3-msg-b07a" parent="p3-nhan-vien" edge="1" source="p3-trinh-duyet-nhan-vien" target="p3-nginx" value="7a · Yêu cầu sau tự gửi cookie phiên&lt;br&gt;Lệnh ghi kèm X-XSRF-TOKEN" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;labelBackgroundColor=#FFFFFF;fontColor=#0F172A;fontSize=13;strokeColor=#475569;strokeWidth=1.5;endArrow=block;endFill=1;exitX=0.5;exitY=0.7222222222;entryX=0.5;entryY=0.7222222222;exitPerimeter=0;entryPerimeter=0;jettySize=0;">
+          <mxGeometry x="0" relative="1" as="geometry">
+            <mxPoint x="0" y="-23" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="p3-msg-b07b" parent="p3-nhan-vien" edge="1" source="p3-nginx" target="p3-api-nhan-vien" value="7b · Chuyển tiếp đến /admin/**" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;labelBackgroundColor=#FFFFFF;fontColor=#0F172A;fontSize=13;strokeColor=#475569;strokeWidth=1.5;endArrow=block;endFill=1;exitX=0.5;exitY=0.7777777778;entryX=0.5;entryY=0.7777777778;exitPerimeter=0;entryPerimeter=0;jettySize=0;">
+          <mxGeometry x="0" relative="1" as="geometry">
+            <mxPoint x="0" y="-15" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="p3-msg-b08a" parent="p3-nhan-vien" edge="1" source="p3-api-nhan-vien" target="p3-db-nhan-vien" value="8a · Kiểm JWT rồi tra lại vai trò trong DB" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;labelBackgroundColor=#FFFFFF;fontColor=#0F172A;fontSize=13;strokeColor=#475569;strokeWidth=1.5;endArrow=block;endFill=1;exitX=0.5;exitY=0.8333333333;entryX=0.5;entryY=0.8333333333;exitPerimeter=0;entryPerimeter=0;jettySize=0;">
+          <mxGeometry x="0" relative="1" as="geometry">
+            <mxPoint x="0" y="-15" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="p3-msg-b08b" parent="p3-nhan-vien" edge="1" source="p3-api-nhan-vien" target="p3-nginx" value="8b · Trả kết quả nếu còn quyền&lt;br&gt;Mất quyền: 403 · Đã xoá tài khoản: 401" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;labelBackgroundColor=#FFFFFF;fontColor=#0F172A;fontSize=13;strokeColor=#475569;strokeWidth=1.5;endArrow=block;endFill=0;exitX=0.5;exitY=0.9;entryX=0.5;entryY=0.9;exitPerimeter=0;entryPerimeter=0;jettySize=0;dashed=1;dashPattern=6 4;">
+          <mxGeometry x="0" relative="1" as="geometry">
+            <mxPoint x="0" y="-23" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="p3-msg-b08c" parent="p3-nhan-vien" edge="1" source="p3-nginx" target="p3-trinh-duyet-nhan-vien" value="8c · Chuyển tiếp kết quả" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;labelBackgroundColor=#FFFFFF;fontColor=#0F172A;fontSize=13;strokeColor=#475569;strokeWidth=1.5;endArrow=block;endFill=0;exitX=0.5;exitY=0.9555555556;entryX=0.5;entryY=0.9555555556;exitPerimeter=0;entryPerimeter=0;jettySize=0;dashed=1;dashPattern=6 4;">
+          <mxGeometry x="0" relative="1" as="geometry">
+            <mxPoint x="0" y="-15" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="p3-ghi-chu-khach" parent="p3-1" vertex="1" value="&lt;b&gt;Phiên khách hàng&lt;/b&gt;&lt;br&gt;Web xoá gotrips_session khi đăng xuất. JWT đã cấp còn hiệu lực tới khi hết hạn.&lt;br&gt;JWT trong cookie HttpOnly chỉ được đọc phía máy chủ. JavaScript nhận đích chuyển trang, không nhận token." style="rounded=0;html=1;whiteSpace=wrap;overflow=visible;strokeWidth=1.5;align=left;verticalAlign=middle;spacing=10;fontSize=13;fontColor=#0F172A;fillColor=#FEF3C7;strokeColor=#B45309;">
+          <mxGeometry x="40" y="1340" width="1160" height="100" as="geometry" />
+        </mxCell>
+        <mxCell id="p3-ghi-chu-nhan-vien" parent="p3-1" vertex="1" value="&lt;b&gt;Phiên quản trị&lt;/b&gt;&lt;br&gt;Đăng nhập: Set-Cookie: gotrips_admin_session (HttpOnly, SameSite=Strict, Path=/, mặc định 8 giờ).&lt;br&gt;API trả UserResponse và đổi cookie XSRF-TOKEN. Nội dung JSON chỉ chứa thông tin người dùng.&lt;br&gt;Đăng xuất: POST /admin/auth/logout kèm X-XSRF-TOKEN → 204, xoá cả hai cookie." style="rounded=0;html=1;whiteSpace=wrap;overflow=visible;strokeWidth=1.5;align=left;verticalAlign=middle;spacing=10;fontSize=13;fontColor=#0F172A;fillColor=#FEF3C7;strokeColor=#B45309;">
+          <mxGeometry x="1240" y="1340" width="1160" height="100" as="geometry" />
+        </mxCell>
+        <mxCell id="p3-so-sanh" parent="p3-1" vertex="1" value="&lt;b&gt;So sánh hai cách đăng nhập&lt;/b&gt;&lt;br&gt;&lt;br&gt;&lt;table style=&quot;border-collapse:collapse;table-layout:fixed;text-align:left;&quot;&gt;&lt;tr&gt;&lt;th style=&quot;width:230px;border:1px solid #CBD5E1;background:#E0F2FE;font-size:13px;font-weight:600;padding:6px 8px;vertical-align:middle;&quot;&gt;Thuộc tính&lt;/th&gt;&lt;th style=&quot;width:405px;border:1px solid #CBD5E1;background:#E0F2FE;font-size:13px;font-weight:600;padding:6px 8px;vertical-align:middle;&quot;&gt;Website khách hàng&lt;/th&gt;&lt;th style=&quot;width:405px;border:1px solid #CBD5E1;background:#E0F2FE;font-size:13px;font-weight:600;padding:6px 8px;vertical-align:middle;&quot;&gt;Trang quản trị&lt;/th&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td style=&quot;width:230px;border:1px solid #CBD5E1;background:#FFFFFF;font-size:13px;font-weight:600;padding:6px 8px;vertical-align:middle;&quot;&gt;Ai dùng&lt;/td&gt;&lt;td style=&quot;width:405px;border:1px solid #CBD5E1;background:#FFFFFF;font-size:13px;font-weight:400;padding:6px 8px;vertical-align:middle;&quot;&gt;Khách hàng, thường có vai trò CUSTOMER&lt;/td&gt;&lt;td style=&quot;width:405px;border:1px solid #CBD5E1;background:#FFFFFF;font-size:13px;font-weight:400;padding:6px 8px;vertical-align:middle;&quot;&gt;STAFF hoặc ADMIN&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td style=&quot;width:230px;border:1px solid #CBD5E1;background:#F8FAFC;font-size:13px;font-weight:600;padding:6px 8px;vertical-align:middle;&quot;&gt;JWT và nơi đặt cookie&lt;/td&gt;&lt;td style=&quot;width:405px;border:1px solid #CBD5E1;background:#F8FAFC;font-size:13px;font-weight:400;padding:6px 8px;vertical-align:middle;&quot;&gt;API cấp JWT. gotrips-web đặt cookie HttpOnly&lt;/td&gt;&lt;td style=&quot;width:405px;border:1px solid #CBD5E1;background:#F8FAFC;font-size:13px;font-weight:400;padding:6px 8px;vertical-align:middle;&quot;&gt;API đặt JWT vào cookie HttpOnly qua nginx&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td style=&quot;width:230px;border:1px solid #CBD5E1;background:#FFFFFF;font-size:13px;font-weight:600;padding:6px 8px;vertical-align:middle;&quot;&gt;Tên cookie phiên&lt;/td&gt;&lt;td style=&quot;width:405px;border:1px solid #CBD5E1;background:#FFFFFF;font-size:13px;font-weight:400;padding:6px 8px;vertical-align:middle;&quot;&gt;gotrips_session&lt;/td&gt;&lt;td style=&quot;width:405px;border:1px solid #CBD5E1;background:#FFFFFF;font-size:13px;font-weight:400;padding:6px 8px;vertical-align:middle;&quot;&gt;gotrips_admin_session&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td style=&quot;width:230px;border:1px solid #CBD5E1;background:#F8FAFC;font-size:13px;font-weight:600;padding:6px 8px;vertical-align:middle;&quot;&gt;Hạn mặc định&lt;/td&gt;&lt;td style=&quot;width:405px;border:1px solid #CBD5E1;background:#F8FAFC;font-size:13px;font-weight:400;padding:6px 8px;vertical-align:middle;&quot;&gt;7 ngày · GOTRIPS_JWT_EXPIRATION&lt;/td&gt;&lt;td style=&quot;width:405px;border:1px solid #CBD5E1;background:#F8FAFC;font-size:13px;font-weight:400;padding:6px 8px;vertical-align:middle;&quot;&gt;8 giờ · GOTRIPS_JWT_ADMIN_EXPIRATION&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td style=&quot;width:230px;border:1px solid #CBD5E1;background:#FFFFFF;font-size:13px;font-weight:600;padding:6px 8px;vertical-align:middle;&quot;&gt;SameSite&lt;/td&gt;&lt;td style=&quot;width:405px;border:1px solid #CBD5E1;background:#FFFFFF;font-size:13px;font-weight:400;padding:6px 8px;vertical-align:middle;&quot;&gt;Lax&lt;/td&gt;&lt;td style=&quot;width:405px;border:1px solid #CBD5E1;background:#FFFFFF;font-size:13px;font-weight:400;padding:6px 8px;vertical-align:middle;&quot;&gt;Strict&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td style=&quot;width:230px;border:1px solid #CBD5E1;background:#F8FAFC;font-size:13px;font-weight:600;padding:6px 8px;vertical-align:middle;&quot;&gt;CSRF ở API&lt;/td&gt;&lt;td style=&quot;width:405px;border:1px solid #CBD5E1;background:#F8FAFC;font-size:13px;font-weight:400;padding:6px 8px;vertical-align:middle;&quot;&gt;Tắt trong chuỗi Bearer ngoài /admin/**&lt;/td&gt;&lt;td style=&quot;width:405px;border:1px solid #CBD5E1;background:#F8FAFC;font-size:13px;font-weight:400;padding:6px 8px;vertical-align:middle;&quot;&gt;Đăng nhập, đăng xuất và lệnh ghi dùng cookie&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td style=&quot;width:230px;border:1px solid #CBD5E1;background:#FFFFFF;font-size:13px;font-weight:600;padding:6px 8px;vertical-align:middle;&quot;&gt;Vai trò khi xác thực&lt;/td&gt;&lt;td style=&quot;width:405px;border:1px solid #CBD5E1;background:#FFFFFF;font-size:13px;font-weight:400;padding:6px 8px;vertical-align:middle;&quot;&gt;Claim roles của JWT&lt;/td&gt;&lt;td style=&quot;width:405px;border:1px solid #CBD5E1;background:#FFFFFF;font-size:13px;font-weight:400;padding:6px 8px;vertical-align:middle;&quot;&gt;Đọc DB mỗi yêu cầu cần xác thực&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td style=&quot;width:230px;border:1px solid #CBD5E1;background:#F8FAFC;font-size:13px;font-weight:600;padding:6px 8px;vertical-align:middle;&quot;&gt;Đường gọi của trình duyệt&lt;/td&gt;&lt;td style=&quot;width:405px;border:1px solid #CBD5E1;background:#F8FAFC;font-size:13px;font-weight:400;padding:6px 8px;vertical-align:middle;&quot;&gt;Qua máy chủ gotrips-web&lt;/td&gt;&lt;td style=&quot;width:405px;border:1px solid #CBD5E1;background:#F8FAFC;font-size:13px;font-weight:400;padding:6px 8px;vertical-align:middle;&quot;&gt;Qua nginx cùng nguồn tại /api/&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;" style="rounded=0;html=1;whiteSpace=wrap;overflow=visible;strokeWidth=1.5;align=left;verticalAlign=top;spacing=10;fontSize=14;fontColor=#0F172A;fillColor=#FFFFFF;strokeColor=#CBD5E1;">
+          <mxGeometry x="40" y="1480" width="1160" height="390" as="geometry" />
+        </mxCell>
+        <mxCell id="p3-phan-quyen" parent="p3-1" vertex="1" value="&lt;b&gt;Phân quyền đường dẫn API&lt;/b&gt;&lt;br&gt;&lt;br&gt;&lt;table style=&quot;border-collapse:collapse;table-layout:fixed;text-align:left;&quot;&gt;&lt;tr&gt;&lt;th style=&quot;width:275px;border:1px solid #CBD5E1;background:#DCFCE7;font-size:13px;font-weight:600;padding:7px 8px;vertical-align:middle;&quot;&gt;Quyền&lt;/th&gt;&lt;th style=&quot;width:770px;border:1px solid #CBD5E1;background:#DCFCE7;font-size:13px;font-weight:600;padding:7px 8px;vertical-align:middle;&quot;&gt;Phương thức và đường dẫn&lt;/th&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td style=&quot;width:275px;border:1px solid #CBD5E1;background:#FFFFFF;font-size:13px;font-weight:600;padding:7px 8px;vertical-align:middle;&quot;&gt;Công khai · Danh mục&lt;/td&gt;&lt;td style=&quot;width:770px;border:1px solid #CBD5E1;background:#FFFFFF;font-size:13px;font-weight:400;padding:7px 8px;vertical-align:middle;&quot;&gt;GET /destinations, /airports, /tours, /tours/*, /hotels, /hotels/*,&lt;br&gt;/flights, /flights/*, /flight-routes/popular, /testimonials&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td style=&quot;width:275px;border:1px solid #CBD5E1;background:#F8FAFC;font-size:13px;font-weight:600;padding:7px 8px;vertical-align:middle;&quot;&gt;Công khai · Đăng ký và vận hành&lt;/td&gt;&lt;td style=&quot;width:770px;border:1px solid #CBD5E1;background:#F8FAFC;font-size:13px;font-weight:400;padding:7px 8px;vertical-align:middle;&quot;&gt;POST /auth/register, /auth/login, /newsletter/subscriptions, /payments/sepay/webhook&lt;br&gt;Vận hành: /actuator/health, /actuator/health/**, /v3/api-docs/**, /swagger-ui/**, /swagger-ui.html&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td style=&quot;width:275px;border:1px solid #CBD5E1;background:#FFFFFF;font-size:13px;font-weight:600;padding:7px 8px;vertical-align:middle;&quot;&gt;JWT Bearer · Website&lt;/td&gt;&lt;td style=&quot;width:770px;border:1px solid #CBD5E1;background:#FFFFFF;font-size:13px;font-weight:400;padding:7px 8px;vertical-align:middle;&quot;&gt;GET /auth/me, PUT /auth/me, PUT /auth/me/password, /bookings/** và các đường dẫn khác cần xác thực ngoài /admin/**&lt;br&gt;API kiểm tài khoản còn tồn tại và quyền sở hữu đơn tại nơi xử lý.&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td style=&quot;width:275px;border:1px solid #CBD5E1;background:#F8FAFC;font-size:13px;font-weight:600;padding:7px 8px;vertical-align:middle;&quot;&gt;Công khai với CSRF · Admin&lt;/td&gt;&lt;td style=&quot;width:770px;border:1px solid #CBD5E1;background:#F8FAFC;font-size:13px;font-weight:400;padding:7px 8px;vertical-align:middle;&quot;&gt;POST /admin/auth/login và /admin/auth/logout&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td style=&quot;width:275px;border:1px solid #CBD5E1;background:#FFFFFF;font-size:13px;font-weight:600;padding:7px 8px;vertical-align:middle;&quot;&gt;STAFF hoặc ADMIN · Admin&lt;/td&gt;&lt;td style=&quot;width:770px;border:1px solid #CBD5E1;background:#FFFFFF;font-size:13px;font-weight:400;padding:7px 8px;vertical-align:middle;&quot;&gt;/admin/**, gồm GET /admin/auth/me, trừ các ngoại lệ trong bảng&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td style=&quot;width:275px;border:1px solid #CBD5E1;background:#F8FAFC;font-size:13px;font-weight:600;padding:7px 8px;vertical-align:middle;&quot;&gt;Chỉ ADMIN&lt;/td&gt;&lt;td style=&quot;width:770px;border:1px solid #CBD5E1;background:#F8FAFC;font-size:13px;font-weight:400;padding:7px 8px;vertical-align:middle;&quot;&gt;/admin/staff/**&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;br&gt;Ký tự * khớp một đoạn URL. Ký tự ** bao phủ các đường dẫn con." style="rounded=0;html=1;whiteSpace=wrap;overflow=visible;strokeWidth=1.5;align=left;verticalAlign=top;spacing=10;fontSize=14;fontColor=#0F172A;fillColor=#FFFFFF;strokeColor=#CBD5E1;">
+          <mxGeometry x="1240" y="1480" width="1160" height="390" as="geometry" />
+        </mxCell>
+        <mxCell id="p3-diem-can-nho" parent="p3-1" vertex="1" value="&lt;b&gt;Điểm cần nhớ&lt;/b&gt;&lt;br&gt;Cả hai luồng dùng JWT HS256. API dùng hai chuỗi bảo mật và không lưu phiên phía máy chủ.&lt;br&gt;API xác thực theo claim roles ở chuỗi khách. Chuỗi admin lấy quyền hiện tại từ DB và ưu tiên Bearer nếu có.&lt;br&gt;Đăng nhập và đăng xuất admin luôn cần CSRF. Các lệnh ghi admin dùng Bearer được miễn CSRF." style="rounded=0;html=1;whiteSpace=wrap;overflow=visible;strokeWidth=1.5;align=left;verticalAlign=middle;spacing=10;fontSize=13;fontColor=#0F172A;fillColor=#FEF3C7;strokeColor=#B45309;">
+          <mxGeometry x="40" y="1910" width="2360" height="110" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+  <diagram name="04 · Làm mới cache" id="p4-trang">
+    <mxGraphModel dx="1200" dy="800" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="0" pageScale="1" math="0" shadow="0" pageWidth="2400" pageHeight="1930">
+      <root>
+        <mxCell id="p4-0" />
+        <mxCell id="p4-1" parent="p4-0" />
+        <mxCell id="p4-tieu-de" parent="p4-1" vertex="1" value="GoTrips — Làm mới cache" style="text;html=1;strokeColor=none;fillColor=none;whiteSpace=wrap;align=left;verticalAlign=middle;spacing=6;fontSize=24;fontColor=#0F172A;fontStyle=1;">
+          <mxGeometry x="40" y="20" width="2320" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="p4-phu-de" parent="p4-1" vertex="1" value="Tag danh mục, làm mới website và dữ liệu hồ sơ · 28/11/2026" style="text;html=1;strokeColor=none;fillColor=none;whiteSpace=wrap;align=left;verticalAlign=middle;spacing=6;fontSize=14;fontColor=#475569;">
+          <mxGeometry x="40" y="100" width="2320" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="p4-cach-doc" parent="p4-1" vertex="1" value="&lt;b&gt;Cách đọc&lt;/b&gt;&lt;br&gt;&lt;span style=&quot;background-color:#E0F2FE;color:#0369A1;font-weight:700;&quot;&gt;&amp;nbsp;Xanh dương · Web&amp;nbsp;&lt;/span&gt;&amp;nbsp; · &amp;nbsp;&lt;span style=&quot;background-color:#F3E8FF;color:#7E22CE;font-weight:700;&quot;&gt;&amp;nbsp;Tím · Admin&amp;nbsp;&lt;/span&gt;&amp;nbsp; · &amp;nbsp;&lt;span style=&quot;background-color:#DCFCE7;color:#15803D;font-weight:700;&quot;&gt;&amp;nbsp;Xanh lá · API&amp;nbsp;&lt;/span&gt;&amp;nbsp; · &amp;nbsp;&lt;span style=&quot;background-color:#E5E7EB;color:#334155;font-weight:700;&quot;&gt;&amp;nbsp;Xám · PostgreSQL&amp;nbsp;&lt;/span&gt;&amp;nbsp; · &amp;nbsp;&lt;span style=&quot;background-color:#FEF3C7;color:#B45309;font-weight:700;&quot;&gt;&amp;nbsp;Vàng · Ghi chú&amp;nbsp;&lt;/span&gt;&amp;nbsp; · &amp;nbsp;&lt;span style=&quot;background-color:#FFFFFF;color:#334155;font-weight:700;&quot;&gt;&amp;nbsp;Trắng · Người dùng / hệ thống ngoài&amp;nbsp;&lt;/span&gt; &amp;nbsp;|&amp;nbsp; Đọc từng làn từ trái sang phải. Nét liền: xử lý hiện có. Nét đứt: webhook tuỳ chọn." style="rounded=0;html=1;whiteSpace=wrap;overflow=visible;strokeWidth=1.5;align=left;verticalAlign=middle;spacing=10;fontSize=12;fontColor=#0F172A;fillColor=#FEF3C7;strokeColor=#B45309;">
+          <mxGeometry x="40" y="170" width="2320" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="p4-web-cache" parent="p4-1" vertex="1" value="&lt;b&gt;Web cache gì&lt;/b&gt;" style="swimlane;html=1;whiteSpace=wrap;horizontal=1;rounded=0;collapsible=0;startSize=50;align=left;spacingLeft=16;verticalAlign=middle;fontSize=16;fontColor=#0F172A;fillColor=#E0F2FE;swimlaneFillColor=#F0F9FF;strokeColor=#0369A1;strokeWidth=1.5;">
+          <mxGeometry x="40" y="270" width="2320" height="410" as="geometry" />
+        </mxCell>
+        <mxCell id="p4-bang-cache" parent="p4-web-cache" vertex="1" value="&lt;table style=&quot;border-collapse:collapse;table-layout:fixed;text-align:left;&quot;&gt;&lt;tr&gt;&lt;th style=&quot;width:530px;border:1px solid #CBD5E1;background:#E0F2FE;font-size:13px;font-weight:600;padding:3px 8px;vertical-align:middle;&quot;&gt;Dữ liệu&lt;/th&gt;&lt;th style=&quot;width:520px;border:1px solid #CBD5E1;background:#E0F2FE;font-size:13px;font-weight:600;padding:3px 8px;vertical-align:middle;&quot;&gt;Tag (cacheTag)&lt;/th&gt;&lt;th style=&quot;width:200px;border:1px solid #CBD5E1;background:#E0F2FE;font-size:13px;font-weight:600;padding:3px 8px;vertical-align:middle;&quot;&gt;Nhóm cacheLife&lt;/th&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td style=&quot;width:530px;border:1px solid #CBD5E1;background:#FFFFFF;font-size:13px;font-weight:600;padding:3px 8px;vertical-align:middle;&quot;&gt;Banner trang chủ (cấu hình của web)&lt;/td&gt;&lt;td style=&quot;width:520px;border:1px solid #CBD5E1;background:#FFFFFF;font-size:13px;font-weight:400;padding:3px 8px;vertical-align:middle;&quot;&gt;site&lt;/td&gt;&lt;td style=&quot;width:200px;border:1px solid #CBD5E1;background:#FFFFFF;font-size:13px;font-weight:400;padding:3px 8px;vertical-align:middle;&quot;&gt;days&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td style=&quot;width:530px;border:1px solid #CBD5E1;background:#F8FAFC;font-size:13px;font-weight:600;padding:3px 8px;vertical-align:middle;&quot;&gt;Điểm đến&lt;/td&gt;&lt;td style=&quot;width:520px;border:1px solid #CBD5E1;background:#F8FAFC;font-size:13px;font-weight:400;padding:3px 8px;vertical-align:middle;&quot;&gt;destinations, tours&lt;/td&gt;&lt;td style=&quot;width:200px;border:1px solid #CBD5E1;background:#F8FAFC;font-size:13px;font-weight:400;padding:3px 8px;vertical-align:middle;&quot;&gt;hours&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td style=&quot;width:530px;border:1px solid #CBD5E1;background:#FFFFFF;font-size:13px;font-weight:600;padding:3px 8px;vertical-align:middle;&quot;&gt;Tour nổi bật&lt;/td&gt;&lt;td style=&quot;width:520px;border:1px solid #CBD5E1;background:#FFFFFF;font-size:13px;font-weight:400;padding:3px 8px;vertical-align:middle;&quot;&gt;tours, departures&lt;/td&gt;&lt;td style=&quot;width:200px;border:1px solid #CBD5E1;background:#FFFFFF;font-size:13px;font-weight:400;padding:3px 8px;vertical-align:middle;&quot;&gt;hours&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td style=&quot;width:530px;border:1px solid #CBD5E1;background:#F8FAFC;font-size:13px;font-weight:600;padding:3px 8px;vertical-align:middle;&quot;&gt;Kết quả tìm tour&lt;/td&gt;&lt;td style=&quot;width:520px;border:1px solid #CBD5E1;background:#F8FAFC;font-size:13px;font-weight:400;padding:3px 8px;vertical-align:middle;&quot;&gt;tours, departures, destinations&lt;/td&gt;&lt;td style=&quot;width:200px;border:1px solid #CBD5E1;background:#F8FAFC;font-size:13px;font-weight:400;padding:3px 8px;vertical-align:middle;&quot;&gt;hours&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td style=&quot;width:530px;border:1px solid #CBD5E1;background:#FFFFFF;font-size:13px;font-weight:600;padding:3px 8px;vertical-align:middle;&quot;&gt;Chi tiết tour&lt;/td&gt;&lt;td style=&quot;width:520px;border:1px solid #CBD5E1;background:#FFFFFF;font-size:13px;font-weight:400;padding:3px 8px;vertical-align:middle;&quot;&gt;tours, departures, testimonials&lt;/td&gt;&lt;td style=&quot;width:200px;border:1px solid #CBD5E1;background:#FFFFFF;font-size:13px;font-weight:400;padding:3px 8px;vertical-align:middle;&quot;&gt;hours&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td style=&quot;width:530px;border:1px solid #CBD5E1;background:#F8FAFC;font-size:13px;font-weight:600;padding:3px 8px;vertical-align:middle;&quot;&gt;Khách sạn nổi bật, gợi ý, tìm kiếm và chi tiết&lt;/td&gt;&lt;td style=&quot;width:520px;border:1px solid #CBD5E1;background:#F8FAFC;font-size:13px;font-weight:400;padding:3px 8px;vertical-align:middle;&quot;&gt;hotels, destinations&lt;/td&gt;&lt;td style=&quot;width:200px;border:1px solid #CBD5E1;background:#F8FAFC;font-size:13px;font-weight:400;padding:3px 8px;vertical-align:middle;&quot;&gt;hours&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td style=&quot;width:530px;border:1px solid #CBD5E1;background:#FFFFFF;font-size:13px;font-weight:600;padding:3px 8px;vertical-align:middle;&quot;&gt;Kết quả tìm vé và chi tiết lịch bay&lt;/td&gt;&lt;td style=&quot;width:520px;border:1px solid #CBD5E1;background:#FFFFFF;font-size:13px;font-weight:400;padding:3px 8px;vertical-align:middle;&quot;&gt;flights, airports&lt;/td&gt;&lt;td style=&quot;width:200px;border:1px solid #CBD5E1;background:#FFFFFF;font-size:13px;font-weight:400;padding:3px 8px;vertical-align:middle;&quot;&gt;minutes&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td style=&quot;width:530px;border:1px solid #CBD5E1;background:#F8FAFC;font-size:13px;font-weight:600;padding:3px 8px;vertical-align:middle;&quot;&gt;Chặng bay phổ biến&lt;/td&gt;&lt;td style=&quot;width:520px;border:1px solid #CBD5E1;background:#F8FAFC;font-size:13px;font-weight:400;padding:3px 8px;vertical-align:middle;&quot;&gt;flight-routes, airports&lt;/td&gt;&lt;td style=&quot;width:200px;border:1px solid #CBD5E1;background:#F8FAFC;font-size:13px;font-weight:400;padding:3px 8px;vertical-align:middle;&quot;&gt;hours&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td style=&quot;width:530px;border:1px solid #CBD5E1;background:#FFFFFF;font-size:13px;font-weight:600;padding:3px 8px;vertical-align:middle;&quot;&gt;Sân bay&lt;/td&gt;&lt;td style=&quot;width:520px;border:1px solid #CBD5E1;background:#FFFFFF;font-size:13px;font-weight:400;padding:3px 8px;vertical-align:middle;&quot;&gt;airports&lt;/td&gt;&lt;td style=&quot;width:200px;border:1px solid #CBD5E1;background:#FFFFFF;font-size:13px;font-weight:400;padding:3px 8px;vertical-align:middle;&quot;&gt;days&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td style=&quot;width:530px;border:1px solid #CBD5E1;background:#F8FAFC;font-size:13px;font-weight:600;padding:3px 8px;vertical-align:middle;&quot;&gt;Đánh giá&lt;/td&gt;&lt;td style=&quot;width:520px;border:1px solid #CBD5E1;background:#F8FAFC;font-size:13px;font-weight:400;padding:3px 8px;vertical-align:middle;&quot;&gt;testimonials, tours&lt;/td&gt;&lt;td style=&quot;width:200px;border:1px solid #CBD5E1;background:#F8FAFC;font-size:13px;font-weight:400;padding:3px 8px;vertical-align:middle;&quot;&gt;days&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;" style="rounded=0;html=1;whiteSpace=wrap;overflow=visible;strokeWidth=1.5;align=left;verticalAlign=middle;spacing=10;fontSize=14;fontColor=#0F172A;fillColor=#FFFFFF;strokeColor=#CBD5E1;">
+          <mxGeometry x="40" y="90" width="1360" height="280" as="geometry" />
+        </mxCell>
+        <mxCell id="p4-pham-vi-cache" parent="p4-web-cache" vertex="1" value="&lt;b&gt;Cache ở máy chủ web&lt;/b&gt;&lt;br&gt;Danh mục dùng &quot;use cache&quot;, cacheLife và cacheTag trong bộ nhớ tiến trình.&lt;br&gt;Đơn đặt chỗ, hồ sơ, phiên đăng nhập và lượt kiểm chuyến bay lúc đặt dùng no-store.&lt;br&gt;Sửa hồ sơ xong, Server Action gọi refresh() để cập nhật trang và Header.&lt;br&gt;loadSection đợi yêu cầu thật bằng await io() trước khi nạp từng khối.&lt;br&gt;Ở bản triển khai, lượt đọc sau mốc revalidate sẽ nạp lại từ API.&lt;br&gt;minutes: 1 phút · hours: 1 giờ · days: 1 ngày." style="rounded=0;html=1;whiteSpace=wrap;overflow=visible;strokeWidth=1.5;align=left;verticalAlign=middle;spacing=10;fontSize=14;fontColor=#0F172A;fillColor=#FEF3C7;strokeColor=#B45309;">
+          <mxGeometry x="1440" y="90" width="840" height="280" as="geometry" />
+        </mxCell>
+        <mxCell id="p4-lan-dat-don" parent="p4-1" vertex="1" value="&lt;b&gt;1 · Khách tạo đơn trên web&lt;/b&gt;" style="swimlane;html=1;whiteSpace=wrap;horizontal=1;rounded=0;collapsible=0;startSize=50;align=left;spacingLeft=16;verticalAlign=middle;fontSize=16;fontColor=#0F172A;fillColor=#E0F2FE;swimlaneFillColor=#F0F9FF;strokeColor=#0369A1;strokeWidth=1.5;">
+          <mxGeometry x="40" y="720" width="2320" height="210" as="geometry" />
+        </mxCell>
+        <mxCell id="p4-server-action" parent="p4-lan-dat-don" vertex="1" value="&lt;b&gt;Server Action&lt;/b&gt;&lt;br&gt;POST /bookings/tours, /bookings/hotels&lt;br&gt;hoặc /bookings/flights" style="rounded=0;html=1;whiteSpace=wrap;overflow=visible;strokeWidth=1.5;align=center;verticalAlign=middle;spacing=10;fontSize=14;fontColor=#0F172A;fillColor=#E0F2FE;strokeColor=#0369A1;">
+          <mxGeometry x="40" y="90" width="400" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="p4-tao-don" parent="p4-lan-dat-don" vertex="1" value="&lt;b&gt;API tạo đơn và giữ chỗ&lt;/b&gt;&lt;br&gt;Trả 201 kèm mã đơn" style="rounded=0;html=1;whiteSpace=wrap;overflow=visible;strokeWidth=1.5;align=center;verticalAlign=middle;spacing=10;fontSize=14;fontColor=#0F172A;fillColor=#DCFCE7;strokeColor=#15803D;">
+          <mxGeometry x="520" y="90" width="430" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="p4-after" parent="p4-lan-dat-don" vertex="1" value="&lt;b&gt;Web làm hết hạn tag sau khi gửi phản hồi&lt;/b&gt;&lt;br&gt;after(() =&amp;gt; revalidateTag(tag, { expire: 0 }))" style="rounded=0;html=1;whiteSpace=wrap;overflow=visible;strokeWidth=1.5;align=center;verticalAlign=middle;spacing=10;fontSize=14;fontColor=#0F172A;fillColor=#E0F2FE;strokeColor=#0369A1;">
+          <mxGeometry x="1030" y="90" width="640" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="p4-luot-xem-moi" parent="p4-lan-dat-don" vertex="1" value="&lt;b&gt;Lượt đọc tiếp theo tại máy chủ&lt;/b&gt;&lt;br&gt;Lấy số chỗ mới từ API" style="rounded=0;html=1;whiteSpace=wrap;overflow=visible;strokeWidth=1.5;align=center;verticalAlign=middle;spacing=10;fontSize=14;fontColor=#0F172A;fillColor=#E0F2FE;strokeColor=#0369A1;">
+          <mxGeometry x="1750" y="90" width="530" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="p4-goi-tao-don" parent="p4-lan-dat-don" edge="1" source="p4-server-action" target="p4-tao-don" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;labelBackgroundColor=#FFFFFF;fontColor=#0F172A;fontSize=13;strokeColor=#475569;strokeWidth=1.5;endArrow=block;endFill=1;exitX=1;exitY=0.5;entryX=0;entryY=0.5;exitPerimeter=0;entryPerimeter=0;">
+          <mxGeometry x="0" relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="p4-nhan-201" parent="p4-lan-dat-don" edge="1" source="p4-tao-don" target="p4-after" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;labelBackgroundColor=#FFFFFF;fontColor=#0F172A;fontSize=13;strokeColor=#475569;strokeWidth=1.5;endArrow=block;endFill=1;exitX=1;exitY=0.5;entryX=0;entryY=0.5;exitPerimeter=0;entryPerimeter=0;">
+          <mxGeometry x="0" relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="p4-doc-sau-after" parent="p4-lan-dat-don" edge="1" source="p4-after" target="p4-luot-xem-moi" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;labelBackgroundColor=#FFFFFF;fontColor=#0F172A;fontSize=13;strokeColor=#475569;strokeWidth=1.5;endArrow=block;endFill=1;exitX=1;exitY=0.5;entryX=0;entryY=0.5;exitPerimeter=0;entryPerimeter=0;">
+          <mxGeometry x="0" relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="p4-lan-admin" parent="p4-1" vertex="1" value="&lt;b&gt;2 · Nhân viên ghi danh mục hoặc huỷ đơn qua admin&lt;/b&gt;" style="swimlane;html=1;whiteSpace=wrap;horizontal=1;rounded=0;collapsible=0;startSize=50;align=left;spacingLeft=16;verticalAlign=middle;fontSize=16;fontColor=#0F172A;fillColor=#F3E8FF;swimlaneFillColor=#FAF8FC;strokeColor=#7E22CE;strokeWidth=1.5;">
+          <mxGeometry x="40" y="970" width="2320" height="330" as="geometry" />
+        </mxCell>
+        <mxCell id="p4-ghi-admin" parent="p4-lan-admin" vertex="1" value="&lt;b&gt;gotrips-admin&lt;/b&gt;&lt;br&gt;Gửi thao tác ghi" style="rounded=0;html=1;whiteSpace=wrap;overflow=visible;strokeWidth=1.5;align=center;verticalAlign=middle;spacing=10;fontSize=13;fontColor=#0F172A;fillColor=#F3E8FF;strokeColor=#7E22CE;">
+          <mxGeometry x="40" y="90" width="280" height="100" as="geometry" />
+        </mxCell>
+        <mxCell id="p4-su-kien" parent="p4-lan-admin" vertex="1" value="&lt;b&gt;API ghi trong giao dịch&lt;/b&gt;&lt;br&gt;Phát WebCatalogChanged kèm tag" style="rounded=0;html=1;whiteSpace=wrap;overflow=visible;strokeWidth=1.5;align=center;verticalAlign=middle;spacing=10;fontSize=13;fontColor=#0F172A;fillColor=#DCFCE7;strokeColor=#15803D;">
+          <mxGeometry x="400" y="90" width="330" height="100" as="geometry" />
+        </mxCell>
+        <mxCell id="p4-sau-commit" parent="p4-lan-admin" vertex="1" value="&lt;b&gt;Sau commit · WebRevalidation&lt;/b&gt;&lt;br&gt;Executor riêng: 1–2 luồng, hàng đợi 50&lt;br&gt;Phản hồi admin không đợi webhook" style="rounded=0;html=1;whiteSpace=wrap;overflow=visible;strokeWidth=1.5;align=center;verticalAlign=middle;spacing=10;fontSize=13;fontColor=#0F172A;fillColor=#DCFCE7;strokeColor=#15803D;">
+          <mxGeometry x="810" y="90" width="330" height="100" as="geometry" />
+        </mxCell>
+        <mxCell id="p4-webhook" parent="p4-lan-admin" vertex="1" value="&lt;b&gt;POST tới GOTRIPS_WEB_REVALIDATE_URL&lt;/b&gt;&lt;br&gt;Header X-Gotrips-Revalidate-Secret&lt;br&gt;JSON { tags: [...] }" style="rounded=0;html=1;whiteSpace=wrap;overflow=visible;strokeWidth=1.5;align=center;verticalAlign=middle;spacing=10;fontSize=13;fontColor=#0F172A;fillColor=#DCFCE7;strokeColor=#15803D;dashed=1;dashPattern=6 4;">
+          <mxGeometry x="1220" y="90" width="440" height="100" as="geometry" />
+        </mxCell>
+        <mxCell id="p4-route" parent="p4-lan-admin" vertex="1" value="&lt;b&gt;Web · POST /api/revalidate&lt;/b&gt;&lt;br&gt;So bí mật bằng timingSafeEqual, kiểm tag cho phép&lt;br&gt;revalidateTag(tag, { expire: 0 }) → 204" style="rounded=0;html=1;whiteSpace=wrap;overflow=visible;strokeWidth=1.5;align=center;verticalAlign=middle;spacing=10;fontSize=13;fontColor=#0F172A;fillColor=#E0F2FE;strokeColor=#0369A1;">
+          <mxGeometry x="1740" y="90" width="540" height="100" as="geometry" />
+        </mxCell>
+        <mxCell id="p4-rollback" parent="p4-lan-admin" vertex="1" value="&lt;b&gt;Nếu rollback&lt;/b&gt;&lt;br&gt;Bỏ qua sự kiện, không gửi webhook." style="rounded=0;html=1;whiteSpace=wrap;overflow=visible;strokeWidth=1.5;align=left;verticalAlign=middle;spacing=10;fontSize=13;fontColor=#0F172A;fillColor=#FEF3C7;strokeColor=#B45309;">
+          <mxGeometry x="400" y="230" width="330" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="p4-warn" parent="p4-lan-admin" vertex="1" value="&lt;b&gt;Nếu web từ chối hoặc lỗi mạng&lt;/b&gt;&lt;br&gt;API ghi WARN. Thao tác đã commit vẫn thành công." style="rounded=0;html=1;whiteSpace=wrap;overflow=visible;strokeWidth=1.5;align=left;verticalAlign=middle;spacing=10;fontSize=13;fontColor=#0F172A;fillColor=#FEF3C7;strokeColor=#B45309;">
+          <mxGeometry x="1220" y="230" width="440" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="p4-admin-api" parent="p4-lan-admin" edge="1" source="p4-ghi-admin" target="p4-su-kien" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;labelBackgroundColor=#FFFFFF;fontColor=#0F172A;fontSize=13;strokeColor=#475569;strokeWidth=1.5;endArrow=block;endFill=1;exitX=1;exitY=0.5;entryX=0;entryY=0.5;exitPerimeter=0;entryPerimeter=0;">
+          <mxGeometry x="0" relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="p4-api-commit" parent="p4-lan-admin" edge="1" source="p4-su-kien" target="p4-sau-commit" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;labelBackgroundColor=#FFFFFF;fontColor=#0F172A;fontSize=13;strokeColor=#475569;strokeWidth=1.5;endArrow=block;endFill=1;exitX=1;exitY=0.5;entryX=0;entryY=0.5;exitPerimeter=0;entryPerimeter=0;">
+          <mxGeometry x="0" relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="p4-commit-webhook" parent="p4-lan-admin" edge="1" source="p4-sau-commit" target="p4-webhook" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;labelBackgroundColor=#FFFFFF;fontColor=#0F172A;fontSize=13;strokeColor=#475569;strokeWidth=1.5;endArrow=block;endFill=0;exitX=1;exitY=0.5;entryX=0;entryY=0.5;exitPerimeter=0;entryPerimeter=0;dashed=1;dashPattern=6 4;">
+          <mxGeometry x="0" relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="p4-webhook-route" parent="p4-lan-admin" edge="1" source="p4-webhook" target="p4-route" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;labelBackgroundColor=#FFFFFF;fontColor=#0F172A;fontSize=13;strokeColor=#475569;strokeWidth=1.5;endArrow=block;endFill=0;exitX=1;exitY=0.5;entryX=0;entryY=0.5;exitPerimeter=0;entryPerimeter=0;dashed=1;dashPattern=6 4;">
+          <mxGeometry x="0" relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="p4-rollback-branch" parent="p4-lan-admin" edge="1" source="p4-su-kien" target="p4-rollback" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;labelBackgroundColor=#FFFFFF;fontColor=#0F172A;fontSize=13;strokeColor=#B45309;strokeWidth=1.5;endArrow=block;endFill=1;exitX=0.5;exitY=1;entryX=0.5;entryY=0;exitPerimeter=0;entryPerimeter=0;">
+          <mxGeometry x="0" relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="p4-warn-branch" parent="p4-lan-admin" edge="1" source="p4-webhook" target="p4-warn" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;labelBackgroundColor=#FFFFFF;fontColor=#0F172A;fontSize=13;strokeColor=#B45309;strokeWidth=1.5;endArrow=block;endFill=0;exitX=0.5;exitY=1;entryX=0.5;entryY=0;exitPerimeter=0;entryPerimeter=0;dashed=1;dashPattern=6 4;">
+          <mxGeometry x="0" relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="p4-lan-khac" parent="p4-1" vertex="1" value="&lt;b&gt;3 · Thay đổi qua đường khác&lt;/b&gt;" style="swimlane;html=1;whiteSpace=wrap;horizontal=1;rounded=0;collapsible=0;startSize=50;align=left;spacingLeft=16;verticalAlign=middle;fontSize=16;fontColor=#0F172A;fillColor=#FFFFFF;swimlaneFillColor=#F8FAFC;strokeColor=#CBD5E1;strokeWidth=1.5;">
+          <mxGeometry x="40" y="1340" width="2320" height="190" as="geometry" />
+        </mxCell>
+        <mxCell id="p4-doi-ben-ngoai" parent="p4-lan-khac" vertex="1" value="&lt;b&gt;Sửa DB trực tiếp hoặc tạo đơn từ ứng dụng khác&lt;/b&gt;&lt;br&gt;Web không nhận tín hiệu làm mới" style="rounded=0;html=1;whiteSpace=wrap;overflow=visible;strokeWidth=1.5;align=center;verticalAlign=middle;spacing=10;fontSize=14;fontColor=#0F172A;fillColor=#FFFFFF;strokeColor=#CBD5E1;">
+          <mxGeometry x="40" y="90" width="550" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="p4-doi-theo-cache-life" parent="p4-lan-khac" vertex="1" value="&lt;b&gt;Cache hiện có tiếp tục phục vụ&lt;/b&gt;&lt;br&gt;Chờ tới mốc làm mới của cacheLife" style="rounded=0;html=1;whiteSpace=wrap;overflow=visible;strokeWidth=1.5;align=center;verticalAlign=middle;spacing=10;fontSize=14;fontColor=#0F172A;fillColor=#E0F2FE;strokeColor=#0369A1;">
+          <mxGeometry x="720" y="90" width="620" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="p4-nap-lai" parent="p4-lan-khac" vertex="1" value="&lt;b&gt;Lượt đọc sau mốc làm mới&lt;/b&gt;&lt;br&gt;Web lấy lại dữ liệu từ API" style="rounded=0;html=1;whiteSpace=wrap;overflow=visible;strokeWidth=1.5;align=center;verticalAlign=middle;spacing=10;fontSize=14;fontColor=#0F172A;fillColor=#E0F2FE;strokeColor=#0369A1;">
+          <mxGeometry x="1520" y="90" width="760" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="p4-thay-doi-den-cache" parent="p4-lan-khac" edge="1" source="p4-doi-ben-ngoai" target="p4-doi-theo-cache-life" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;labelBackgroundColor=#FFFFFF;fontColor=#0F172A;fontSize=13;strokeColor=#475569;strokeWidth=1.5;endArrow=block;endFill=1;exitX=1;exitY=0.5;entryX=0;entryY=0.5;exitPerimeter=0;entryPerimeter=0;">
+          <mxGeometry x="0" relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="p4-cache-den-api" parent="p4-lan-khac" edge="1" source="p4-doi-theo-cache-life" target="p4-nap-lai" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;labelBackgroundColor=#FFFFFF;fontColor=#0F172A;fontSize=13;strokeColor=#475569;strokeWidth=1.5;endArrow=block;endFill=1;exitX=1;exitY=0.5;entryX=0;entryY=0.5;exitPerimeter=0;entryPerimeter=0;">
+          <mxGeometry x="0" relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="p4-bang-thao-tac" parent="p4-1" vertex="1" value="&lt;b&gt;Thao tác → tag bị làm mới&lt;/b&gt;&lt;br&gt;&lt;br&gt;&lt;table style=&quot;border-collapse:collapse;table-layout:fixed;text-align:left;&quot;&gt;&lt;tr&gt;&lt;th style=&quot;width:540px;border:1px solid #CBD5E1;background:#DCFCE7;font-size:13px;font-weight:600;padding:4px 8px;vertical-align:middle;&quot;&gt;Thao tác&lt;/th&gt;&lt;th style=&quot;width:680px;border:1px solid #CBD5E1;background:#DCFCE7;font-size:13px;font-weight:600;padding:4px 8px;vertical-align:middle;&quot;&gt;Tag bị làm mới&lt;/th&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td style=&quot;width:540px;border:1px solid #CBD5E1;background:#FFFFFF;font-size:13px;font-weight:600;padding:4px 8px;vertical-align:middle;&quot;&gt;Admin ghi điểm đến, tour, chuyến khởi hành&lt;/td&gt;&lt;td style=&quot;width:680px;border:1px solid #CBD5E1;background:#FFFFFF;font-size:13px;font-weight:400;padding:4px 8px;vertical-align:middle;&quot;&gt;tours, departures, destinations&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td style=&quot;width:540px;border:1px solid #CBD5E1;background:#F8FAFC;font-size:13px;font-weight:600;padding:4px 8px;vertical-align:middle;&quot;&gt;Admin ghi khách sạn, loại phòng&lt;/td&gt;&lt;td style=&quot;width:680px;border:1px solid #CBD5E1;background:#F8FAFC;font-size:13px;font-weight:400;padding:4px 8px;vertical-align:middle;&quot;&gt;hotels, destinations&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td style=&quot;width:540px;border:1px solid #CBD5E1;background:#FFFFFF;font-size:13px;font-weight:600;padding:4px 8px;vertical-align:middle;&quot;&gt;Admin ghi hãng bay, lịch bay&lt;/td&gt;&lt;td style=&quot;width:680px;border:1px solid #CBD5E1;background:#FFFFFF;font-size:13px;font-weight:400;padding:4px 8px;vertical-align:middle;&quot;&gt;flights&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td style=&quot;width:540px;border:1px solid #CBD5E1;background:#F8FAFC;font-size:13px;font-weight:600;padding:4px 8px;vertical-align:middle;&quot;&gt;Admin ghi sân bay&lt;/td&gt;&lt;td style=&quot;width:680px;border:1px solid #CBD5E1;background:#F8FAFC;font-size:13px;font-weight:400;padding:4px 8px;vertical-align:middle;&quot;&gt;airports&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td style=&quot;width:540px;border:1px solid #CBD5E1;background:#FFFFFF;font-size:13px;font-weight:600;padding:4px 8px;vertical-align:middle;&quot;&gt;Admin ghi chặng phổ biến&lt;/td&gt;&lt;td style=&quot;width:680px;border:1px solid #CBD5E1;background:#FFFFFF;font-size:13px;font-weight:400;padding:4px 8px;vertical-align:middle;&quot;&gt;flight-routes&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td style=&quot;width:540px;border:1px solid #CBD5E1;background:#F8FAFC;font-size:13px;font-weight:600;padding:4px 8px;vertical-align:middle;&quot;&gt;Admin huỷ đơn&lt;/td&gt;&lt;td style=&quot;width:680px;border:1px solid #CBD5E1;background:#F8FAFC;font-size:13px;font-weight:400;padding:4px 8px;vertical-align:middle;&quot;&gt;tours, departures, hotels, flights&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td style=&quot;width:540px;border:1px solid #CBD5E1;background:#FFFFFF;font-size:13px;font-weight:600;padding:4px 8px;vertical-align:middle;&quot;&gt;Khách tạo đơn từ web&lt;/td&gt;&lt;td style=&quot;width:680px;border:1px solid #CBD5E1;background:#FFFFFF;font-size:13px;font-weight:400;padding:4px 8px;vertical-align:middle;&quot;&gt;Tour: tours, departures · Khách sạn: hotels · Vé: flights&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;" style="rounded=0;html=1;whiteSpace=wrap;overflow=visible;strokeWidth=1.5;align=left;verticalAlign=top;spacing=10;fontSize=14;fontColor=#0F172A;fillColor=#FFFFFF;strokeColor=#CBD5E1;">
+          <mxGeometry x="40" y="1570" width="1350" height="270" as="geometry" />
+        </mxCell>
+        <mxCell id="p4-tag-cho-phep" parent="p4-1" vertex="1" value="&lt;b&gt;Tag /api/revalidate chấp nhận&lt;/b&gt;&lt;br&gt;destinations, tours, departures, hotels, flights, flight-routes, airports.&lt;br&gt;Sai hoặc thiếu bí mật: 401. Danh sách tag không hợp lệ: 400.&lt;br&gt;Đánh giá được làm mới qua tag tours. Route không nhận site và testimonials.&lt;br&gt;Thiếu URL: bỏ qua webhook. Thiếu bí mật API hoặc hàng đợi đầy: ghi WARN." style="rounded=0;html=1;whiteSpace=wrap;overflow=visible;strokeWidth=1.5;align=left;verticalAlign=middle;spacing=10;fontSize=13;fontColor=#0F172A;fillColor=#FEF3C7;strokeColor=#B45309;">
+          <mxGeometry x="1430" y="1570" width="930" height="100" as="geometry" />
+        </mxCell>
+        <mxCell id="p4-diem-can-nho" parent="p4-1" vertex="1" value="&lt;b&gt;Điểm cần nhớ&lt;/b&gt;&lt;br&gt;Khởi động lại container web sẽ mất cache trong bộ nhớ của tiến trình đó.&lt;br&gt;API chỉ gửi tới một URL. Khi có nhiều bản chạy web, cần xem lại cách làm mới.&lt;br&gt;Lượt đọc tại máy chủ lấy dữ liệu mới sau khi tag bị làm hết hạn." style="rounded=0;html=1;whiteSpace=wrap;overflow=visible;strokeWidth=1.5;align=left;verticalAlign=middle;spacing=10;fontSize=13;fontColor=#0F172A;fillColor=#FEF3C7;strokeColor=#B45309;">
+          <mxGeometry x="1430" y="1710" width="930" height="130" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

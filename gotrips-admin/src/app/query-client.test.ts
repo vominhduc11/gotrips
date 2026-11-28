@@ -10,7 +10,7 @@ describe('Xử lý hết phiên', () => {
   it.each([200, 403])('kiểm lại me sau lỗi 403 của query và mutation cùng lúc (%s)', async (status) => {
     const onSessionLost = vi.fn()
     const client = createAppQueryClient(onSessionLost)
-    const session: UserResponse = { id: 'staff', roles: ['STAFF'], fullName: 'Nhân viên', email: 'staff@example.com' }
+    const session: UserResponse = { id: 'staff', roles: ['STAFF'], fullName: 'Nhân viên', email: 'staff@example.com', phone: null }
     client.setQueryData(adminMeOptions().queryKey, session)
     let finish!: (response: Response) => void
     const fetch = vi.fn(() => new Promise<Response>((resolve) => { finish = resolve }))

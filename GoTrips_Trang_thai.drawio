@@ -1,0 +1,1489 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mxfile host="Electron" compressed="false" version="29.0.3" pages="4">
+  <diagram id="p1-trang" name="01 · Vòng đời đơn &amp; thanh toán">
+    <mxGraphModel dx="1200" dy="800" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="0" pageScale="1" pageWidth="2440" pageHeight="2300" math="0" shadow="0">
+      <root>
+        <mxCell id="p1-0" />
+        <mxCell id="p1-1" parent="p1-0" />
+        <mxCell id="p1-tieu-de" parent="p1-1" vertex="1" value="&lt;b&gt;GoTrips · Vòng đời đơn &amp;amp; thanh toán&lt;/b&gt;" style="text;html=1;whiteSpace=wrap;fontSize=14;fontColor=#0F172A;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;fontSize=24;fontStyle=1;">
+          <mxGeometry x="40" y="20" width="2360" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="p1-phu-de" parent="p1-1" vertex="1" value="Tạo đơn, giữ chỗ, nhận tiền và huỷ cho tour, khách sạn, vé máy bay · 28/11/2026" style="text;html=1;whiteSpace=wrap;fontSize=14;fontColor=#0F172A;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;fontColor=#475569;">
+          <mxGeometry x="40" y="120" width="2360" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="p1-cach-doc" parent="p1-1" vertex="1" value="&lt;b&gt;Cách đọc&lt;/b&gt;&lt;br&gt;● Bắt đầu  ·  ◉ Kết thúc  ·  Hộp bo góc viền liền: trạng thái lưu  ·  Hộp bo góc viền đứt: trạng thái tính ra  ·  ◇ Rẽ nhánh, đọc điều kiện trên mũi tên ra&lt;br&gt;→ Chuyển hiện có  ·  ⋯→ Tự động theo ngày  ·  – – → Nét đứt xám: Chưa có  ·  Vàng: đang chờ  ·  Xanh lá: đang hoạt động  ·  Xám: tạm ẩn, đóng bán, hết chỗ  ·  Đỏ: đã huỷ, đã xoá, đã qua" style="html=1;whiteSpace=wrap;fontSize=14;fontColor=#0F172A;rounded=0;align=left;verticalAlign=middle;spacing=14;fillColor=#FFFBEB;strokeColor=#B45309;strokeWidth=1.5;">
+          <mxGeometry x="40" y="210" width="2360" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="p1-luu" parent="p1-1" vertex="1" value="&lt;b&gt;Lưu ở đâu&lt;/b&gt;&lt;br&gt;V5  ·  bookings.status và payments.status là hai cột riêng. payments.booking_id nối 1–1 với bookings.id. payments.method = BANK_TRANSFER.&lt;br&gt;Mốc thời gian  ·  bookings.created_at, confirmed_at, cancelled_at và payments.paid_at. availableActions và các nhóm Tổng quan được tính ra.&lt;br&gt;V10  ·  payments.received_amount lưu tiền đã phân bổ, bank_transactions lưu giao dịch SePay. Khách có thể đọc số đã nhận qua GET /bookings/{code}/payment-status." style="html=1;whiteSpace=wrap;fontSize=14;fontColor=#0F172A;rounded=0;align=left;verticalAlign=middle;spacing=14;fillColor=#FFFBEB;strokeColor=#B45309;strokeWidth=1.5;">
+          <mxGeometry x="40" y="350" width="2360" height="110" as="geometry" />
+        </mxCell>
+        <mxCell id="p1-chinh" parent="p1-1" vertex="1" value="&lt;b&gt;Vòng đời của tổ hợp đơn và thanh toán&lt;/b&gt;" style="text;html=1;whiteSpace=wrap;fontSize=14;fontColor=#0F172A;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;fontSize=18;fontStyle=1;">
+          <mxGeometry x="40" y="520" width="1470" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="p1-phu-don" parent="p1-1" vertex="1" value="&lt;b&gt;Trạng thái đơn · bookings.status&lt;/b&gt;" style="text;html=1;whiteSpace=wrap;fontSize=14;fontColor=#0F172A;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;fontSize=18;fontStyle=1;">
+          <mxGeometry x="1620" y="520" width="780" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="p1-bat-dau" parent="p1-1" vertex="1" value="" style="ellipse;shape=startState;html=1;aspect=fixed;fillColor=#0F172A;strokeColor=#0F172A;">
+          <mxGeometry x="40" y="710" width="30" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="p1-st-pending-unpaid" parent="p1-1" vertex="1" value="&lt;b&gt;Chờ thanh toán&lt;/b&gt;&lt;br&gt;PENDING + UNPAID&lt;br&gt;Admin: chờ xử lý" style="html=1;whiteSpace=wrap;fontSize=14;fontColor=#0F172A;rounded=1;arcSize=20;spacing=6;align=center;verticalAlign=middle;strokeWidth=1.6;fillColor=#FEF3C7;strokeColor=#B45309;">
+          <mxGeometry x="350" y="680" width="230" height="90" as="geometry" />
+        </mxCell>
+        <mxCell id="p1-st-pending-paid" parent="p1-1" vertex="1" value="&lt;b&gt;Đã thu tiền, chờ xác nhận&lt;/b&gt;&lt;br&gt;PENDING + PAID&lt;br&gt;Admin: chờ xử lý" style="html=1;whiteSpace=wrap;fontSize=14;fontColor=#0F172A;rounded=1;arcSize=20;spacing=6;align=center;verticalAlign=middle;strokeWidth=1.6;fillColor=#FEF3C7;strokeColor=#B45309;">
+          <mxGeometry x="830" y="680" width="230" height="90" as="geometry" />
+        </mxCell>
+        <mxCell id="p1-st-confirmed-paid" parent="p1-1" vertex="1" value="&lt;b&gt;Đã xác nhận&lt;/b&gt;&lt;br&gt;CONFIRMED + PAID&lt;br&gt;Website: đã xác nhận" style="html=1;whiteSpace=wrap;fontSize=14;fontColor=#0F172A;rounded=1;arcSize=20;spacing=6;align=center;verticalAlign=middle;strokeWidth=1.6;fillColor=#DCFCE7;strokeColor=#15803D;">
+          <mxGeometry x="1310" y="680" width="230" height="90" as="geometry" />
+        </mxCell>
+        <mxCell id="p1-st-cancelled-unpaid" parent="p1-1" vertex="1" value="&lt;b&gt;Đã huỷ, không còn khoản phải thu&lt;/b&gt;&lt;br&gt;CANCELLED + CANCELLED&lt;br&gt;Admin: không thu" style="html=1;whiteSpace=wrap;fontSize=14;fontColor=#0F172A;rounded=1;arcSize=20;spacing=6;align=center;verticalAlign=middle;strokeWidth=1.6;fillColor=#FEE2E2;strokeColor=#B91C1C;">
+          <mxGeometry x="210" y="1090" width="280" height="90" as="geometry" />
+        </mxCell>
+        <mxCell id="p1-st-cancelled-paid" parent="p1-1" vertex="1" value="&lt;b&gt;Đã huỷ, cần hoàn tiền&lt;/b&gt;&lt;br&gt;CANCELLED + PAID&lt;br&gt;Admin: cảnh báo hoàn thủ công" style="html=1;whiteSpace=wrap;fontSize=14;fontColor=#0F172A;rounded=1;arcSize=20;spacing=6;align=center;verticalAlign=middle;strokeWidth=1.6;fillColor=#FEE2E2;strokeColor=#B91C1C;">
+          <mxGeometry x="810" y="1090" width="270" height="90" as="geometry" />
+        </mxCell>
+        <mxCell id="p1-st-refunded" parent="p1-1" vertex="1" value="&lt;b&gt;Đã hoàn tiền&lt;/b&gt;&lt;br&gt;Chưa có trong hệ thống" style="html=1;whiteSpace=wrap;fontSize=14;fontColor=#0F172A;rounded=1;arcSize=20;spacing=6;align=center;verticalAlign=middle;strokeWidth=1.6;fillColor=#F8FAFC;strokeColor=#9CA3AF;dashed=1;dashPattern=6 4;">
+          <mxGeometry x="1280" y="1090" width="260" height="90" as="geometry" />
+        </mxCell>
+        <mxCell id="p1-ket-thuc" parent="p1-1" vertex="1" value="" style="ellipse;shape=endState;html=1;aspect=fixed;fillColor=#0F172A;strokeColor=#0F172A;">
+          <mxGeometry x="630" y="1300" width="30" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="p1-tr-create" parent="p1-1" edge="1" source="p1-bat-dau" target="p1-st-pending-unpaid" value="Khách · tạo đơn và giữ chỗ&lt;br&gt;[Đăng nhập, dịch vụ và chỗ hợp lệ]&lt;br&gt;POST /bookings/tours|hotels|flights → 201" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;endSize=7;strokeWidth=1.6;fontSize=13;fontColor=#334155;labelBackgroundColor=#FFFFFF;strokeColor=#475569;exitX=1;exitY=0.5;exitPerimeter=0;entryX=0;entryY=0.5;entryPerimeter=0;">
+          <mxGeometry x="-1" relative="1" as="geometry">
+            <mxPoint x="140.0" y="0.0" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="p1-tr-mark-paid" parent="p1-1" edge="1" source="p1-st-pending-unpaid" target="p1-st-pending-paid" value="Nhân viên · đánh dấu đã nhận tiền&lt;br&gt;POST /admin/bookings/{code}/mark-paid&lt;br&gt;Ghi paid_at" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;endSize=7;strokeWidth=1.6;fontSize=13;fontColor=#334155;labelBackgroundColor=#FFFFFF;strokeColor=#475569;exitX=1;exitY=0.5;exitPerimeter=0;entryX=0;entryY=0.5;entryPerimeter=0;">
+          <mxGeometry x="-1" relative="1" as="geometry">
+            <mxPoint x="125.0" y="-5.0" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="p1-tr-confirm" parent="p1-1" edge="1" source="p1-st-pending-paid" target="p1-st-confirmed-paid" value="Nhân viên · xác nhận đơn&lt;br&gt;POST /admin/bookings/{code}/confirm&lt;br&gt;Ghi confirmed_at" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;endSize=7;strokeWidth=1.6;fontSize=13;fontColor=#334155;labelBackgroundColor=#FFFFFF;strokeColor=#475569;exitX=1;exitY=0.5;exitPerimeter=0;entryX=0;entryY=0.5;entryPerimeter=0;">
+          <mxGeometry x="-1" relative="1" as="geometry">
+            <mxPoint x="125.0" y="-5.0" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="p1-tr-sepay-confirm" parent="p1-1" edge="1" source="p1-st-pending-unpaid" target="p1-st-confirmed-paid" value="SePay hoặc nhân viên · gắn đủ tiền [dịch vụ từ ngày mai]&lt;br&gt;POST /payments/sepay/webhook · POST /admin/bank-transactions/{id}/assign&lt;br&gt;Tự xác nhận, ghi paid_at và confirmed_at cùng thời điểm" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;endSize=7;strokeWidth=1.6;fontSize=13;fontColor=#334155;labelBackgroundColor=#FFFFFF;strokeColor=#475569;exitX=1;exitY=0;exitPerimeter=0;entryX=0.52173913;entryY=0;entryPerimeter=0;">
+          <mxGeometry x="-1" relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="580" y="610" />
+              <mxPoint x="1430" y="610" />
+            </Array>
+            <mxPoint x="400.0" y="-75.0" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="p1-tr-sepay-paid" parent="p1-1" edge="1" source="p1-st-pending-unpaid" target="p1-st-pending-paid" value="SePay hoặc nhân viên · gắn đủ tiền&lt;br&gt;[Ngày dịch vụ ≤ hôm nay] · ghi paid_at&lt;br&gt;POST /payments/sepay/webhook&lt;br&gt;POST /admin/bank-transactions/{id}/assign" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;endSize=7;strokeWidth=1.6;fontSize=13;fontColor=#334155;labelBackgroundColor=#FFFFFF;strokeColor=#475569;exitX=1;exitY=0.9;exitPerimeter=0;entryX=0;entryY=0.9;entryPerimeter=0;">
+          <mxGeometry x="-1" relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="650" y="810" />
+              <mxPoint x="760" y="810" />
+            </Array>
+            <mxPoint x="168.0" y="68.0" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="p1-tr-sepay-partial" parent="p1-1" edge="1" source="p1-st-pending-unpaid" target="p1-st-pending-unpaid" value="SePay hoặc nhân viên · gắn khoản chuyển chưa đủ&lt;br&gt;[Đơn còn nhận tiền] · cộng received_amount" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;endSize=7;strokeWidth=1.6;fontSize=13;fontColor=#334155;labelBackgroundColor=#FFFFFF;strokeColor=#475569;exitX=0.25;exitY=0;exitPerimeter=0;entryX=0;entryY=0.2;entryPerimeter=0;">
+          <mxGeometry x="-1" relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="410" y="620" />
+              <mxPoint x="290" y="620" />
+              <mxPoint x="290" y="700" />
+            </Array>
+            <mxPoint x="-32.5" y="-48.0" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="p1-tr-cancel-unpaid" parent="p1-1" edge="1" source="p1-st-pending-unpaid" target="p1-st-cancelled-unpaid" value="Nhân viên · huỷ đơn chưa thu đủ&lt;br&gt;POST /admin/bookings/{code}/cancel&lt;br&gt;Ghi cancelled_at · trả chỗ" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;endSize=7;strokeWidth=1.6;fontSize=13;fontColor=#334155;labelBackgroundColor=#FFFFFF;strokeColor=#475569;exitX=0.18;exitY=1;exitPerimeter=0;entryX=0.65;entryY=0;entryPerimeter=0;">
+          <mxGeometry x="-1" relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="390" y="1020" />
+              <mxPoint x="390" y="1020" />
+            </Array>
+            <mxPoint x="-13.4" y="200.0" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="p1-tr-cancel-pending-paid" parent="p1-1" edge="1" source="p1-st-pending-paid" target="p1-st-cancelled-paid" value="Nhân viên · huỷ đơn đã thu&lt;br&gt;POST /admin/bookings/{code}/cancel&lt;br&gt;Ghi cancelled_at · trả chỗ" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;endSize=7;strokeWidth=1.6;fontSize=13;fontColor=#334155;labelBackgroundColor=#FFFFFF;strokeColor=#475569;exitX=0.5;exitY=1;exitPerimeter=0;entryX=0.5;entryY=0;entryPerimeter=0;">
+          <mxGeometry x="-1" relative="1" as="geometry">
+            <mxPoint x="0.0" y="175.0" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="p1-tr-cancel-confirmed" parent="p1-1" edge="1" source="p1-st-confirmed-paid" target="p1-st-cancelled-paid" value="Nhân viên · huỷ đơn đã xác nhận&lt;br&gt;POST /admin/bookings/{code}/cancel&lt;br&gt;Ghi cancelled_at · trả chỗ" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;endSize=7;strokeWidth=1.6;fontSize=13;fontColor=#334155;labelBackgroundColor=#FFFFFF;strokeColor=#475569;exitX=0.5;exitY=1;exitPerimeter=0;entryX=0.85;entryY=0;entryPerimeter=0;">
+          <mxGeometry x="-1" relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="1430" y="1000" />
+              <mxPoint x="1040" y="1000" />
+            </Array>
+            <mxPoint x="-100.0" y="195.0" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="p1-tr-future-expired" parent="p1-1" edge="1" source="p1-st-pending-unpaid" target="p1-st-cancelled-unpaid" value="Chưa có: tự huỷ khi quá hạn thanh toán" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;endSize=7;strokeWidth=1.6;fontSize=13;fontColor=#334155;labelBackgroundColor=#FFFFFF;strokeColor=#9CA3AF;dashed=1;dashPattern=6 4;exitX=0.27;exitY=1;exitPerimeter=0;entryX=0;entryY=0.35;entryPerimeter=0;">
+          <mxGeometry x="-1" relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="410" y="870" />
+              <mxPoint x="100" y="870" />
+              <mxPoint x="100" y="1120" />
+            </Array>
+            <mxPoint x="-182.1" y="100.0" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="p1-tr-future-customer" parent="p1-1" edge="1" source="p1-st-pending-unpaid" target="p1-st-cancelled-unpaid" value="Chưa có: khách tự huỷ" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;endSize=7;strokeWidth=1.6;fontSize=13;fontColor=#334155;labelBackgroundColor=#FFFFFF;strokeColor=#9CA3AF;dashed=1;dashPattern=6 4;exitX=0.82;exitY=1;exitPerimeter=0;entryX=1;entryY=0.65;entryPerimeter=0;">
+          <mxGeometry x="-1" relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="540" y="1050" />
+              <mxPoint x="600" y="1050" />
+              <mxPoint x="600" y="1150" />
+            </Array>
+            <mxPoint x="31.4" y="275.0" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="p1-tr-future-refund" parent="p1-1" edge="1" source="p1-st-cancelled-paid" target="p1-st-refunded" value="Chưa có: hoàn tiền" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;endSize=7;strokeWidth=1.6;fontSize=13;fontColor=#334155;labelBackgroundColor=#FFFFFF;strokeColor=#9CA3AF;dashed=1;dashPattern=6 4;exitX=1;exitY=0.5;exitPerimeter=0;entryX=0;entryY=0.5;entryPerimeter=0;">
+          <mxGeometry x="-1" relative="1" as="geometry">
+            <mxPoint x="100.0" y="0.0" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="p1-tr-end-unpaid" parent="p1-1" edge="1" source="p1-st-cancelled-unpaid" target="p1-ket-thuc" value="Đơn đã kết thúc" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;endSize=7;strokeWidth=1.6;fontSize=13;fontColor=#334155;labelBackgroundColor=#FFFFFF;strokeColor=#475569;exitX=0.5;exitY=1;exitPerimeter=0;entryX=0;entryY=0.66666667;entryPerimeter=0;">
+          <mxGeometry x="-1" relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="350" y="1320" />
+            </Array>
+            <mxPoint x="140.0" y="135.0" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="p1-tr-end-paid" parent="p1-1" edge="1" source="p1-st-cancelled-paid" target="p1-ket-thuc" value="Đơn đã kết thúc" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;endSize=7;strokeWidth=1.6;fontSize=13;fontColor=#334155;labelBackgroundColor=#FFFFFF;strokeColor=#475569;exitX=0.51851852;exitY=1;exitPerimeter=0;entryX=1;entryY=0.66666667;entryPerimeter=0;">
+          <mxGeometry x="-1" relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="950" y="1320" />
+            </Array>
+            <mxPoint x="-150.0" y="135.0" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="p1-don-start" parent="p1-1" vertex="1" value="" style="ellipse;shape=startState;html=1;aspect=fixed;fillColor=#0F172A;strokeColor=#0F172A;">
+          <mxGeometry x="1620" y="660" width="30" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="p1-don-pending" parent="p1-1" vertex="1" value="&lt;b&gt;Chờ xử lý&lt;/b&gt;&lt;br&gt;PENDING" style="html=1;whiteSpace=wrap;fontSize=14;fontColor=#0F172A;rounded=1;arcSize=20;spacing=6;align=center;verticalAlign=middle;strokeWidth=1.6;fillColor=#FEF3C7;strokeColor=#B45309;">
+          <mxGeometry x="1720" y="630" width="170" height="90" as="geometry" />
+        </mxCell>
+        <mxCell id="p1-don-confirmed" parent="p1-1" vertex="1" value="&lt;b&gt;Đã xác nhận&lt;/b&gt;&lt;br&gt;CONFIRMED" style="html=1;whiteSpace=wrap;fontSize=14;fontColor=#0F172A;rounded=1;arcSize=20;spacing=6;align=center;verticalAlign=middle;strokeWidth=1.6;fillColor=#DCFCE7;strokeColor=#15803D;">
+          <mxGeometry x="1980" y="630" width="170" height="90" as="geometry" />
+        </mxCell>
+        <mxCell id="p1-don-cancelled" parent="p1-1" vertex="1" value="&lt;b&gt;Đã huỷ&lt;/b&gt;&lt;br&gt;CANCELLED" style="html=1;whiteSpace=wrap;fontSize=14;fontColor=#0F172A;rounded=1;arcSize=20;spacing=6;align=center;verticalAlign=middle;strokeWidth=1.6;fillColor=#FEE2E2;strokeColor=#B91C1C;">
+          <mxGeometry x="2230" y="630" width="170" height="90" as="geometry" />
+        </mxCell>
+        <mxCell id="p1-don-create" parent="p1-1" edge="1" source="p1-don-start" target="p1-don-pending" value="Tạo đơn" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;endSize=7;strokeWidth=1.6;fontSize=13;fontColor=#334155;labelBackgroundColor=#FFFFFF;strokeColor=#475569;exitX=1;exitY=0.5;exitPerimeter=0;entryX=0;entryY=0.5;entryPerimeter=0;">
+          <mxGeometry x="-1" relative="1" as="geometry">
+            <mxPoint x="35.0" y="0.0" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="p1-don-confirm" parent="p1-1" edge="1" source="p1-don-pending" target="p1-don-confirmed" value="Xác nhận&lt;br&gt;[Đã thu đủ]" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;endSize=7;strokeWidth=1.6;fontSize=13;fontColor=#334155;labelBackgroundColor=#FFFFFF;strokeColor=#475569;exitX=1;exitY=0.5;exitPerimeter=0;entryX=0;entryY=0.5;entryPerimeter=0;">
+          <mxGeometry x="-1" relative="1" as="geometry">
+            <mxPoint x="45.0" y="-9.0" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="p1-don-cancel-confirmed" parent="p1-1" edge="1" source="p1-don-confirmed" target="p1-don-cancelled" value="Huỷ đơn" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;endSize=7;strokeWidth=1.6;fontSize=13;fontColor=#334155;labelBackgroundColor=#FFFFFF;strokeColor=#475569;exitX=1;exitY=0.5;exitPerimeter=0;entryX=0;entryY=0.5;entryPerimeter=0;">
+          <mxGeometry x="-1" relative="1" as="geometry">
+            <mxPoint x="40.0" y="0.0" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="p1-don-cancel-pending" parent="p1-1" edge="1" source="p1-don-pending" target="p1-don-cancelled" value="Huỷ khi đang chờ xử lý" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;endSize=7;strokeWidth=1.6;fontSize=13;fontColor=#334155;labelBackgroundColor=#FFFFFF;strokeColor=#475569;exitX=0.5;exitY=1;exitPerimeter=0;entryX=0.5;entryY=1;entryPerimeter=0;">
+          <mxGeometry x="-1" relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="1810" y="770" />
+              <mxPoint x="2320" y="770" />
+            </Array>
+            <mxPoint x="255.0" y="50.0" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="p1-phu-thanh-toan" parent="p1-1" vertex="1" value="&lt;b&gt;Trạng thái thanh toán · payments.status&lt;/b&gt;" style="text;html=1;whiteSpace=wrap;fontSize=14;fontColor=#0F172A;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;fontSize=18;fontStyle=1;">
+          <mxGeometry x="1620" y="830" width="780" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="p1-tt-start" parent="p1-1" vertex="1" value="" style="ellipse;shape=startState;html=1;aspect=fixed;fillColor=#0F172A;strokeColor=#0F172A;">
+          <mxGeometry x="1620" y="970" width="30" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="p1-tt-unpaid" parent="p1-1" vertex="1" value="&lt;b&gt;Chưa thanh toán&lt;/b&gt;&lt;br&gt;UNPAID" style="html=1;whiteSpace=wrap;fontSize=14;fontColor=#0F172A;rounded=1;arcSize=20;spacing=6;align=center;verticalAlign=middle;strokeWidth=1.6;fillColor=#FEF3C7;strokeColor=#B45309;">
+          <mxGeometry x="1720" y="940" width="170" height="90" as="geometry" />
+        </mxCell>
+        <mxCell id="p1-tt-paid" parent="p1-1" vertex="1" value="&lt;b&gt;Đã thanh toán&lt;/b&gt;&lt;br&gt;PAID" style="html=1;whiteSpace=wrap;fontSize=14;fontColor=#0F172A;rounded=1;arcSize=20;spacing=6;align=center;verticalAlign=middle;strokeWidth=1.6;fillColor=#DCFCE7;strokeColor=#15803D;">
+          <mxGeometry x="1980" y="940" width="170" height="90" as="geometry" />
+        </mxCell>
+        <mxCell id="p1-tt-cancelled" parent="p1-1" vertex="1" value="&lt;b&gt;Huỷ thanh toán&lt;/b&gt;&lt;br&gt;CANCELLED" style="html=1;whiteSpace=wrap;fontSize=14;fontColor=#0F172A;rounded=1;arcSize=20;spacing=6;align=center;verticalAlign=middle;strokeWidth=1.6;fillColor=#FEE2E2;strokeColor=#B91C1C;">
+          <mxGeometry x="2230" y="940" width="170" height="90" as="geometry" />
+        </mxCell>
+        <mxCell id="p1-tt-create" parent="p1-1" edge="1" source="p1-tt-start" target="p1-tt-unpaid" value="Tạo đơn" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;endSize=7;strokeWidth=1.6;fontSize=13;fontColor=#334155;labelBackgroundColor=#FFFFFF;strokeColor=#475569;exitX=1;exitY=0.5;exitPerimeter=0;entryX=0;entryY=0.5;entryPerimeter=0;">
+          <mxGeometry x="-1" relative="1" as="geometry">
+            <mxPoint x="35.0" y="0.0" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="p1-tt-paid-tr" parent="p1-1" edge="1" source="p1-tt-unpaid" target="p1-tt-paid" value="Ghi nhận&lt;br&gt;đủ tiền" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;endSize=7;strokeWidth=1.6;fontSize=13;fontColor=#334155;labelBackgroundColor=#FFFFFF;strokeColor=#475569;exitX=1;exitY=0.5;exitPerimeter=0;entryX=0;entryY=0.5;entryPerimeter=0;">
+          <mxGeometry x="-1" relative="1" as="geometry">
+            <mxPoint x="45.0" y="-10.0" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="p1-tt-cancel-tr" parent="p1-1" edge="1" source="p1-tt-unpaid" target="p1-tt-cancelled" value="Huỷ đơn trước lúc ghi nhận đã thu đủ" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;endSize=7;strokeWidth=1.6;fontSize=13;fontColor=#334155;labelBackgroundColor=#FFFFFF;strokeColor=#475569;exitX=0.5;exitY=1;exitPerimeter=0;entryX=0.5;entryY=1;entryPerimeter=0;">
+          <mxGeometry x="-1" relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="1810" y="1080" />
+              <mxPoint x="2320" y="1080" />
+            </Array>
+            <mxPoint x="255.0" y="50.0" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="p1-giai-nghia" parent="p1-1" vertex="1" value="&lt;b&gt;Thanh toán khi huỷ và khi có tiền về&lt;/b&gt;&lt;br&gt;CANCELLED ở payments nghĩa là khoản phải thu đã đóng do huỷ đơn khi còn UNPAID. Khoản PAID giữ nguyên. Hộp thoại huỷ nhắc hoàn tiền thủ công.&lt;br&gt;SePay chỉ nhận khi webhook đã cấu hình, chữ ký hợp lệ và là giao dịch tiền vào.&lt;br&gt;Webhook kiểm tài khoản nhận, mã đơn, trùng giao dịch và tiền còn phải thu.&lt;br&gt;Nhân viên gắn giao dịch chưa có đơn qua POST /admin/bank-transactions/{id}/assign, dùng cùng luật nhận tiền và tự xác nhận.&lt;br&gt;Huỷ sau khi nhận một phần vẫn là CANCELLED + CANCELLED. Đối chiếu khoản tiền lệch ở giao dịch, tách khỏi trạng thái của đơn." style="html=1;whiteSpace=wrap;fontSize=14;fontColor=#0F172A;rounded=0;align=left;verticalAlign=middle;spacing=14;fillColor=#FFFBEB;strokeColor=#B45309;strokeWidth=1.5;">
+          <mxGeometry x="1620" y="1140" width="780" height="190" as="geometry" />
+        </mxCell>
+        <mxCell id="p1-loi" parent="p1-1" vertex="1" value="&lt;b&gt;Thao tác sai trạng thái → 409&lt;/b&gt;&lt;br&gt;Đánh dấu đã nhận tiền · “Chỉ đánh dấu đã thanh toán được cho đơn đang chờ xác nhận và chưa thanh toán.”&lt;br&gt;Xác nhận · “Chỉ xác nhận được đơn đang chờ xác nhận và đã thanh toán.”&lt;br&gt;Huỷ · “Đơn này đã huỷ trước đó.”" style="html=1;whiteSpace=wrap;fontSize=14;fontColor=#0F172A;rounded=0;align=left;verticalAlign=middle;spacing=14;fillColor=#FFFBEB;strokeColor=#B45309;strokeWidth=1.5;">
+          <mxGeometry x="40" y="1390" width="2360" height="120" as="geometry" />
+        </mxCell>
+        <mxCell id="p1-bang" parent="p1-1" vertex="1" value="&lt;b&gt;Tổ hợp trạng thái&lt;/b&gt;" style="shape=table;startSize=40;container=1;collapsible=1;childLayout=tableLayout;fixedRows=1;rowLines=1;fontStyle=1;align=center;resizeLast=1;html=1;fontSize=16;fillColor=#DBEAFE;strokeColor=#1D4ED8;fontColor=#0F172A;">
+          <mxGeometry x="40" y="1570" width="2360" height="500" as="geometry">
+            <mxRectangle width="2360" height="40" as="alternateBounds" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="p1-bang-hang-0" parent="p1-bang" vertex="1" value="" style="shape=tableRow;horizontal=0;startSize=0;swimlaneHead=0;swimlaneBody=0;fillColor=#E5E7EB;collapsible=0;dropTarget=0;top=0;left=0;right=0;bottom=1;">
+          <mxGeometry x="0" y="40" width="2360" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="p1-bang-hang-0-cot-0" parent="p1-bang-hang-0" vertex="1" value="&lt;b&gt;Tổ hợp&lt;/b&gt;" style="shape=partialRectangle;connectable=0;fillColor=none;top=0;left=0;bottom=0;right=1;align=left;verticalAlign=middle;spacing=10;overflow=hidden;html=1;whiteSpace=wrap;fontSize=14;fontColor=#0F172A;strokeColor=#CBD5E1;">
+          <mxGeometry x="0" y="0" width="400" height="40" as="geometry">
+            <mxRectangle width="400" height="40" as="alternateBounds" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="p1-bang-hang-0-cot-1" parent="p1-bang-hang-0" vertex="1" value="&lt;b&gt;Nhãn trên website&lt;/b&gt;" style="shape=partialRectangle;connectable=0;fillColor=none;top=0;left=0;bottom=0;right=1;align=left;verticalAlign=middle;spacing=10;overflow=hidden;html=1;whiteSpace=wrap;fontSize=14;fontColor=#0F172A;strokeColor=#CBD5E1;">
+          <mxGeometry x="400" y="0" width="390" height="40" as="geometry">
+            <mxRectangle width="390" height="40" as="alternateBounds" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="p1-bang-hang-0-cot-2" parent="p1-bang-hang-0" vertex="1" value="&lt;b&gt;Nhãn trên admin&lt;/b&gt;" style="shape=partialRectangle;connectable=0;fillColor=none;top=0;left=0;bottom=0;right=1;align=left;verticalAlign=middle;spacing=10;overflow=hidden;html=1;whiteSpace=wrap;fontSize=14;fontColor=#0F172A;strokeColor=#CBD5E1;">
+          <mxGeometry x="790" y="0" width="390" height="40" as="geometry">
+            <mxRectangle width="390" height="40" as="alternateBounds" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="p1-bang-hang-0-cot-3" parent="p1-bang-hang-0" vertex="1" value="&lt;b&gt;availableActions&lt;/b&gt;" style="shape=partialRectangle;connectable=0;fillColor=none;top=0;left=0;bottom=0;right=1;align=left;verticalAlign=middle;spacing=10;overflow=hidden;html=1;whiteSpace=wrap;fontSize=14;fontColor=#0F172A;strokeColor=#CBD5E1;">
+          <mxGeometry x="1180" y="0" width="360" height="40" as="geometry">
+            <mxRectangle width="360" height="40" as="alternateBounds" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="p1-bang-hang-0-cot-4" parent="p1-bang-hang-0" vertex="1" value="&lt;b&gt;Giữ chỗ?&lt;/b&gt;" style="shape=partialRectangle;connectable=0;fillColor=none;top=0;left=0;bottom=0;right=1;align=left;verticalAlign=middle;spacing=10;overflow=hidden;html=1;whiteSpace=wrap;fontSize=14;fontColor=#0F172A;strokeColor=#CBD5E1;">
+          <mxGeometry x="1540" y="0" width="290" height="40" as="geometry">
+            <mxRectangle width="290" height="40" as="alternateBounds" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="p1-bang-hang-0-cot-5" parent="p1-bang-hang-0" vertex="1" value="&lt;b&gt;Tổng quan&lt;/b&gt;" style="shape=partialRectangle;connectable=0;fillColor=none;top=0;left=0;bottom=0;right=0;align=left;verticalAlign=middle;spacing=10;overflow=hidden;html=1;whiteSpace=wrap;fontSize=14;fontColor=#0F172A;strokeColor=#CBD5E1;">
+          <mxGeometry x="1830" y="0" width="530" height="40" as="geometry">
+            <mxRectangle width="530" height="40" as="alternateBounds" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="p1-bang-hang-1" parent="p1-bang" vertex="1" value="" style="shape=tableRow;horizontal=0;startSize=0;swimlaneHead=0;swimlaneBody=0;fillColor=#FFFFFF;collapsible=0;dropTarget=0;top=0;left=0;right=0;bottom=1;">
+          <mxGeometry x="0" y="80" width="2360" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="p1-bang-hang-1-cot-0" parent="p1-bang-hang-1" vertex="1" value="&lt;b&gt;PENDING + UNPAID&lt;/b&gt;&lt;br&gt;Chờ thanh toán" style="shape=partialRectangle;connectable=0;fillColor=none;top=0;left=0;bottom=0;right=1;align=left;verticalAlign=middle;spacing=10;overflow=hidden;html=1;whiteSpace=wrap;fontSize=14;fontColor=#0F172A;strokeColor=#CBD5E1;">
+          <mxGeometry x="0" y="0" width="400" height="60" as="geometry">
+            <mxRectangle width="400" height="60" as="alternateBounds" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="p1-bang-hang-1-cot-1" parent="p1-bang-hang-1" vertex="1" value="Chờ xác nhận&lt;br&gt;Chưa thanh toán" style="shape=partialRectangle;connectable=0;fillColor=none;top=0;left=0;bottom=0;right=1;align=left;verticalAlign=middle;spacing=10;overflow=hidden;html=1;whiteSpace=wrap;fontSize=14;fontColor=#0F172A;strokeColor=#CBD5E1;">
+          <mxGeometry x="400" y="0" width="390" height="60" as="geometry">
+            <mxRectangle width="390" height="60" as="alternateBounds" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="p1-bang-hang-1-cot-2" parent="p1-bang-hang-1" vertex="1" value="Chờ xử lý&lt;br&gt;Chưa thanh toán" style="shape=partialRectangle;connectable=0;fillColor=none;top=0;left=0;bottom=0;right=1;align=left;verticalAlign=middle;spacing=10;overflow=hidden;html=1;whiteSpace=wrap;fontSize=14;fontColor=#0F172A;strokeColor=#CBD5E1;">
+          <mxGeometry x="790" y="0" width="390" height="60" as="geometry">
+            <mxRectangle width="390" height="60" as="alternateBounds" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="p1-bang-hang-1-cot-3" parent="p1-bang-hang-1" vertex="1" value="MARK_PAID · CANCEL" style="shape=partialRectangle;connectable=0;fillColor=none;top=0;left=0;bottom=0;right=1;align=left;verticalAlign=middle;spacing=10;overflow=hidden;html=1;whiteSpace=wrap;fontSize=14;fontColor=#0F172A;strokeColor=#CBD5E1;">
+          <mxGeometry x="1180" y="0" width="360" height="60" as="geometry">
+            <mxRectangle width="360" height="60" as="alternateBounds" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="p1-bang-hang-1-cot-4" parent="p1-bang-hang-1" vertex="1" value="Có" style="shape=partialRectangle;connectable=0;fillColor=none;top=0;left=0;bottom=0;right=1;align=left;verticalAlign=middle;spacing=10;overflow=hidden;html=1;whiteSpace=wrap;fontSize=14;fontColor=#0F172A;strokeColor=#CBD5E1;">
+          <mxGeometry x="1540" y="0" width="290" height="60" as="geometry">
+            <mxRectangle width="290" height="60" as="alternateBounds" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="p1-bang-hang-1-cot-5" parent="p1-bang-hang-1" vertex="1" value="Chờ thanh toán; chưa vào doanh thu" style="shape=partialRectangle;connectable=0;fillColor=none;top=0;left=0;bottom=0;right=0;align=left;verticalAlign=middle;spacing=10;overflow=hidden;html=1;whiteSpace=wrap;fontSize=14;fontColor=#0F172A;strokeColor=#CBD5E1;">
+          <mxGeometry x="1830" y="0" width="530" height="60" as="geometry">
+            <mxRectangle width="530" height="60" as="alternateBounds" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="p1-bang-hang-2" parent="p1-bang" vertex="1" value="" style="shape=tableRow;horizontal=0;startSize=0;swimlaneHead=0;swimlaneBody=0;fillColor=#F8FAFC;collapsible=0;dropTarget=0;top=0;left=0;right=0;bottom=1;">
+          <mxGeometry x="0" y="140" width="2360" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="p1-bang-hang-2-cot-0" parent="p1-bang-hang-2" vertex="1" value="&lt;b&gt;PENDING + PAID&lt;/b&gt;&lt;br&gt;Đã thu tiền, chờ xác nhận" style="shape=partialRectangle;connectable=0;fillColor=none;top=0;left=0;bottom=0;right=1;align=left;verticalAlign=middle;spacing=10;overflow=hidden;html=1;whiteSpace=wrap;fontSize=14;fontColor=#0F172A;strokeColor=#CBD5E1;">
+          <mxGeometry x="0" y="0" width="400" height="60" as="geometry">
+            <mxRectangle width="400" height="60" as="alternateBounds" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="p1-bang-hang-2-cot-1" parent="p1-bang-hang-2" vertex="1" value="Chờ xác nhận&lt;br&gt;Đã thanh toán" style="shape=partialRectangle;connectable=0;fillColor=none;top=0;left=0;bottom=0;right=1;align=left;verticalAlign=middle;spacing=10;overflow=hidden;html=1;whiteSpace=wrap;fontSize=14;fontColor=#0F172A;strokeColor=#CBD5E1;">
+          <mxGeometry x="400" y="0" width="390" height="60" as="geometry">
+            <mxRectangle width="390" height="60" as="alternateBounds" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="p1-bang-hang-2-cot-2" parent="p1-bang-hang-2" vertex="1" value="Chờ xử lý&lt;br&gt;Đã thanh toán" style="shape=partialRectangle;connectable=0;fillColor=none;top=0;left=0;bottom=0;right=1;align=left;verticalAlign=middle;spacing=10;overflow=hidden;html=1;whiteSpace=wrap;fontSize=14;fontColor=#0F172A;strokeColor=#CBD5E1;">
+          <mxGeometry x="790" y="0" width="390" height="60" as="geometry">
+            <mxRectangle width="390" height="60" as="alternateBounds" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="p1-bang-hang-2-cot-3" parent="p1-bang-hang-2" vertex="1" value="CONFIRM · CANCEL" style="shape=partialRectangle;connectable=0;fillColor=none;top=0;left=0;bottom=0;right=1;align=left;verticalAlign=middle;spacing=10;overflow=hidden;html=1;whiteSpace=wrap;fontSize=14;fontColor=#0F172A;strokeColor=#CBD5E1;">
+          <mxGeometry x="1180" y="0" width="360" height="60" as="geometry">
+            <mxRectangle width="360" height="60" as="alternateBounds" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="p1-bang-hang-2-cot-4" parent="p1-bang-hang-2" vertex="1" value="Có" style="shape=partialRectangle;connectable=0;fillColor=none;top=0;left=0;bottom=0;right=1;align=left;verticalAlign=middle;spacing=10;overflow=hidden;html=1;whiteSpace=wrap;fontSize=14;fontColor=#0F172A;strokeColor=#CBD5E1;">
+          <mxGeometry x="1540" y="0" width="290" height="60" as="geometry">
+            <mxRectangle width="290" height="60" as="alternateBounds" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="p1-bang-hang-2-cot-5" parent="p1-bang-hang-2" vertex="1" value="Chờ xác nhận; doanh thu theo paid_at" style="shape=partialRectangle;connectable=0;fillColor=none;top=0;left=0;bottom=0;right=0;align=left;verticalAlign=middle;spacing=10;overflow=hidden;html=1;whiteSpace=wrap;fontSize=14;fontColor=#0F172A;strokeColor=#CBD5E1;">
+          <mxGeometry x="1830" y="0" width="530" height="60" as="geometry">
+            <mxRectangle width="530" height="60" as="alternateBounds" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="p1-bang-hang-3" parent="p1-bang" vertex="1" value="" style="shape=tableRow;horizontal=0;startSize=0;swimlaneHead=0;swimlaneBody=0;fillColor=#FFFFFF;collapsible=0;dropTarget=0;top=0;left=0;right=0;bottom=1;">
+          <mxGeometry x="0" y="200" width="2360" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="p1-bang-hang-3-cot-0" parent="p1-bang-hang-3" vertex="1" value="&lt;b&gt;CONFIRMED + PAID&lt;/b&gt;" style="shape=partialRectangle;connectable=0;fillColor=none;top=0;left=0;bottom=0;right=1;align=left;verticalAlign=middle;spacing=10;overflow=hidden;html=1;whiteSpace=wrap;fontSize=14;fontColor=#0F172A;strokeColor=#CBD5E1;">
+          <mxGeometry x="0" y="0" width="400" height="60" as="geometry">
+            <mxRectangle width="400" height="60" as="alternateBounds" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="p1-bang-hang-3-cot-1" parent="p1-bang-hang-3" vertex="1" value="Đã xác nhận&lt;br&gt;Đã thanh toán" style="shape=partialRectangle;connectable=0;fillColor=none;top=0;left=0;bottom=0;right=1;align=left;verticalAlign=middle;spacing=10;overflow=hidden;html=1;whiteSpace=wrap;fontSize=14;fontColor=#0F172A;strokeColor=#CBD5E1;">
+          <mxGeometry x="400" y="0" width="390" height="60" as="geometry">
+            <mxRectangle width="390" height="60" as="alternateBounds" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="p1-bang-hang-3-cot-2" parent="p1-bang-hang-3" vertex="1" value="Đã xác nhận&lt;br&gt;Đã thanh toán" style="shape=partialRectangle;connectable=0;fillColor=none;top=0;left=0;bottom=0;right=1;align=left;verticalAlign=middle;spacing=10;overflow=hidden;html=1;whiteSpace=wrap;fontSize=14;fontColor=#0F172A;strokeColor=#CBD5E1;">
+          <mxGeometry x="790" y="0" width="390" height="60" as="geometry">
+            <mxRectangle width="390" height="60" as="alternateBounds" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="p1-bang-hang-3-cot-3" parent="p1-bang-hang-3" vertex="1" value="CANCEL" style="shape=partialRectangle;connectable=0;fillColor=none;top=0;left=0;bottom=0;right=1;align=left;verticalAlign=middle;spacing=10;overflow=hidden;html=1;whiteSpace=wrap;fontSize=14;fontColor=#0F172A;strokeColor=#CBD5E1;">
+          <mxGeometry x="1180" y="0" width="360" height="60" as="geometry">
+            <mxRectangle width="360" height="60" as="alternateBounds" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="p1-bang-hang-3-cot-4" parent="p1-bang-hang-3" vertex="1" value="Có" style="shape=partialRectangle;connectable=0;fillColor=none;top=0;left=0;bottom=0;right=1;align=left;verticalAlign=middle;spacing=10;overflow=hidden;html=1;whiteSpace=wrap;fontSize=14;fontColor=#0F172A;strokeColor=#CBD5E1;">
+          <mxGeometry x="1540" y="0" width="290" height="60" as="geometry">
+            <mxRectangle width="290" height="60" as="alternateBounds" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="p1-bang-hang-3-cot-5" parent="p1-bang-hang-3" vertex="1" value="Doanh thu theo paid_at" style="shape=partialRectangle;connectable=0;fillColor=none;top=0;left=0;bottom=0;right=0;align=left;verticalAlign=middle;spacing=10;overflow=hidden;html=1;whiteSpace=wrap;fontSize=14;fontColor=#0F172A;strokeColor=#CBD5E1;">
+          <mxGeometry x="1830" y="0" width="530" height="60" as="geometry">
+            <mxRectangle width="530" height="60" as="alternateBounds" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="p1-bang-hang-4" parent="p1-bang" vertex="1" value="" style="shape=tableRow;horizontal=0;startSize=0;swimlaneHead=0;swimlaneBody=0;fillColor=#F8FAFC;collapsible=0;dropTarget=0;top=0;left=0;right=0;bottom=1;">
+          <mxGeometry x="0" y="260" width="2360" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="p1-bang-hang-4-cot-0" parent="p1-bang-hang-4" vertex="1" value="&lt;b&gt;CANCELLED + CANCELLED&lt;/b&gt;&lt;br&gt;Đã huỷ khoản phải thu" style="shape=partialRectangle;connectable=0;fillColor=none;top=0;left=0;bottom=0;right=1;align=left;verticalAlign=middle;spacing=10;overflow=hidden;html=1;whiteSpace=wrap;fontSize=14;fontColor=#0F172A;strokeColor=#CBD5E1;">
+          <mxGeometry x="0" y="0" width="400" height="60" as="geometry">
+            <mxRectangle width="400" height="60" as="alternateBounds" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="p1-bang-hang-4-cot-1" parent="p1-bang-hang-4" vertex="1" value="Đã huỷ&lt;br&gt;Huỷ thanh toán" style="shape=partialRectangle;connectable=0;fillColor=none;top=0;left=0;bottom=0;right=1;align=left;verticalAlign=middle;spacing=10;overflow=hidden;html=1;whiteSpace=wrap;fontSize=14;fontColor=#0F172A;strokeColor=#CBD5E1;">
+          <mxGeometry x="400" y="0" width="390" height="60" as="geometry">
+            <mxRectangle width="390" height="60" as="alternateBounds" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="p1-bang-hang-4-cot-2" parent="p1-bang-hang-4" vertex="1" value="Đã huỷ&lt;br&gt;Không thu" style="shape=partialRectangle;connectable=0;fillColor=none;top=0;left=0;bottom=0;right=1;align=left;verticalAlign=middle;spacing=10;overflow=hidden;html=1;whiteSpace=wrap;fontSize=14;fontColor=#0F172A;strokeColor=#CBD5E1;">
+          <mxGeometry x="790" y="0" width="390" height="60" as="geometry">
+            <mxRectangle width="390" height="60" as="alternateBounds" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="p1-bang-hang-4-cot-3" parent="p1-bang-hang-4" vertex="1" value="Không có" style="shape=partialRectangle;connectable=0;fillColor=none;top=0;left=0;bottom=0;right=1;align=left;verticalAlign=middle;spacing=10;overflow=hidden;html=1;whiteSpace=wrap;fontSize=14;fontColor=#0F172A;strokeColor=#CBD5E1;">
+          <mxGeometry x="1180" y="0" width="360" height="60" as="geometry">
+            <mxRectangle width="360" height="60" as="alternateBounds" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="p1-bang-hang-4-cot-4" parent="p1-bang-hang-4" vertex="1" value="Không" style="shape=partialRectangle;connectable=0;fillColor=none;top=0;left=0;bottom=0;right=1;align=left;verticalAlign=middle;spacing=10;overflow=hidden;html=1;whiteSpace=wrap;fontSize=14;fontColor=#0F172A;strokeColor=#CBD5E1;">
+          <mxGeometry x="1540" y="0" width="290" height="60" as="geometry">
+            <mxRectangle width="290" height="60" as="alternateBounds" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="p1-bang-hang-4-cot-5" parent="p1-bang-hang-4" vertex="1" value="Không thuộc ba nhóm" style="shape=partialRectangle;connectable=0;fillColor=none;top=0;left=0;bottom=0;right=0;align=left;verticalAlign=middle;spacing=10;overflow=hidden;html=1;whiteSpace=wrap;fontSize=14;fontColor=#0F172A;strokeColor=#CBD5E1;">
+          <mxGeometry x="1830" y="0" width="530" height="60" as="geometry">
+            <mxRectangle width="530" height="60" as="alternateBounds" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="p1-bang-hang-5" parent="p1-bang" vertex="1" value="" style="shape=tableRow;horizontal=0;startSize=0;swimlaneHead=0;swimlaneBody=0;fillColor=#FFFFFF;collapsible=0;dropTarget=0;top=0;left=0;right=0;bottom=1;">
+          <mxGeometry x="0" y="320" width="2360" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="p1-bang-hang-5-cot-0" parent="p1-bang-hang-5" vertex="1" value="&lt;b&gt;CANCELLED + PAID&lt;/b&gt;" style="shape=partialRectangle;connectable=0;fillColor=none;top=0;left=0;bottom=0;right=1;align=left;verticalAlign=middle;spacing=10;overflow=hidden;html=1;whiteSpace=wrap;fontSize=14;fontColor=#0F172A;strokeColor=#CBD5E1;">
+          <mxGeometry x="0" y="0" width="400" height="60" as="geometry">
+            <mxRectangle width="400" height="60" as="alternateBounds" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="p1-bang-hang-5-cot-1" parent="p1-bang-hang-5" vertex="1" value="Đã huỷ&lt;br&gt;Đã thanh toán" style="shape=partialRectangle;connectable=0;fillColor=none;top=0;left=0;bottom=0;right=1;align=left;verticalAlign=middle;spacing=10;overflow=hidden;html=1;whiteSpace=wrap;fontSize=14;fontColor=#0F172A;strokeColor=#CBD5E1;">
+          <mxGeometry x="400" y="0" width="390" height="60" as="geometry">
+            <mxRectangle width="390" height="60" as="alternateBounds" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="p1-bang-hang-5-cot-2" parent="p1-bang-hang-5" vertex="1" value="Đã huỷ&lt;br&gt;Đã thanh toán" style="shape=partialRectangle;connectable=0;fillColor=none;top=0;left=0;bottom=0;right=1;align=left;verticalAlign=middle;spacing=10;overflow=hidden;html=1;whiteSpace=wrap;fontSize=14;fontColor=#0F172A;strokeColor=#CBD5E1;">
+          <mxGeometry x="790" y="0" width="390" height="60" as="geometry">
+            <mxRectangle width="390" height="60" as="alternateBounds" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="p1-bang-hang-5-cot-3" parent="p1-bang-hang-5" vertex="1" value="Không có" style="shape=partialRectangle;connectable=0;fillColor=none;top=0;left=0;bottom=0;right=1;align=left;verticalAlign=middle;spacing=10;overflow=hidden;html=1;whiteSpace=wrap;fontSize=14;fontColor=#0F172A;strokeColor=#CBD5E1;">
+          <mxGeometry x="1180" y="0" width="360" height="60" as="geometry">
+            <mxRectangle width="360" height="60" as="alternateBounds" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="p1-bang-hang-5-cot-4" parent="p1-bang-hang-5" vertex="1" value="Không" style="shape=partialRectangle;connectable=0;fillColor=none;top=0;left=0;bottom=0;right=1;align=left;verticalAlign=middle;spacing=10;overflow=hidden;html=1;whiteSpace=wrap;fontSize=14;fontColor=#0F172A;strokeColor=#CBD5E1;">
+          <mxGeometry x="1540" y="0" width="290" height="60" as="geometry">
+            <mxRectangle width="290" height="60" as="alternateBounds" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="p1-bang-hang-5-cot-5" parent="p1-bang-hang-5" vertex="1" value="Cần hoàn tiền; loại khỏi doanh thu" style="shape=partialRectangle;connectable=0;fillColor=none;top=0;left=0;bottom=0;right=0;align=left;verticalAlign=middle;spacing=10;overflow=hidden;html=1;whiteSpace=wrap;fontSize=14;fontColor=#0F172A;strokeColor=#CBD5E1;">
+          <mxGeometry x="1830" y="0" width="530" height="60" as="geometry">
+            <mxRectangle width="530" height="60" as="alternateBounds" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="p1-bang-hang-6" parent="p1-bang" vertex="1" value="" style="shape=tableRow;horizontal=0;startSize=0;swimlaneHead=0;swimlaneBody=0;fillColor=#F8FAFC;collapsible=0;dropTarget=0;top=0;left=0;right=0;bottom=1;">
+          <mxGeometry x="0" y="380" width="2360" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="p1-bang-hang-6-cot-0" parent="p1-bang-hang-6" vertex="1" value="&lt;b&gt;CONFIRMED + UNPAID&lt;/b&gt;&lt;br&gt;Không xảy ra" style="shape=partialRectangle;connectable=0;fillColor=none;top=0;left=0;bottom=0;right=1;align=left;verticalAlign=middle;spacing=10;overflow=hidden;html=1;whiteSpace=wrap;fontSize=14;fontColor=#0F172A;strokeColor=#CBD5E1;">
+          <mxGeometry x="0" y="0" width="400" height="60" as="geometry">
+            <mxRectangle width="400" height="60" as="alternateBounds" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="p1-bang-hang-6-cot-1" parent="p1-bang-hang-6" vertex="1" value="—" style="shape=partialRectangle;connectable=0;fillColor=none;top=0;left=0;bottom=0;right=1;align=left;verticalAlign=middle;spacing=10;overflow=hidden;html=1;whiteSpace=wrap;fontSize=14;fontColor=#0F172A;strokeColor=#CBD5E1;">
+          <mxGeometry x="400" y="0" width="390" height="60" as="geometry">
+            <mxRectangle width="390" height="60" as="alternateBounds" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="p1-bang-hang-6-cot-2" parent="p1-bang-hang-6" vertex="1" value="—" style="shape=partialRectangle;connectable=0;fillColor=none;top=0;left=0;bottom=0;right=1;align=left;verticalAlign=middle;spacing=10;overflow=hidden;html=1;whiteSpace=wrap;fontSize=14;fontColor=#0F172A;strokeColor=#CBD5E1;">
+          <mxGeometry x="790" y="0" width="390" height="60" as="geometry">
+            <mxRectangle width="390" height="60" as="alternateBounds" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="p1-bang-hang-6-cot-3" parent="p1-bang-hang-6" vertex="1" value="—" style="shape=partialRectangle;connectable=0;fillColor=none;top=0;left=0;bottom=0;right=1;align=left;verticalAlign=middle;spacing=10;overflow=hidden;html=1;whiteSpace=wrap;fontSize=14;fontColor=#0F172A;strokeColor=#CBD5E1;">
+          <mxGeometry x="1180" y="0" width="360" height="60" as="geometry">
+            <mxRectangle width="360" height="60" as="alternateBounds" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="p1-bang-hang-6-cot-4" parent="p1-bang-hang-6" vertex="1" value="—" style="shape=partialRectangle;connectable=0;fillColor=none;top=0;left=0;bottom=0;right=1;align=left;verticalAlign=middle;spacing=10;overflow=hidden;html=1;whiteSpace=wrap;fontSize=14;fontColor=#0F172A;strokeColor=#CBD5E1;">
+          <mxGeometry x="1540" y="0" width="290" height="60" as="geometry">
+            <mxRectangle width="290" height="60" as="alternateBounds" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="p1-bang-hang-6-cot-5" parent="p1-bang-hang-6" vertex="1" value="Xác nhận chỉ nhận đơn PENDING + PAID." style="shape=partialRectangle;connectable=0;fillColor=none;top=0;left=0;bottom=0;right=0;align=left;verticalAlign=middle;spacing=10;overflow=hidden;html=1;whiteSpace=wrap;fontSize=14;fontColor=#0F172A;strokeColor=#CBD5E1;">
+          <mxGeometry x="1830" y="0" width="530" height="60" as="geometry">
+            <mxRectangle width="530" height="60" as="alternateBounds" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="p1-bang-hang-7" parent="p1-bang" vertex="1" value="" style="shape=tableRow;horizontal=0;startSize=0;swimlaneHead=0;swimlaneBody=0;fillColor=#FFFFFF;collapsible=0;dropTarget=0;top=0;left=0;right=0;bottom=1;">
+          <mxGeometry x="0" y="440" width="2360" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="p1-bang-hang-7-cot-0" parent="p1-bang-hang-7" vertex="1" value="&lt;b&gt;PENDING + CANCELLED&lt;/b&gt;&lt;br&gt;Không xảy ra" style="shape=partialRectangle;connectable=0;fillColor=none;top=0;left=0;bottom=0;right=1;align=left;verticalAlign=middle;spacing=10;overflow=hidden;html=1;whiteSpace=wrap;fontSize=14;fontColor=#0F172A;strokeColor=#CBD5E1;">
+          <mxGeometry x="0" y="0" width="400" height="60" as="geometry">
+            <mxRectangle width="400" height="60" as="alternateBounds" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="p1-bang-hang-7-cot-1" parent="p1-bang-hang-7" vertex="1" value="—" style="shape=partialRectangle;connectable=0;fillColor=none;top=0;left=0;bottom=0;right=1;align=left;verticalAlign=middle;spacing=10;overflow=hidden;html=1;whiteSpace=wrap;fontSize=14;fontColor=#0F172A;strokeColor=#CBD5E1;">
+          <mxGeometry x="400" y="0" width="390" height="60" as="geometry">
+            <mxRectangle width="390" height="60" as="alternateBounds" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="p1-bang-hang-7-cot-2" parent="p1-bang-hang-7" vertex="1" value="—" style="shape=partialRectangle;connectable=0;fillColor=none;top=0;left=0;bottom=0;right=1;align=left;verticalAlign=middle;spacing=10;overflow=hidden;html=1;whiteSpace=wrap;fontSize=14;fontColor=#0F172A;strokeColor=#CBD5E1;">
+          <mxGeometry x="790" y="0" width="390" height="60" as="geometry">
+            <mxRectangle width="390" height="60" as="alternateBounds" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="p1-bang-hang-7-cot-3" parent="p1-bang-hang-7" vertex="1" value="—" style="shape=partialRectangle;connectable=0;fillColor=none;top=0;left=0;bottom=0;right=1;align=left;verticalAlign=middle;spacing=10;overflow=hidden;html=1;whiteSpace=wrap;fontSize=14;fontColor=#0F172A;strokeColor=#CBD5E1;">
+          <mxGeometry x="1180" y="0" width="360" height="60" as="geometry">
+            <mxRectangle width="360" height="60" as="alternateBounds" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="p1-bang-hang-7-cot-4" parent="p1-bang-hang-7" vertex="1" value="—" style="shape=partialRectangle;connectable=0;fillColor=none;top=0;left=0;bottom=0;right=1;align=left;verticalAlign=middle;spacing=10;overflow=hidden;html=1;whiteSpace=wrap;fontSize=14;fontColor=#0F172A;strokeColor=#CBD5E1;">
+          <mxGeometry x="1540" y="0" width="290" height="60" as="geometry">
+            <mxRectangle width="290" height="60" as="alternateBounds" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="p1-bang-hang-7-cot-5" parent="p1-bang-hang-7" vertex="1" value="Huỷ khoản UNPAID đồng thời huỷ đơn." style="shape=partialRectangle;connectable=0;fillColor=none;top=0;left=0;bottom=0;right=0;align=left;verticalAlign=middle;spacing=10;overflow=hidden;html=1;whiteSpace=wrap;fontSize=14;fontColor=#0F172A;strokeColor=#CBD5E1;">
+          <mxGeometry x="1830" y="0" width="530" height="60" as="geometry">
+            <mxRectangle width="530" height="60" as="alternateBounds" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="p1-can-nho" parent="p1-1" vertex="1" value="&lt;b&gt;Điểm cần nhớ&lt;/b&gt;&lt;br&gt;Chỉ xác nhận sau khi đã thu đủ. BANK_TRANSFER là phương thức duy nhất, nhân viên có thể ghi nhận thủ công hoặc API nhận qua SePay.&lt;br&gt;Đơn chưa thanh toán giữ chỗ đến khi nhân viên huỷ, chưa có tác vụ tự hết hạn. Nhân viên có thể huỷ cả sau ngày sử dụng dịch vụ.&lt;br&gt;Tạo đơn tăng booked_seats của tour; phòng và ghế được đếm từ đơn chưa huỷ. Khi huỷ, trả chỗ và phát yêu cầu làm mới cache tours, departures, hotels, flights.&lt;br&gt;Doanh thu tính theo paid_at của khoản PAID thuộc đơn chưa huỷ. Khoản PAID cần hoàn vì đã huỷ đơn nằm ở Tổng quan.&lt;br&gt;Trang 01–03 của GoTrips_Luong_nghiep_vu.drawio trình bày luồng tạo từng loại đơn." style="html=1;whiteSpace=wrap;fontSize=14;fontColor=#0F172A;rounded=0;align=left;verticalAlign=middle;spacing=14;fillColor=#FFFBEB;strokeColor=#B45309;strokeWidth=1.5;">
+          <mxGeometry x="40" y="2130" width="2360" height="130" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+  <diagram id="p2-trang" name="02 · Vòng đời tour &amp; khách sạn">
+    <mxGraphModel dx="1200" dy="800" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="0" pageScale="1" pageWidth="2440" pageHeight="2130" math="0" shadow="0">
+      <root>
+        <mxCell id="p2-0" />
+        <mxCell id="p2-1" parent="p2-0" />
+        <mxCell id="p2-tieu-de" parent="p2-1" vertex="1" value="&lt;b&gt;GoTrips · Vòng đời tour &amp;amp; khách sạn&lt;/b&gt;" style="text;html=1;whiteSpace=wrap;fontSize=14;fontColor=#0F172A;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;fontSize=24;fontStyle=1;">
+          <mxGeometry x="40" y="20" width="2360" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="p2-phu-de" parent="p2-1" vertex="1" value="Ẩn, xoá mềm, khôi phục và điều kiện xuất hiện trên website · 28/11/2026" style="text;html=1;whiteSpace=wrap;fontSize=14;fontColor=#0F172A;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;fontColor=#475569;">
+          <mxGeometry x="40" y="120" width="2360" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="p2-cach-doc" parent="p2-1" vertex="1" value="&lt;b&gt;Cách đọc&lt;/b&gt;&lt;br&gt;● Bắt đầu  ·  ◉ Kết thúc  ·  Hộp bo góc viền liền: trạng thái lưu  ·  Hộp bo góc viền đứt: trạng thái tính ra  ·  ◇ Rẽ nhánh, đọc điều kiện trên mũi tên ra&lt;br&gt;→ Chuyển hiện có  ·  ⋯→ Tự động theo ngày  ·  – – → Nét đứt xám: Chưa có  ·  Vàng: đang chờ  ·  Xanh lá: đang hoạt động  ·  Xám: tạm ẩn, đóng bán, hết chỗ  ·  Đỏ: đã huỷ, đã xoá, đã qua" style="html=1;whiteSpace=wrap;fontSize=14;fontColor=#0F172A;rounded=0;align=left;verticalAlign=middle;spacing=14;fillColor=#FFFBEB;strokeColor=#B45309;strokeWidth=1.5;">
+          <mxGeometry x="40" y="210" width="2360" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="p2-luu" parent="p2-1" vertex="1" value="&lt;b&gt;Lưu ở đâu&lt;/b&gt;&lt;br&gt;V7  ·  tours.status và hotels.status lưu CatalogStatus: ACTIVE, HIDDEN, DELETED. Lúc tạo mặc định ACTIVE.&lt;br&gt;visibleOnWebsite được tính ra cho khách sạn: status = ACTIVE và có loại phòng với hotel_room_types.total_rooms &amp;gt; 0.&lt;br&gt;Điểm đến không có cột trạng thái. Tour và khách sạn tham chiếu điểm đến qua destination_id." style="html=1;whiteSpace=wrap;fontSize=14;fontColor=#0F172A;rounded=0;align=left;verticalAlign=middle;spacing=14;fillColor=#FFFBEB;strokeColor=#B45309;strokeWidth=1.5;">
+          <mxGeometry x="40" y="350" width="2360" height="110" as="geometry" />
+        </mxCell>
+        <mxCell id="p2-chinh" parent="p2-1" vertex="1" value="&lt;b&gt;Tour và khách sạn dùng chung ba trạng thái&lt;/b&gt;" style="text;html=1;whiteSpace=wrap;fontSize=14;fontColor=#0F172A;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;fontSize=18;fontStyle=1;">
+          <mxGeometry x="40" y="520" width="2360" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="p2-bat-dau" parent="p2-1" vertex="1" value="" style="ellipse;shape=startState;html=1;aspect=fixed;fillColor=#0F172A;strokeColor=#0F172A;">
+          <mxGeometry x="40" y="750" width="30" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="p2-chon-khi-tao" parent="p2-1" vertex="1" value="" style="rhombus;html=1;fillColor=#FFFFFF;strokeColor=#475569;strokeWidth=1.6;">
+          <mxGeometry x="300" y="740" width="40" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="p2-st-active" parent="p2-1" vertex="1" value="&lt;b&gt;Đang hiện&lt;/b&gt;&lt;br&gt;ACTIVE&lt;br&gt;Admin: Đang hiện" style="html=1;whiteSpace=wrap;fontSize=14;fontColor=#0F172A;rounded=1;arcSize=20;verticalAlign=top;align=center;spacingTop=10;fillColor=#DCFCE7;strokeColor=#15803D;strokeWidth=1.6;container=1;">
+          <mxGeometry x="500" y="620" width="970" height="470" as="geometry" />
+        </mxCell>
+        <mxCell id="p2-hotel-visibility" parent="p2-st-active" vertex="1" value="&lt;b&gt;Riêng khách sạn · tính lại visibleOnWebsite khi đang ACTIVE&lt;/b&gt;" style="html=1;whiteSpace=wrap;fontSize=14;fontColor=#0F172A;rounded=1;arcSize=20;verticalAlign=top;align=center;spacingTop=8;fillColor=#FFFFFF;strokeColor=#6B7280;dashed=1;dashPattern=6 4;container=1;">
+          <mxGeometry x="50" y="130" width="870" height="300" as="geometry" />
+        </mxCell>
+        <mxCell id="p2-hotel-visible" parent="p2-hotel-visibility" vertex="1" value="&lt;b&gt;Hiện trên website&lt;/b&gt;&lt;br&gt;visibleOnWebsite = true&lt;br&gt;(tính ra)" style="html=1;whiteSpace=wrap;fontSize=14;fontColor=#0F172A;rounded=1;arcSize=20;spacing=6;align=center;verticalAlign=middle;strokeWidth=1.6;fillColor=#DCFCE7;strokeColor=#15803D;dashed=1;dashPattern=6 4;">
+          <mxGeometry x="40" y="180" width="240" height="90" as="geometry" />
+        </mxCell>
+        <mxCell id="p2-hotel-not-visible" parent="p2-hotel-visibility" vertex="1" value="&lt;b&gt;Chưa hiện&lt;/b&gt;&lt;br&gt;visibleOnWebsite = false&lt;br&gt;(tính ra)&lt;br&gt;Website: hết loại phòng đang bán" style="html=1;whiteSpace=wrap;fontSize=14;fontColor=#0F172A;rounded=1;arcSize=20;spacing=6;align=center;verticalAlign=middle;strokeWidth=1.6;fillColor=#E5E7EB;strokeColor=#6B7280;dashed=1;dashPattern=6 4;">
+          <mxGeometry x="600" y="180" width="230" height="90" as="geometry" />
+        </mxCell>
+        <mxCell id="p2-hotel-bat-dau" parent="p2-hotel-visibility" vertex="1" value="" style="ellipse;shape=startState;html=1;aspect=fixed;fillColor=#0F172A;strokeColor=#0F172A;">
+          <mxGeometry x="420" y="40" width="30" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="p2-hotel-kiem-loai" parent="p2-hotel-visibility" vertex="1" value="" style="rhombus;html=1;fillColor=#FFFFFF;strokeColor=#475569;strokeWidth=1.6;">
+          <mxGeometry x="410" y="130" width="40" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="p2-st-hidden" parent="p2-1" vertex="1" value="&lt;b&gt;Tạm ẩn&lt;/b&gt;&lt;br&gt;HIDDEN&lt;br&gt;Website: chi tiết trả 404&lt;br&gt;Admin: Đang ẩn" style="html=1;whiteSpace=wrap;fontSize=14;fontColor=#0F172A;rounded=1;arcSize=20;spacing=6;align=center;verticalAlign=middle;strokeWidth=1.6;fillColor=#E5E7EB;strokeColor=#6B7280;">
+          <mxGeometry x="1780" y="670" width="230" height="160" as="geometry" />
+        </mxCell>
+        <mxCell id="p2-st-deleted" parent="p2-1" vertex="1" value="&lt;b&gt;Đã xoá&lt;/b&gt;&lt;br&gt;DELETED&lt;br&gt;Website: chi tiết trả 404&lt;br&gt;Admin: chỉ khôi phục" style="html=1;whiteSpace=wrap;fontSize=14;fontColor=#0F172A;rounded=1;arcSize=20;spacing=6;align=center;verticalAlign=middle;strokeWidth=1.6;fillColor=#FEE2E2;strokeColor=#B91C1C;">
+          <mxGeometry x="1780" y="1070" width="230" height="100" as="geometry" />
+        </mxCell>
+        <mxCell id="p2-tr-create" parent="p2-1" edge="1" source="p2-bat-dau" target="p2-chon-khi-tao" value="Nhân viên · tạo&lt;br&gt;POST /admin/tours&lt;br&gt;POST /admin/hotels" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;endSize=7;strokeWidth=1.6;fontSize=13;fontColor=#334155;labelBackgroundColor=#FFFFFF;strokeColor=#475569;exitX=1;exitY=0.5;exitPerimeter=0;entryX=0;entryY=0.5;entryPerimeter=0;">
+          <mxGeometry x="-1" relative="1" as="geometry">
+            <mxPoint x="114.0" y="-9.0" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="p2-tr-create-active" parent="p2-1" edge="1" source="p2-chon-khi-tao" target="p2-st-active" value="[status = ACTIVE&lt;br&gt;hoặc bỏ trống]" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;endSize=7;strokeWidth=1.6;fontSize=13;fontColor=#334155;labelBackgroundColor=#FFFFFF;strokeColor=#475569;exitX=1;exitY=0.5;exitPerimeter=0;entryX=0;entryY=0.3;entryPerimeter=0;">
+          <mxGeometry x="-1" relative="1" as="geometry">
+            <mxPoint x="80.0" y="-2.0" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="p2-tr-create-hidden" parent="p2-1" edge="1" source="p2-chon-khi-tao" target="p2-st-hidden" value="[status = HIDDEN]" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;endSize=7;strokeWidth=1.6;fontSize=13;fontColor=#334155;labelBackgroundColor=#FFFFFF;strokeColor=#475569;exitX=0.5;exitY=0;exitPerimeter=0;entryX=0.52173913;entryY=0;entryPerimeter=0;">
+          <mxGeometry x="-1" relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="320" y="580" />
+              <mxPoint x="1900" y="580" />
+            </Array>
+            <mxPoint x="690.0" y="-156.0" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="p2-tr-hotel-check" parent="p2-hotel-visibility" edge="1" source="p2-hotel-bat-dau" target="p2-hotel-kiem-loai" value="Xét số loại phòng đang bán" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;endSize=7;strokeWidth=1.6;fontSize=13;fontColor=#334155;labelBackgroundColor=#FFFFFF;strokeColor=#475569;exitX=.5;exitY=1;exitPerimeter=0;entryX=.625;entryY=0;entryPerimeter=0;">
+          <mxGeometry x="-1" relative="1" as="geometry">
+            <mxPoint x="120.0" y="28.0" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="p2-tr-hotel-check-visible" parent="p2-hotel-visibility" edge="1" source="p2-hotel-kiem-loai" target="p2-hotel-visible" value="[Có loại phòng đang bán]" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;endSize=7;strokeWidth=1.6;fontSize=13;fontColor=#334155;labelBackgroundColor=#FFFFFF;strokeColor=#475569;exitX=0;exitY=0.5;exitPerimeter=0;entryX=0.5;entryY=0;entryPerimeter=0;">
+          <mxGeometry x="-1" relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="160" y="150" />
+            </Array>
+            <mxPoint x="-185.0" y="0.0" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="p2-tr-hotel-check-invisible" parent="p2-hotel-visibility" edge="1" source="p2-hotel-kiem-loai" target="p2-hotel-not-visible" value="[Không có loại đang bán]" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;endSize=7;strokeWidth=1.6;fontSize=13;fontColor=#334155;labelBackgroundColor=#FFFFFF;strokeColor=#475569;exitX=1;exitY=0.5;exitPerimeter=0;entryX=0.52173913;entryY=0;entryPerimeter=0;">
+          <mxGeometry x="-1" relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="720" y="150" />
+            </Array>
+            <mxPoint x="205.0" y="0.0" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="p2-tr-hotel-zero" parent="p2-hotel-visibility" edge="1" source="p2-hotel-visible" target="p2-hotel-not-visible" value="Nhân viên · đưa loại cuối về 0&lt;br&gt;hoặc xoá loại đang bán cuối cùng" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;endSize=7;strokeWidth=1.6;fontSize=13;fontColor=#334155;labelBackgroundColor=#FFFFFF;strokeColor=#475569;exitX=1;exitY=0.3;exitPerimeter=0;entryX=0;entryY=0.3;entryPerimeter=0;">
+          <mxGeometry x="-1" relative="1" as="geometry">
+            <mxPoint x="160.0" y="0.0" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="p2-tr-hotel-positive" parent="p2-hotel-visibility" edge="1" source="p2-hotel-not-visible" target="p2-hotel-visible" value="Nhân viên · thêm loại đang bán&lt;br&gt;hoặc tăng tổng phòng lên trên 0" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;endSize=7;strokeWidth=1.6;fontSize=13;fontColor=#334155;labelBackgroundColor=#FFFFFF;strokeColor=#475569;exitX=0;exitY=0.75;exitPerimeter=0;entryX=1;entryY=0.75;entryPerimeter=0;">
+          <mxGeometry x="-1" relative="1" as="geometry">
+            <mxPoint x="-160.0" y="9.5" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="p2-tr-hide" parent="p2-1" edge="1" source="p2-st-active" target="p2-st-hidden" value="Nhân viên · ẩn [HIDDEN]&lt;br&gt;PATCH /admin/tours/{id}/status&lt;br&gt;PATCH /admin/hotels/{id}/status" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;endSize=7;strokeWidth=1.6;fontSize=13;fontColor=#334155;labelBackgroundColor=#FFFFFF;strokeColor=#475569;exitX=1;exitY=0.16;exitPerimeter=0;entryX=0;entryY=0.16;entryPerimeter=0;">
+          <mxGeometry x="-1" relative="1" as="geometry">
+            <mxPoint x="155.0" y="2.8" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="p2-tr-show" parent="p2-1" edge="1" source="p2-st-hidden" target="p2-st-active" value="Nhân viên · cho hiện [ACTIVE]&lt;br&gt;PATCH /admin/tours/{id}/status&lt;br&gt;PATCH /admin/hotels/{id}/status" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;endSize=7;strokeWidth=1.6;fontSize=13;fontColor=#334155;labelBackgroundColor=#FFFFFF;strokeColor=#475569;exitX=0;exitY=0.86;exitPerimeter=0;entryX=1;entryY=0.4;entryPerimeter=0;">
+          <mxGeometry x="-1" relative="1" as="geometry">
+            <mxPoint x="-155.0" y="0.4" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="p2-tr-delete-active" parent="p2-1" edge="1" source="p2-st-active" target="p2-st-deleted" value="Nhân viên · xoá mềm&lt;br&gt;DELETE /admin/tours/{id}&lt;br&gt;DELETE /admin/hotels/{id}" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;endSize=7;strokeWidth=1.6;fontSize=13;fontColor=#334155;labelBackgroundColor=#FFFFFF;strokeColor=#475569;exitX=1;exitY=0.83;exitPerimeter=0;entryX=0;entryY=0.5;entryPerimeter=0;">
+          <mxGeometry x="-1" relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="1520" y="1010" />
+              <mxPoint x="1520" y="1120" />
+            </Array>
+            <mxPoint x="130.0" y="109.9" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="p2-tr-delete-hidden" parent="p2-1" edge="1" source="p2-st-hidden" target="p2-st-deleted" value="Nhân viên · xoá mềm&lt;br&gt;DELETE /admin/tours/{id}&lt;br&gt;DELETE /admin/hotels/{id}" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;endSize=7;strokeWidth=1.6;fontSize=13;fontColor=#334155;labelBackgroundColor=#FFFFFF;strokeColor=#475569;exitX=0.17391304;exitY=1;exitPerimeter=0;entryX=0.17391304;entryY=0;entryPerimeter=0;">
+          <mxGeometry x="-1" relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="1820" y="950" />
+            </Array>
+            <mxPoint x="-75.0" y="116.0" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="p2-tr-restore" parent="p2-1" edge="1" source="p2-st-deleted" target="p2-st-hidden" value="Nhân viên · khôi phục về HIDDEN&lt;br&gt;POST /admin/tours/{id}/restore&lt;br&gt;POST /admin/hotels/{id}/restore" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;endSize=7;strokeWidth=1.6;fontSize=13;fontColor=#334155;labelBackgroundColor=#FFFFFF;strokeColor=#475569;exitX=0.7826087;exitY=0;exitPerimeter=0;entryX=0.7826087;entryY=1;entryPerimeter=0;">
+          <mxGeometry x="-1" relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="1960" y="950" />
+            </Array>
+            <mxPoint x="80.0" y="-125.0" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="p2-diem-den" parent="p2-1" vertex="1" value="&lt;b&gt;Điểm đến&lt;/b&gt;&lt;br&gt;Điểm đến không có trạng thái.&lt;br&gt;DELETE /admin/destinations/{id}&lt;br&gt;Còn tour hoặc khách sạn tham chiếu ở bất kỳ trạng thái nào thì trả 409." style="html=1;whiteSpace=wrap;fontSize=14;fontColor=#0F172A;rounded=0;align=left;verticalAlign=middle;spacing=14;fillColor=#FFFBEB;strokeColor=#B45309;strokeWidth=1.5;">
+          <mxGeometry x="2070" y="630" width="330" height="210" as="geometry" />
+        </mxCell>
+        <mxCell id="p2-goi-y-phong" parent="p2-1" vertex="1" value="&lt;b&gt;Loại phòng cuối cùng&lt;/b&gt;&lt;br&gt;Admin cảnh báo trước khi đưa loại phòng đang bán cuối cùng về 0 hoặc xoá loại ấy.&lt;br&gt;Thêm: POST /admin/hotels/{id}/room-types&lt;br&gt;Sửa: PUT /admin/room-types/{id}&lt;br&gt;Xoá: DELETE /admin/room-types/{id}&lt;br&gt;Khách sạn ACTIVE thiếu loại phòng: admin báo chưa hiện trên website, phân biệt chưa có loại và không còn loại đang bán.&lt;br&gt;Điều kiện giảm và xoá xem trang 04." style="html=1;whiteSpace=wrap;fontSize=14;fontColor=#0F172A;rounded=0;align=left;verticalAlign=middle;spacing=14;fillColor=#FFFBEB;strokeColor=#B45309;strokeWidth=1.5;">
+          <mxGeometry x="40" y="860" width="390" height="230" as="geometry" />
+        </mxCell>
+        <mxCell id="p2-loi" parent="p2-1" vertex="1" value="&lt;b&gt;Lệnh ghi trên bản đã xoá → 409&lt;/b&gt;&lt;br&gt;Xoá lại · “Tour này đã bị xoá.”  ·  “Khách sạn này đã bị xoá.”&lt;br&gt;Sửa hoặc đổi hiển thị · “Tour đã bị xoá. Hãy khôi phục trước khi thay đổi.”  ·  “Khách sạn đã bị xoá. Hãy khôi phục trước khi thay đổi.”&lt;br&gt;Các lệnh ghi lên chuyến hoặc loại phòng của bản đã xoá cũng bị chặn. Từ DELETED, thao tác ghi được phép là khôi phục." style="html=1;whiteSpace=wrap;fontSize=14;fontColor=#0F172A;rounded=0;align=left;verticalAlign=middle;spacing=14;fillColor=#FFFBEB;strokeColor=#B45309;strokeWidth=1.5;">
+          <mxGeometry x="40" y="1230" width="2360" height="120" as="geometry" />
+        </mxCell>
+        <mxCell id="p2-bang" parent="p2-1" vertex="1" value="&lt;b&gt;Ở mỗi trạng thái&lt;/b&gt;" style="shape=table;startSize=40;container=1;collapsible=1;childLayout=tableLayout;fixedRows=1;rowLines=1;fontStyle=1;align=center;resizeLast=1;html=1;fontSize=16;fillColor=#DBEAFE;strokeColor=#1D4ED8;fontColor=#0F172A;">
+          <mxGeometry x="40" y="1410" width="2360" height="430" as="geometry">
+            <mxRectangle width="2360" height="40" as="alternateBounds" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="p2-bang-hang-0" parent="p2-bang" vertex="1" value="" style="shape=tableRow;horizontal=0;startSize=0;swimlaneHead=0;swimlaneBody=0;fillColor=#E5E7EB;collapsible=0;dropTarget=0;top=0;left=0;right=0;bottom=1;">
+          <mxGeometry x="0" y="40" width="2360" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="p2-bang-hang-0-cot-0" parent="p2-bang-hang-0" vertex="1" value="&lt;b&gt;Trạng thái&lt;/b&gt;" style="shape=partialRectangle;connectable=0;fillColor=none;top=0;left=0;bottom=0;right=1;align=left;verticalAlign=middle;spacing=10;overflow=hidden;html=1;whiteSpace=wrap;fontSize=14;fontColor=#0F172A;strokeColor=#CBD5E1;">
+          <mxGeometry x="0" y="0" width="220" height="40" as="geometry">
+            <mxRectangle width="220" height="40" as="alternateBounds" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="p2-bang-hang-0-cot-1" parent="p2-bang-hang-0" vertex="1" value="&lt;b&gt;Website&lt;/b&gt;" style="shape=partialRectangle;connectable=0;fillColor=none;top=0;left=0;bottom=0;right=1;align=left;verticalAlign=middle;spacing=10;overflow=hidden;html=1;whiteSpace=wrap;fontSize=14;fontColor=#0F172A;strokeColor=#CBD5E1;">
+          <mxGeometry x="220" y="0" width="730" height="40" as="geometry">
+            <mxRectangle width="730" height="40" as="alternateBounds" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="p2-bang-hang-0-cot-2" parent="p2-bang-hang-0" vertex="1" value="&lt;b&gt;Khách đặt mới?&lt;/b&gt;" style="shape=partialRectangle;connectable=0;fillColor=none;top=0;left=0;bottom=0;right=1;align=left;verticalAlign=middle;spacing=10;overflow=hidden;html=1;whiteSpace=wrap;fontSize=14;fontColor=#0F172A;strokeColor=#CBD5E1;">
+          <mxGeometry x="950" y="0" width="580" height="40" as="geometry">
+            <mxRectangle width="580" height="40" as="alternateBounds" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="p2-bang-hang-0-cot-3" parent="p2-bang-hang-0" vertex="1" value="&lt;b&gt;Đơn cũ&lt;/b&gt;" style="shape=partialRectangle;connectable=0;fillColor=none;top=0;left=0;bottom=0;right=1;align=left;verticalAlign=middle;spacing=10;overflow=hidden;html=1;whiteSpace=wrap;fontSize=14;fontColor=#0F172A;strokeColor=#CBD5E1;">
+          <mxGeometry x="1530" y="0" width="220" height="40" as="geometry">
+            <mxRectangle width="220" height="40" as="alternateBounds" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="p2-bang-hang-0-cot-4" parent="p2-bang-hang-0" vertex="1" value="&lt;b&gt;Admin thao tác&lt;/b&gt;" style="shape=partialRectangle;connectable=0;fillColor=none;top=0;left=0;bottom=0;right=1;align=left;verticalAlign=middle;spacing=10;overflow=hidden;html=1;whiteSpace=wrap;fontSize=14;fontColor=#0F172A;strokeColor=#CBD5E1;">
+          <mxGeometry x="1750" y="0" width="380" height="40" as="geometry">
+            <mxRectangle width="380" height="40" as="alternateBounds" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="p2-bang-hang-0-cot-5" parent="p2-bang-hang-0" vertex="1" value="&lt;b&gt;Danh sách mặc định?&lt;/b&gt;" style="shape=partialRectangle;connectable=0;fillColor=none;top=0;left=0;bottom=0;right=0;align=left;verticalAlign=middle;spacing=10;overflow=hidden;html=1;whiteSpace=wrap;fontSize=14;fontColor=#0F172A;strokeColor=#CBD5E1;">
+          <mxGeometry x="2130" y="0" width="230" height="40" as="geometry">
+            <mxRectangle width="230" height="40" as="alternateBounds" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="p2-bang-hang-1" parent="p2-bang" vertex="1" value="" style="shape=tableRow;horizontal=0;startSize=0;swimlaneHead=0;swimlaneBody=0;fillColor=#FFFFFF;collapsible=0;dropTarget=0;top=0;left=0;right=0;bottom=1;">
+          <mxGeometry x="0" y="80" width="2360" height="130" as="geometry" />
+        </mxCell>
+        <mxCell id="p2-bang-hang-1-cot-0" parent="p2-bang-hang-1" vertex="1" value="&lt;b&gt;ACTIVE&lt;/b&gt;" style="shape=partialRectangle;connectable=0;fillColor=none;top=0;left=0;bottom=0;right=1;align=left;verticalAlign=middle;spacing=10;overflow=hidden;html=1;whiteSpace=wrap;fontSize=14;fontColor=#0F172A;strokeColor=#CBD5E1;">
+          <mxGeometry x="0" y="0" width="220" height="130" as="geometry">
+            <mxRectangle width="220" height="130" as="alternateBounds" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="p2-bang-hang-1-cot-1" parent="p2-bang-hang-1" vertex="1" value="Tour: có chi tiết, đánh giá và được đếm theo điểm đến. Có trong tìm kiếm thông thường; lọc ngày/khách cần chuyến đủ chỗ.&lt;br&gt;Nổi bật: is_featured và có chuyến đặt được.&lt;br&gt;Khách sạn: chi tiết/nổi bật cần loại đang bán; tìm kiếm cần phòng phù hợp và đủ trống." style="shape=partialRectangle;connectable=0;fillColor=none;top=0;left=0;bottom=0;right=1;align=left;verticalAlign=middle;spacing=10;overflow=hidden;html=1;whiteSpace=wrap;fontSize=14;fontColor=#0F172A;strokeColor=#CBD5E1;">
+          <mxGeometry x="220" y="0" width="730" height="130" as="geometry">
+            <mxRectangle width="730" height="130" as="alternateBounds" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="p2-bang-hang-1-cot-2" parent="p2-bang-hang-1" vertex="1" value="Tour: chuyến từ ngày mai, đang mở và đủ chỗ.&lt;br&gt;Khách sạn: nhận từ ngày mai, loại phòng phù hợp sức chứa và còn đủ phòng cho kỳ ở." style="shape=partialRectangle;connectable=0;fillColor=none;top=0;left=0;bottom=0;right=1;align=left;verticalAlign=middle;spacing=10;overflow=hidden;html=1;whiteSpace=wrap;fontSize=14;fontColor=#0F172A;strokeColor=#CBD5E1;">
+          <mxGeometry x="950" y="0" width="580" height="130" as="geometry">
+            <mxRectangle width="580" height="130" as="alternateBounds" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="p2-bang-hang-1-cot-3" parent="p2-bang-hang-1" vertex="1" value="Vẫn đọc được" style="shape=partialRectangle;connectable=0;fillColor=none;top=0;left=0;bottom=0;right=1;align=left;verticalAlign=middle;spacing=10;overflow=hidden;html=1;whiteSpace=wrap;fontSize=14;fontColor=#0F172A;strokeColor=#CBD5E1;">
+          <mxGeometry x="1530" y="0" width="220" height="130" as="geometry">
+            <mxRectangle width="220" height="130" as="alternateBounds" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="p2-bang-hang-1-cot-4" parent="p2-bang-hang-1" vertex="1" value="Sửa nội dung, ẩn hoặc xoá mềm.&lt;br&gt;Có thể quản lý chuyến và loại phòng." style="shape=partialRectangle;connectable=0;fillColor=none;top=0;left=0;bottom=0;right=1;align=left;verticalAlign=middle;spacing=10;overflow=hidden;html=1;whiteSpace=wrap;fontSize=14;fontColor=#0F172A;strokeColor=#CBD5E1;">
+          <mxGeometry x="1750" y="0" width="380" height="130" as="geometry">
+            <mxRectangle width="380" height="130" as="alternateBounds" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="p2-bang-hang-1-cot-5" parent="p2-bang-hang-1" vertex="1" value="Có" style="shape=partialRectangle;connectable=0;fillColor=none;top=0;left=0;bottom=0;right=0;align=left;verticalAlign=middle;spacing=10;overflow=hidden;html=1;whiteSpace=wrap;fontSize=14;fontColor=#0F172A;strokeColor=#CBD5E1;">
+          <mxGeometry x="2130" y="0" width="230" height="130" as="geometry">
+            <mxRectangle width="230" height="130" as="alternateBounds" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="p2-bang-hang-2" parent="p2-bang" vertex="1" value="" style="shape=tableRow;horizontal=0;startSize=0;swimlaneHead=0;swimlaneBody=0;fillColor=#F8FAFC;collapsible=0;dropTarget=0;top=0;left=0;right=0;bottom=1;">
+          <mxGeometry x="0" y="210" width="2360" height="110" as="geometry" />
+        </mxCell>
+        <mxCell id="p2-bang-hang-2-cot-0" parent="p2-bang-hang-2" vertex="1" value="&lt;b&gt;HIDDEN&lt;/b&gt;" style="shape=partialRectangle;connectable=0;fillColor=none;top=0;left=0;bottom=0;right=1;align=left;verticalAlign=middle;spacing=10;overflow=hidden;html=1;whiteSpace=wrap;fontSize=14;fontColor=#0F172A;strokeColor=#CBD5E1;">
+          <mxGeometry x="0" y="0" width="220" height="110" as="geometry">
+            <mxRectangle width="220" height="110" as="alternateBounds" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="p2-bang-hang-2-cot-1" parent="p2-bang-hang-2" vertex="1" value="Chi tiết API trả 404. Không hiện trong tìm kiếm, nổi bật, số tour theo điểm đến hay đánh giá công khai của tour." style="shape=partialRectangle;connectable=0;fillColor=none;top=0;left=0;bottom=0;right=1;align=left;verticalAlign=middle;spacing=10;overflow=hidden;html=1;whiteSpace=wrap;fontSize=14;fontColor=#0F172A;strokeColor=#CBD5E1;">
+          <mxGeometry x="220" y="0" width="730" height="110" as="geometry">
+            <mxRectangle width="730" height="110" as="alternateBounds" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="p2-bang-hang-2-cot-2" parent="p2-bang-hang-2" vertex="1" value="Không · API trả 400.&lt;br&gt;Tour: “Chuyến khởi hành này không còn tồn tại. Bạn vui lòng chọn ngày khác.”&lt;br&gt;Khách sạn: “Khách sạn này hiện không nhận đặt phòng.”" style="shape=partialRectangle;connectable=0;fillColor=none;top=0;left=0;bottom=0;right=1;align=left;verticalAlign=middle;spacing=10;overflow=hidden;html=1;whiteSpace=wrap;fontSize=14;fontColor=#0F172A;strokeColor=#CBD5E1;">
+          <mxGeometry x="950" y="0" width="580" height="110" as="geometry">
+            <mxRectangle width="580" height="110" as="alternateBounds" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="p2-bang-hang-2-cot-3" parent="p2-bang-hang-2" vertex="1" value="Vẫn đọc được" style="shape=partialRectangle;connectable=0;fillColor=none;top=0;left=0;bottom=0;right=1;align=left;verticalAlign=middle;spacing=10;overflow=hidden;html=1;whiteSpace=wrap;fontSize=14;fontColor=#0F172A;strokeColor=#CBD5E1;">
+          <mxGeometry x="1530" y="0" width="220" height="110" as="geometry">
+            <mxRectangle width="220" height="110" as="alternateBounds" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="p2-bang-hang-2-cot-4" parent="p2-bang-hang-2" vertex="1" value="Sửa nội dung, cho hiện hoặc xoá mềm.&lt;br&gt;Có thể quản lý chuyến và loại phòng." style="shape=partialRectangle;connectable=0;fillColor=none;top=0;left=0;bottom=0;right=1;align=left;verticalAlign=middle;spacing=10;overflow=hidden;html=1;whiteSpace=wrap;fontSize=14;fontColor=#0F172A;strokeColor=#CBD5E1;">
+          <mxGeometry x="1750" y="0" width="380" height="110" as="geometry">
+            <mxRectangle width="380" height="110" as="alternateBounds" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="p2-bang-hang-2-cot-5" parent="p2-bang-hang-2" vertex="1" value="Có" style="shape=partialRectangle;connectable=0;fillColor=none;top=0;left=0;bottom=0;right=0;align=left;verticalAlign=middle;spacing=10;overflow=hidden;html=1;whiteSpace=wrap;fontSize=14;fontColor=#0F172A;strokeColor=#CBD5E1;">
+          <mxGeometry x="2130" y="0" width="230" height="110" as="geometry">
+            <mxRectangle width="230" height="110" as="alternateBounds" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="p2-bang-hang-3" parent="p2-bang" vertex="1" value="" style="shape=tableRow;horizontal=0;startSize=0;swimlaneHead=0;swimlaneBody=0;fillColor=#FFFFFF;collapsible=0;dropTarget=0;top=0;left=0;right=0;bottom=1;">
+          <mxGeometry x="0" y="320" width="2360" height="110" as="geometry" />
+        </mxCell>
+        <mxCell id="p2-bang-hang-3-cot-0" parent="p2-bang-hang-3" vertex="1" value="&lt;b&gt;DELETED&lt;/b&gt;" style="shape=partialRectangle;connectable=0;fillColor=none;top=0;left=0;bottom=0;right=1;align=left;verticalAlign=middle;spacing=10;overflow=hidden;html=1;whiteSpace=wrap;fontSize=14;fontColor=#0F172A;strokeColor=#CBD5E1;">
+          <mxGeometry x="0" y="0" width="220" height="110" as="geometry">
+            <mxRectangle width="220" height="110" as="alternateBounds" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="p2-bang-hang-3-cot-1" parent="p2-bang-hang-3" vertex="1" value="Chi tiết API trả 404. Không hiện trong tìm kiếm, nổi bật, số tour theo điểm đến hay đánh giá công khai của tour." style="shape=partialRectangle;connectable=0;fillColor=none;top=0;left=0;bottom=0;right=1;align=left;verticalAlign=middle;spacing=10;overflow=hidden;html=1;whiteSpace=wrap;fontSize=14;fontColor=#0F172A;strokeColor=#CBD5E1;">
+          <mxGeometry x="220" y="0" width="730" height="110" as="geometry">
+            <mxRectangle width="730" height="110" as="alternateBounds" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="p2-bang-hang-3-cot-2" parent="p2-bang-hang-3" vertex="1" value="Không · API trả 400.&lt;br&gt;Tour: “Chuyến khởi hành này không còn tồn tại. Bạn vui lòng chọn ngày khác.”&lt;br&gt;Khách sạn: “Khách sạn này hiện không nhận đặt phòng.”" style="shape=partialRectangle;connectable=0;fillColor=none;top=0;left=0;bottom=0;right=1;align=left;verticalAlign=middle;spacing=10;overflow=hidden;html=1;whiteSpace=wrap;fontSize=14;fontColor=#0F172A;strokeColor=#CBD5E1;">
+          <mxGeometry x="950" y="0" width="580" height="110" as="geometry">
+            <mxRectangle width="580" height="110" as="alternateBounds" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="p2-bang-hang-3-cot-3" parent="p2-bang-hang-3" vertex="1" value="Vẫn đọc được" style="shape=partialRectangle;connectable=0;fillColor=none;top=0;left=0;bottom=0;right=1;align=left;verticalAlign=middle;spacing=10;overflow=hidden;html=1;whiteSpace=wrap;fontSize=14;fontColor=#0F172A;strokeColor=#CBD5E1;">
+          <mxGeometry x="1530" y="0" width="220" height="110" as="geometry">
+            <mxRectangle width="220" height="110" as="alternateBounds" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="p2-bang-hang-3-cot-4" parent="p2-bang-hang-3" vertex="1" value="Xem và khôi phục về HIDDEN." style="shape=partialRectangle;connectable=0;fillColor=none;top=0;left=0;bottom=0;right=1;align=left;verticalAlign=middle;spacing=10;overflow=hidden;html=1;whiteSpace=wrap;fontSize=14;fontColor=#0F172A;strokeColor=#CBD5E1;">
+          <mxGeometry x="1750" y="0" width="380" height="110" as="geometry">
+            <mxRectangle width="380" height="110" as="alternateBounds" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="p2-bang-hang-3-cot-5" parent="p2-bang-hang-3" vertex="1" value="Không · lọc Đã xoá" style="shape=partialRectangle;connectable=0;fillColor=none;top=0;left=0;bottom=0;right=0;align=left;verticalAlign=middle;spacing=10;overflow=hidden;html=1;whiteSpace=wrap;fontSize=14;fontColor=#0F172A;strokeColor=#CBD5E1;">
+          <mxGeometry x="2130" y="0" width="230" height="110" as="geometry">
+            <mxRectangle width="230" height="110" as="alternateBounds" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="p2-can-nho" parent="p2-1" vertex="1" value="&lt;b&gt;Điểm cần nhớ&lt;/b&gt;&lt;br&gt;HIDDEN, DELETED và slug không tồn tại đều trả 404 ở API chi tiết. Khách sạn ACTIVE thiếu loại phòng đang bán cũng trả 404.&lt;br&gt;Đổi trạng thái phát sự kiện làm mới cache sau khi ghi thành công: tour → tours, departures, destinations; khách sạn → hotels, destinations. Gửi webhook khi đã cấu hình.&lt;br&gt;Tour nổi bật cần is_featured và ít nhất một chuyến đặt được. Tour hết chỗ vẫn có thể xuất hiện trong tìm kiếm khi không lọc ngày hoặc số khách.&lt;br&gt;Xoá không kiểm đơn sắp tới; đơn cũ vẫn đọc được. Bản ghi được giữ để các đơn cũ còn tham chiếu và có thể khôi phục về HIDDEN." style="html=1;whiteSpace=wrap;fontSize=14;fontColor=#0F172A;rounded=0;align=left;verticalAlign=middle;spacing=14;fillColor=#FFFBEB;strokeColor=#B45309;strokeWidth=1.5;">
+          <mxGeometry x="40" y="1900" width="2360" height="160" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+  <diagram id="p3-trang" name="03 · Trạng thái chuyến khởi hành">
+    <mxGraphModel dx="1200" dy="800" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="0" pageScale="1" pageWidth="2440" pageHeight="2590" math="0" shadow="0">
+      <root>
+        <mxCell id="p3-0" />
+        <mxCell id="p3-1" parent="p3-0" />
+        <mxCell id="p3-tieu-de" parent="p3-1" vertex="1" value="&lt;b&gt;GoTrips · Trạng thái chuyến khởi hành&lt;/b&gt;" style="text;html=1;whiteSpace=wrap;fontSize=14;fontColor=#0F172A;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;fontSize=24;fontStyle=1;">
+          <mxGeometry x="40" y="20" width="2360" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="p3-phu-de" parent="p3-1" vertex="1" value="Từ lịch mở bán đến hết chỗ, đóng bán, đã qua hoặc xoá · 28/11/2026" style="text;html=1;whiteSpace=wrap;fontSize=14;fontColor=#0F172A;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;fontColor=#475569;">
+          <mxGeometry x="40" y="120" width="2360" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="p3-cach-doc" parent="p3-1" vertex="1" value="&lt;b&gt;Cách đọc&lt;/b&gt;&lt;br&gt;● Bắt đầu  ·  ◉ Kết thúc  ·  Hộp bo góc viền liền: trạng thái lưu  ·  Hộp bo góc viền đứt: trạng thái tính ra  ·  ◇ Rẽ nhánh, đọc điều kiện trên mũi tên ra&lt;br&gt;→ Chuyển hiện có  ·  ⋯→ Tự động theo ngày  ·  – – → Nét đứt xám: Chưa có  ·  Vàng: đang chờ  ·  Xanh lá: đang hoạt động  ·  Xám: tạm ẩn, đóng bán, hết chỗ  ·  Đỏ: đã huỷ, đã xoá, đã qua" style="html=1;whiteSpace=wrap;fontSize=14;fontColor=#0F172A;rounded=0;align=left;verticalAlign=middle;spacing=14;fillColor=#FFFBEB;strokeColor=#B45309;strokeWidth=1.5;">
+          <mxGeometry x="40" y="210" width="2360" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="p3-luu" parent="p3-1" vertex="1" value="&lt;b&gt;Lưu ở đâu&lt;/b&gt;&lt;br&gt;tour_departures lưu các cột dùng để tính trạng thái: departure_date, sales_closed, booked_seats, total_seats.&lt;br&gt;state, editable, dateEditable, deletable, isAlmostFull và isSoldOut đều được tính. tour_bookings ghi lịch sử tham chiếu chuyến." style="html=1;whiteSpace=wrap;fontSize=14;fontColor=#0F172A;rounded=0;align=left;verticalAlign=middle;spacing=14;fillColor=#FFFBEB;strokeColor=#B45309;strokeWidth=1.5;">
+          <mxGeometry x="40" y="350" width="2360" height="100" as="geometry" />
+        </mxCell>
+        <mxCell id="p3-thu-tu" parent="p3-1" vertex="1" value="&lt;b&gt;Thứ tự ưu tiên khi tính · PAST &amp;gt; CLOSED &amp;gt; SOLD_OUT &amp;gt; UPCOMING&lt;/b&gt;&lt;br&gt;Ngày khởi hành ≤ hôm nay → PAST. Nếu còn trong tương lai: sales_closed → CLOSED; nếu vẫn mở và booked_seats ≥ total_seats → SOLD_OUT; còn lại → UPCOMING.&lt;br&gt;Hôm nay đã là PAST theo ngày Việt Nam. Kết quả tính lại khi đọc dữ liệu theo ngày hiện tại." style="html=1;whiteSpace=wrap;fontSize=14;fontColor=#0F172A;rounded=0;align=left;verticalAlign=middle;spacing=14;fillColor=#FFFBEB;strokeColor=#B45309;strokeWidth=1.5;">
+          <mxGeometry x="40" y="510" width="2360" height="100" as="geometry" />
+        </mxCell>
+        <mxCell id="p3-chinh" parent="p3-1" vertex="1" value="&lt;b&gt;Chuyến khởi hành · website và admin&lt;/b&gt;" style="text;html=1;whiteSpace=wrap;fontSize=14;fontColor=#0F172A;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;fontSize=18;fontStyle=1;">
+          <mxGeometry x="40" y="670" width="2360" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="p3-bat-dau" parent="p3-1" vertex="1" value="" style="ellipse;shape=startState;html=1;aspect=fixed;fillColor=#0F172A;strokeColor=#0F172A;">
+          <mxGeometry x="40" y="940" width="30" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="p3-st-upcoming" parent="p3-1" vertex="1" value="&lt;b&gt;Đang mở bán&lt;/b&gt;&lt;br&gt;UPCOMING&lt;br&gt;(tính ra)&lt;br&gt;Website: chọn được nếu đủ chỗ&lt;br&gt;Admin: Sắp tới" style="html=1;whiteSpace=wrap;fontSize=14;fontColor=#0F172A;rounded=1;arcSize=20;spacing=6;align=center;verticalAlign=middle;strokeWidth=1.6;fillColor=#DCFCE7;strokeColor=#15803D;dashed=1;dashPattern=6 4;">
+          <mxGeometry x="380" y="900" width="270" height="110" as="geometry" />
+        </mxCell>
+        <mxCell id="p3-st-sold-out" parent="p3-1" vertex="1" value="&lt;b&gt;Hết chỗ&lt;/b&gt;&lt;br&gt;SOLD_OUT&lt;br&gt;(tính ra)&lt;br&gt;Website: Hết chỗ&lt;br&gt;Admin: Hết chỗ" style="html=1;whiteSpace=wrap;fontSize=14;fontColor=#0F172A;rounded=1;arcSize=20;spacing=6;align=center;verticalAlign=middle;strokeWidth=1.6;fillColor=#E5E7EB;strokeColor=#6B7280;dashed=1;dashPattern=6 4;">
+          <mxGeometry x="1110" y="900" width="270" height="110" as="geometry" />
+        </mxCell>
+        <mxCell id="p3-st-closed" parent="p3-1" vertex="1" value="&lt;b&gt;Đóng bán&lt;/b&gt;&lt;br&gt;CLOSED&lt;br&gt;(tính ra)&lt;br&gt;Website: Hết chỗ&lt;br&gt;Admin: Đã đóng bán" style="html=1;whiteSpace=wrap;fontSize=14;fontColor=#0F172A;rounded=1;arcSize=20;spacing=6;align=center;verticalAlign=middle;strokeWidth=1.6;fillColor=#E5E7EB;strokeColor=#6B7280;dashed=1;dashPattern=6 4;">
+          <mxGeometry x="750" y="1300" width="290" height="110" as="geometry" />
+        </mxCell>
+        <mxCell id="p3-st-past" parent="p3-1" vertex="1" value="&lt;b&gt;Đã qua&lt;/b&gt;&lt;br&gt;PAST&lt;br&gt;(tính ra)&lt;br&gt;Website: ẩn khỏi lịch&lt;br&gt;Admin: xem khi bật lịch đã qua" style="html=1;whiteSpace=wrap;fontSize=14;fontColor=#0F172A;rounded=1;arcSize=20;spacing=6;align=center;verticalAlign=middle;strokeWidth=1.6;fillColor=#FEE2E2;strokeColor=#B91C1C;dashed=1;dashPattern=6 4;">
+          <mxGeometry x="1610" y="1300" width="270" height="110" as="geometry" />
+        </mxCell>
+        <mxCell id="p3-kiem-cho" parent="p3-1" vertex="1" value="" style="rhombus;html=1;fillColor=#FFFFFF;strokeColor=#475569;strokeWidth=1.6;">
+          <mxGeometry x="880" y="1110" width="40" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="p3-ket-thuc" parent="p3-1" vertex="1" value="" style="ellipse;shape=endState;html=1;aspect=fixed;fillColor=#0F172A;strokeColor=#0F172A;">
+          <mxGeometry x="2190" y="1340" width="30" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="p3-tr-create" parent="p3-1" edge="1" source="p3-bat-dau" target="p3-st-upcoming" value="Nhân viên · tạo chuyến&lt;br&gt;[Ngày từ mai, tour chưa xoá, ngày chưa trùng]&lt;br&gt;POST /admin/tours/{id}/departures" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;endSize=7;strokeWidth=1.6;fontSize=13;fontColor=#334155;labelBackgroundColor=#FFFFFF;strokeColor=#475569;exitX=1;exitY=0.5;exitPerimeter=0;entryX=0;entryY=0.5;entryPerimeter=0;">
+          <mxGeometry x="-1" relative="1" as="geometry">
+            <mxPoint x="153.0" y="-4.0" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="p3-tr-fill" parent="p3-1" edge="1" source="p3-st-upcoming" target="p3-st-sold-out" value="Khách · đặt đến hết chỗ&lt;br&gt;[booked_seats đạt total_seats]&lt;br&gt;POST /bookings/tours" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;endSize=7;strokeWidth=1.6;fontSize=13;fontColor=#334155;labelBackgroundColor=#FFFFFF;strokeColor=#475569;exitX=1;exitY=0.2;exitPerimeter=0;entryX=0;entryY=0.2;entryPerimeter=0;">
+          <mxGeometry x="-1" relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="710" y="890" />
+              <mxPoint x="1050" y="890" />
+            </Array>
+            <mxPoint x="230.0" y="-37.0" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="p3-tr-reduce" parent="p3-1" edge="1" source="p3-st-upcoming" target="p3-st-sold-out" value="Nhân viên · giảm tổng chỗ&lt;br&gt;[total_seats bằng booked_seats &amp;gt; 0]&lt;br&gt;PUT /admin/departures/{id}" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;endSize=7;strokeWidth=1.6;fontSize=13;fontColor=#334155;labelBackgroundColor=#FFFFFF;strokeColor=#475569;exitX=1;exitY=0.48;exitPerimeter=0;entryX=0;entryY=0.48;entryPerimeter=0;">
+          <mxGeometry x="-1" relative="1" as="geometry">
+            <mxPoint x="230.0" y="-0.8" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="p3-tr-free" parent="p3-1" edge="1" source="p3-st-sold-out" target="p3-st-upcoming" value="Nhân viên · huỷ đơn hoặc tăng tổng chỗ [có chỗ trở lại]&lt;br&gt;POST /admin/bookings/{code}/cancel&lt;br&gt;PUT /admin/departures/{id}" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;endSize=7;strokeWidth=1.6;fontSize=13;fontColor=#334155;labelBackgroundColor=#FFFFFF;strokeColor=#475569;exitX=0;exitY=0.88;exitPerimeter=0;entryX=1;entryY=0.88;entryPerimeter=0;">
+          <mxGeometry x="-1" relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="1050" y="1030" />
+              <mxPoint x="710" y="1030" />
+            </Array>
+            <mxPoint x="-230.0" y="38.2" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="p3-tr-close-upcoming" parent="p3-1" edge="1" source="p3-st-upcoming" target="p3-st-closed" value="Nhân viên · đóng bán&lt;br&gt;[Tour chưa xoá; ngày từ mai]&lt;br&gt;POST /admin/departures/{id}/close" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;endSize=7;strokeWidth=1.6;fontSize=13;fontColor=#334155;labelBackgroundColor=#FFFFFF;strokeColor=#475569;exitX=0.25925926;exitY=1;exitPerimeter=0;entryX=0;entryY=0.54545455;entryPerimeter=0;">
+          <mxGeometry x="-1" relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="450" y="1360" />
+            </Array>
+            <mxPoint x="125.0" y="250.0" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="p3-tr-close-sold" parent="p3-1" edge="1" source="p3-st-sold-out" target="p3-st-closed" value="Nhân viên · đóng bán&lt;br&gt;[Tour chưa xoá; ngày từ mai]&lt;br&gt;POST /admin/departures/{id}/close" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;endSize=7;strokeWidth=1.6;fontSize=13;fontColor=#334155;labelBackgroundColor=#FFFFFF;strokeColor=#475569;exitX=0.66666667;exitY=1;exitPerimeter=0;entryX=1;entryY=0.36363636;entryPerimeter=0;">
+          <mxGeometry x="-1" relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="1290" y="1340" />
+            </Array>
+            <mxPoint x="-65.0" y="260.0" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="p3-tr-reopen" parent="p3-1" edge="1" source="p3-st-closed" target="p3-kiem-cho" value="Nhân viên · mở bán lại&lt;br&gt;[Tour chưa xoá; ngày từ mai]&lt;br&gt;POST /admin/departures/{id}/reopen" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;endSize=7;strokeWidth=1.6;fontSize=13;fontColor=#334155;labelBackgroundColor=#FFFFFF;strokeColor=#475569;exitX=0.5;exitY=0;exitPerimeter=0;entryX=0.5;entryY=1;entryPerimeter=0;">
+          <mxGeometry x="-1" relative="1" as="geometry">
+            <mxPoint x="0.0" y="-80.0" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="p3-tr-reopen-open" parent="p3-1" edge="1" source="p3-kiem-cho" target="p3-st-upcoming" value="[booked_seats &amp;lt; total_seats]" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;endSize=7;strokeWidth=1.6;fontSize=13;fontColor=#334155;labelBackgroundColor=#FFFFFF;strokeColor=#475569;exitX=0;exitY=0.5;exitPerimeter=0;entryX=0.74074074;entryY=1;entryPerimeter=0;">
+          <mxGeometry x="-1" relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="580" y="1130" />
+            </Array>
+            <mxPoint x="-196.0" y="0.0" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="p3-tr-reopen-full" parent="p3-1" edge="1" source="p3-kiem-cho" target="p3-st-sold-out" value="[booked_seats ≥ total_seats]" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;endSize=7;strokeWidth=1.6;fontSize=13;fontColor=#334155;labelBackgroundColor=#FFFFFF;strokeColor=#475569;exitX=1;exitY=0.5;exitPerimeter=0;entryX=0.22222222;entryY=1;entryPerimeter=0;">
+          <mxGeometry x="-1" relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="1170" y="1130" />
+            </Array>
+            <mxPoint x="190.0" y="0.0" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="p3-tr-time-upcoming" parent="p3-1" edge="1" source="p3-st-upcoming" target="p3-st-past" value="Tự động: tới ngày khởi hành&lt;br&gt;[Ngày khởi hành ≤ hôm nay]" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;endSize=7;strokeWidth=1.6;fontSize=13;fontColor=#334155;labelBackgroundColor=#FFFFFF;strokeColor=#475569;dashed=1;dashPattern=2 4;exitX=0.51851852;exitY=0;exitPerimeter=0;entryX=0.48148148;entryY=0;entryPerimeter=0;">
+          <mxGeometry x="-1" relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="520" y="800" />
+              <mxPoint x="1740" y="800" />
+            </Array>
+            <mxPoint x="930.0" y="-100.0" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="p3-tr-time-sold" parent="p3-1" edge="1" source="p3-st-sold-out" target="p3-st-past" value="Tự động: tới ngày khởi hành" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;endSize=7;strokeWidth=1.6;fontSize=13;fontColor=#334155;labelBackgroundColor=#FFFFFF;strokeColor=#475569;dashed=1;dashPattern=2 4;exitX=1;exitY=0.54545455;exitPerimeter=0;entryX=0.14814815;entryY=0;entryPerimeter=0;">
+          <mxGeometry x="-1" relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="1650" y="960" />
+            </Array>
+            <mxPoint x="270.0" y="160.0" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="p3-tr-time-closed" parent="p3-1" edge="1" source="p3-st-closed" target="p3-st-past" value="Tự động: tới ngày khởi hành" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;endSize=7;strokeWidth=1.6;fontSize=13;fontColor=#334155;labelBackgroundColor=#FFFFFF;strokeColor=#475569;dashed=1;dashPattern=2 4;exitX=1;exitY=0.8;exitPerimeter=0;entryX=0;entryY=0.8;entryPerimeter=0;">
+          <mxGeometry x="-1" relative="1" as="geometry">
+            <mxPoint x="320.0" y="0.0" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="p3-tr-delete-upcoming" parent="p3-1" edge="1" source="p3-st-upcoming" target="p3-ket-thuc" value="Nhân viên · xoá [deletable]&lt;br&gt;DELETE /admin/departures/{id}" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;endSize=7;strokeWidth=1.6;fontSize=13;fontColor=#334155;labelBackgroundColor=#FFFFFF;strokeColor=#475569;exitX=0.03703704;exitY=1;exitPerimeter=0;entryX=0.33333333;entryY=1;entryPerimeter=0;">
+          <mxGeometry x="-1" relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="390" y="1520" />
+              <mxPoint x="2200" y="1520" />
+            </Array>
+            <mxPoint x="630.0" y="505.0" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="p3-tr-delete-closed" parent="p3-1" edge="1" source="p3-st-closed" target="p3-ket-thuc" value="Nhân viên · xoá [deletable]&lt;br&gt;DELETE /admin/departures/{id}" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;endSize=7;strokeWidth=1.6;fontSize=13;fontColor=#334155;labelBackgroundColor=#FFFFFF;strokeColor=#475569;exitX=0.79310345;exitY=1;exitPerimeter=0;entryX=1.0;entryY=1;entryPerimeter=0;">
+          <mxGeometry x="-1" relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="980" y="1470" />
+              <mxPoint x="2210" y="1470" />
+            </Array>
+            <mxPoint x="590.0" y="55.0" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="p3-tr-delete-past" parent="p3-1" edge="1" source="p3-st-past" target="p3-ket-thuc" value="Nhân viên · xoá [deletable]&lt;br&gt;DELETE /admin/departures/{id}" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;endSize=7;strokeWidth=1.6;fontSize=13;fontColor=#334155;labelBackgroundColor=#FFFFFF;strokeColor=#475569;exitX=1;exitY=0.5;exitPerimeter=0;entryX=0;entryY=0.5;entryPerimeter=0;">
+          <mxGeometry x="-1" relative="1" as="geometry">
+            <mxPoint x="155.0" y="0.0" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="p3-loi" parent="p3-1" vertex="1" value="&lt;b&gt;Khi API trả 409&lt;/b&gt;&lt;br&gt;Xoá chuyến từng có đơn hoặc booked_seats &amp;gt; 0 · “Chuyến đã có khách đặt nên không xoá được. Dùng &amp;quot;Đóng bán&amp;quot; để ngừng nhận khách.”&lt;br&gt;Sửa, đóng hoặc mở lại chuyến hôm nay hay đã qua · “Chuyến khởi hành hôm nay hoặc đã qua nên không thay đổi được.”&lt;br&gt;Đóng thêm lần nữa · “Chuyến này đã đóng bán.”  ·  Mở lại khi đang mở · “Chuyến này đang mở bán.”&lt;br&gt;Đổi ngày khi đã có khách · “Chuyến đã có khách đặt nên không đổi được ngày khởi hành.”  ·  Giảm quá số đã đặt · “Tổng chỗ không được thấp hơn số chỗ đã đặt (…”" style="html=1;whiteSpace=wrap;fontSize=14;fontColor=#0F172A;rounded=0;align=left;verticalAlign=middle;spacing=14;fillColor=#FFFBEB;strokeColor=#B45309;strokeWidth=1.5;">
+          <mxGeometry x="40" y="1590" width="2360" height="170" as="geometry" />
+        </mxCell>
+        <mxCell id="p3-bang" parent="p3-1" vertex="1" value="&lt;b&gt;Ở mỗi trạng thái&lt;/b&gt;" style="shape=table;startSize=40;container=1;collapsible=1;childLayout=tableLayout;fixedRows=1;rowLines=1;fontStyle=1;align=center;resizeLast=1;html=1;fontSize=16;fillColor=#DBEAFE;strokeColor=#1D4ED8;fontColor=#0F172A;">
+          <mxGeometry x="40" y="1820" width="2360" height="480" as="geometry">
+            <mxRectangle width="2360" height="40" as="alternateBounds" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="p3-bang-hang-0" parent="p3-bang" vertex="1" value="" style="shape=tableRow;horizontal=0;startSize=0;swimlaneHead=0;swimlaneBody=0;fillColor=#E5E7EB;collapsible=0;dropTarget=0;top=0;left=0;right=0;bottom=1;">
+          <mxGeometry x="0" y="40" width="2360" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="p3-bang-hang-0-cot-0" parent="p3-bang-hang-0" vertex="1" value="&lt;b&gt;Trạng thái&lt;/b&gt;" style="shape=partialRectangle;connectable=0;fillColor=none;top=0;left=0;bottom=0;right=1;align=left;verticalAlign=middle;spacing=10;overflow=hidden;html=1;whiteSpace=wrap;fontSize=14;fontColor=#0F172A;strokeColor=#CBD5E1;">
+          <mxGeometry x="0" y="0" width="250" height="40" as="geometry">
+            <mxRectangle width="250" height="40" as="alternateBounds" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="p3-bang-hang-0-cot-1" parent="p3-bang-hang-0" vertex="1" value="&lt;b&gt;Website (tour ACTIVE)&lt;/b&gt;" style="shape=partialRectangle;connectable=0;fillColor=none;top=0;left=0;bottom=0;right=1;align=left;verticalAlign=middle;spacing=10;overflow=hidden;html=1;whiteSpace=wrap;fontSize=14;fontColor=#0F172A;strokeColor=#CBD5E1;">
+          <mxGeometry x="250" y="0" width="510" height="40" as="geometry">
+            <mxRectangle width="510" height="40" as="alternateBounds" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="p3-bang-hang-0-cot-2" parent="p3-bang-hang-0" vertex="1" value="&lt;b&gt;Đặt trực tuyến?&lt;/b&gt;" style="shape=partialRectangle;connectable=0;fillColor=none;top=0;left=0;bottom=0;right=1;align=left;verticalAlign=middle;spacing=10;overflow=hidden;html=1;whiteSpace=wrap;fontSize=14;fontColor=#0F172A;strokeColor=#CBD5E1;">
+          <mxGeometry x="760" y="0" width="390" height="40" as="geometry">
+            <mxRectangle width="390" height="40" as="alternateBounds" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="p3-bang-hang-0-cot-3" parent="p3-bang-hang-0" vertex="1" value="&lt;b&gt;editable&lt;/b&gt;" style="shape=partialRectangle;connectable=0;fillColor=none;top=0;left=0;bottom=0;right=1;align=left;verticalAlign=middle;spacing=10;overflow=hidden;html=1;whiteSpace=wrap;fontSize=14;fontColor=#0F172A;strokeColor=#CBD5E1;">
+          <mxGeometry x="1150" y="0" width="240" height="40" as="geometry">
+            <mxRectangle width="240" height="40" as="alternateBounds" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="p3-bang-hang-0-cot-4" parent="p3-bang-hang-0" vertex="1" value="&lt;b&gt;dateEditable&lt;/b&gt;" style="shape=partialRectangle;connectable=0;fillColor=none;top=0;left=0;bottom=0;right=1;align=left;verticalAlign=middle;spacing=10;overflow=hidden;html=1;whiteSpace=wrap;fontSize=14;fontColor=#0F172A;strokeColor=#CBD5E1;">
+          <mxGeometry x="1390" y="0" width="270" height="40" as="geometry">
+            <mxRectangle width="270" height="40" as="alternateBounds" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="p3-bang-hang-0-cot-5" parent="p3-bang-hang-0" vertex="1" value="&lt;b&gt;deletable&lt;/b&gt;" style="shape=partialRectangle;connectable=0;fillColor=none;top=0;left=0;bottom=0;right=1;align=left;verticalAlign=middle;spacing=10;overflow=hidden;html=1;whiteSpace=wrap;fontSize=14;fontColor=#0F172A;strokeColor=#CBD5E1;">
+          <mxGeometry x="1660" y="0" width="290" height="40" as="geometry">
+            <mxRectangle width="290" height="40" as="alternateBounds" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="p3-bang-hang-0-cot-6" parent="p3-bang-hang-0" vertex="1" value="&lt;b&gt;Đóng hoặc mở bán&lt;/b&gt;" style="shape=partialRectangle;connectable=0;fillColor=none;top=0;left=0;bottom=0;right=0;align=left;verticalAlign=middle;spacing=10;overflow=hidden;html=1;whiteSpace=wrap;fontSize=14;fontColor=#0F172A;strokeColor=#CBD5E1;">
+          <mxGeometry x="1950" y="0" width="410" height="40" as="geometry">
+            <mxRectangle width="410" height="40" as="alternateBounds" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="p3-bang-hang-1" parent="p3-bang" vertex="1" value="" style="shape=tableRow;horizontal=0;startSize=0;swimlaneHead=0;swimlaneBody=0;fillColor=#FFFFFF;collapsible=0;dropTarget=0;top=0;left=0;right=0;bottom=1;">
+          <mxGeometry x="0" y="80" width="2360" height="100" as="geometry" />
+        </mxCell>
+        <mxCell id="p3-bang-hang-1-cot-0" parent="p3-bang-hang-1" vertex="1" value="&lt;b&gt;UPCOMING&lt;/b&gt;" style="shape=partialRectangle;connectable=0;fillColor=none;top=0;left=0;bottom=0;right=1;align=left;verticalAlign=middle;spacing=10;overflow=hidden;html=1;whiteSpace=wrap;fontSize=14;fontColor=#0F172A;strokeColor=#CBD5E1;">
+          <mxGeometry x="0" y="0" width="250" height="100" as="geometry">
+            <mxRectangle width="250" height="100" as="alternateBounds" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="p3-bang-hang-1-cot-1" parent="p3-bang-hang-1" vertex="1" value="Có trong lịch; chọn được trong thẻ Đặt tour.&lt;br&gt;Còn 1–5 chỗ: hiện Chỉ còn N chỗ." style="shape=partialRectangle;connectable=0;fillColor=none;top=0;left=0;bottom=0;right=1;align=left;verticalAlign=middle;spacing=10;overflow=hidden;html=1;whiteSpace=wrap;fontSize=14;fontColor=#0F172A;strokeColor=#CBD5E1;">
+          <mxGeometry x="250" y="0" width="510" height="100" as="geometry">
+            <mxRectangle width="510" height="100" as="alternateBounds" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="p3-bang-hang-1-cot-2" parent="p3-bang-hang-1" vertex="1" value="Có, nếu số khách ≤ chỗ còn." style="shape=partialRectangle;connectable=0;fillColor=none;top=0;left=0;bottom=0;right=1;align=left;verticalAlign=middle;spacing=10;overflow=hidden;html=1;whiteSpace=wrap;fontSize=14;fontColor=#0F172A;strokeColor=#CBD5E1;">
+          <mxGeometry x="760" y="0" width="390" height="100" as="geometry">
+            <mxRectangle width="390" height="100" as="alternateBounds" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="p3-bang-hang-1-cot-3" parent="p3-bang-hang-1" vertex="1" value="Có nếu tour chưa xoá" style="shape=partialRectangle;connectable=0;fillColor=none;top=0;left=0;bottom=0;right=1;align=left;verticalAlign=middle;spacing=10;overflow=hidden;html=1;whiteSpace=wrap;fontSize=14;fontColor=#0F172A;strokeColor=#CBD5E1;">
+          <mxGeometry x="1150" y="0" width="240" height="100" as="geometry">
+            <mxRectangle width="240" height="100" as="alternateBounds" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="p3-bang-hang-1-cot-4" parent="p3-bang-hang-1" vertex="1" value="Có nếu tour chưa xoá và chuyến chưa từng có khách" style="shape=partialRectangle;connectable=0;fillColor=none;top=0;left=0;bottom=0;right=1;align=left;verticalAlign=middle;spacing=10;overflow=hidden;html=1;whiteSpace=wrap;fontSize=14;fontColor=#0F172A;strokeColor=#CBD5E1;">
+          <mxGeometry x="1390" y="0" width="270" height="100" as="geometry">
+            <mxRectangle width="270" height="100" as="alternateBounds" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="p3-bang-hang-1-cot-5" parent="p3-bang-hang-1" vertex="1" value="Có nếu tour chưa xoá và chuyến chưa từng có khách" style="shape=partialRectangle;connectable=0;fillColor=none;top=0;left=0;bottom=0;right=1;align=left;verticalAlign=middle;spacing=10;overflow=hidden;html=1;whiteSpace=wrap;fontSize=14;fontColor=#0F172A;strokeColor=#CBD5E1;">
+          <mxGeometry x="1660" y="0" width="290" height="100" as="geometry">
+            <mxRectangle width="290" height="100" as="alternateBounds" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="p3-bang-hang-1-cot-6" parent="p3-bang-hang-1" vertex="1" value="Đóng bán nếu tour chưa xoá." style="shape=partialRectangle;connectable=0;fillColor=none;top=0;left=0;bottom=0;right=0;align=left;verticalAlign=middle;spacing=10;overflow=hidden;html=1;whiteSpace=wrap;fontSize=14;fontColor=#0F172A;strokeColor=#CBD5E1;">
+          <mxGeometry x="1950" y="0" width="410" height="100" as="geometry">
+            <mxRectangle width="410" height="100" as="alternateBounds" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="p3-bang-hang-2" parent="p3-bang" vertex="1" value="" style="shape=tableRow;horizontal=0;startSize=0;swimlaneHead=0;swimlaneBody=0;fillColor=#F8FAFC;collapsible=0;dropTarget=0;top=0;left=0;right=0;bottom=1;">
+          <mxGeometry x="0" y="180" width="2360" height="100" as="geometry" />
+        </mxCell>
+        <mxCell id="p3-bang-hang-2-cot-0" parent="p3-bang-hang-2" vertex="1" value="&lt;b&gt;SOLD_OUT&lt;/b&gt;" style="shape=partialRectangle;connectable=0;fillColor=none;top=0;left=0;bottom=0;right=1;align=left;verticalAlign=middle;spacing=10;overflow=hidden;html=1;whiteSpace=wrap;fontSize=14;fontColor=#0F172A;strokeColor=#CBD5E1;">
+          <mxGeometry x="0" y="0" width="250" height="100" as="geometry">
+            <mxRectangle width="250" height="100" as="alternateBounds" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="p3-bang-hang-2-cot-1" parent="p3-bang-hang-2" vertex="1" value="Có trong lịch với nhãn Hết chỗ.&lt;br&gt;Không chọn được trong thẻ Đặt tour." style="shape=partialRectangle;connectable=0;fillColor=none;top=0;left=0;bottom=0;right=1;align=left;verticalAlign=middle;spacing=10;overflow=hidden;html=1;whiteSpace=wrap;fontSize=14;fontColor=#0F172A;strokeColor=#CBD5E1;">
+          <mxGeometry x="250" y="0" width="510" height="100" as="geometry">
+            <mxRectangle width="510" height="100" as="alternateBounds" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="p3-bang-hang-2-cot-2" parent="p3-bang-hang-2" vertex="1" value="Không · 409.&lt;br&gt;“Chuyến này đã hết chỗ. Bạn vui lòng chọn ngày khác.”" style="shape=partialRectangle;connectable=0;fillColor=none;top=0;left=0;bottom=0;right=1;align=left;verticalAlign=middle;spacing=10;overflow=hidden;html=1;whiteSpace=wrap;fontSize=14;fontColor=#0F172A;strokeColor=#CBD5E1;">
+          <mxGeometry x="760" y="0" width="390" height="100" as="geometry">
+            <mxRectangle width="390" height="100" as="alternateBounds" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="p3-bang-hang-2-cot-3" parent="p3-bang-hang-2" vertex="1" value="Có nếu tour chưa xoá" style="shape=partialRectangle;connectable=0;fillColor=none;top=0;left=0;bottom=0;right=1;align=left;verticalAlign=middle;spacing=10;overflow=hidden;html=1;whiteSpace=wrap;fontSize=14;fontColor=#0F172A;strokeColor=#CBD5E1;">
+          <mxGeometry x="1150" y="0" width="240" height="100" as="geometry">
+            <mxRectangle width="240" height="100" as="alternateBounds" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="p3-bang-hang-2-cot-4" parent="p3-bang-hang-2" vertex="1" value="Không · đã có chỗ đặt" style="shape=partialRectangle;connectable=0;fillColor=none;top=0;left=0;bottom=0;right=1;align=left;verticalAlign=middle;spacing=10;overflow=hidden;html=1;whiteSpace=wrap;fontSize=14;fontColor=#0F172A;strokeColor=#CBD5E1;">
+          <mxGeometry x="1390" y="0" width="270" height="100" as="geometry">
+            <mxRectangle width="270" height="100" as="alternateBounds" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="p3-bang-hang-2-cot-5" parent="p3-bang-hang-2" vertex="1" value="Không · đã có chỗ đặt" style="shape=partialRectangle;connectable=0;fillColor=none;top=0;left=0;bottom=0;right=1;align=left;verticalAlign=middle;spacing=10;overflow=hidden;html=1;whiteSpace=wrap;fontSize=14;fontColor=#0F172A;strokeColor=#CBD5E1;">
+          <mxGeometry x="1660" y="0" width="290" height="100" as="geometry">
+            <mxRectangle width="290" height="100" as="alternateBounds" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="p3-bang-hang-2-cot-6" parent="p3-bang-hang-2" vertex="1" value="Đóng bán nếu tour chưa xoá." style="shape=partialRectangle;connectable=0;fillColor=none;top=0;left=0;bottom=0;right=0;align=left;verticalAlign=middle;spacing=10;overflow=hidden;html=1;whiteSpace=wrap;fontSize=14;fontColor=#0F172A;strokeColor=#CBD5E1;">
+          <mxGeometry x="1950" y="0" width="410" height="100" as="geometry">
+            <mxRectangle width="410" height="100" as="alternateBounds" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="p3-bang-hang-3" parent="p3-bang" vertex="1" value="" style="shape=tableRow;horizontal=0;startSize=0;swimlaneHead=0;swimlaneBody=0;fillColor=#FFFFFF;collapsible=0;dropTarget=0;top=0;left=0;right=0;bottom=1;">
+          <mxGeometry x="0" y="280" width="2360" height="100" as="geometry" />
+        </mxCell>
+        <mxCell id="p3-bang-hang-3-cot-0" parent="p3-bang-hang-3" vertex="1" value="&lt;b&gt;CLOSED&lt;/b&gt;" style="shape=partialRectangle;connectable=0;fillColor=none;top=0;left=0;bottom=0;right=1;align=left;verticalAlign=middle;spacing=10;overflow=hidden;html=1;whiteSpace=wrap;fontSize=14;fontColor=#0F172A;strokeColor=#CBD5E1;">
+          <mxGeometry x="0" y="0" width="250" height="100" as="geometry">
+            <mxRectangle width="250" height="100" as="alternateBounds" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="p3-bang-hang-3-cot-1" parent="p3-bang-hang-3" vertex="1" value="Có trong lịch với nhãn Hết chỗ.&lt;br&gt;Không chọn được trong thẻ Đặt tour." style="shape=partialRectangle;connectable=0;fillColor=none;top=0;left=0;bottom=0;right=1;align=left;verticalAlign=middle;spacing=10;overflow=hidden;html=1;whiteSpace=wrap;fontSize=14;fontColor=#0F172A;strokeColor=#CBD5E1;">
+          <mxGeometry x="250" y="0" width="510" height="100" as="geometry">
+            <mxRectangle width="510" height="100" as="alternateBounds" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="p3-bang-hang-3-cot-2" parent="p3-bang-hang-3" vertex="1" value="Không · 400.&lt;br&gt;“Chuyến này đã đóng đặt chỗ. Bạn vui lòng chọn ngày khác.”" style="shape=partialRectangle;connectable=0;fillColor=none;top=0;left=0;bottom=0;right=1;align=left;verticalAlign=middle;spacing=10;overflow=hidden;html=1;whiteSpace=wrap;fontSize=14;fontColor=#0F172A;strokeColor=#CBD5E1;">
+          <mxGeometry x="760" y="0" width="390" height="100" as="geometry">
+            <mxRectangle width="390" height="100" as="alternateBounds" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="p3-bang-hang-3-cot-3" parent="p3-bang-hang-3" vertex="1" value="Có nếu tour chưa xoá" style="shape=partialRectangle;connectable=0;fillColor=none;top=0;left=0;bottom=0;right=1;align=left;verticalAlign=middle;spacing=10;overflow=hidden;html=1;whiteSpace=wrap;fontSize=14;fontColor=#0F172A;strokeColor=#CBD5E1;">
+          <mxGeometry x="1150" y="0" width="240" height="100" as="geometry">
+            <mxRectangle width="240" height="100" as="alternateBounds" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="p3-bang-hang-3-cot-4" parent="p3-bang-hang-3" vertex="1" value="Có nếu tour chưa xoá và chuyến chưa từng có khách" style="shape=partialRectangle;connectable=0;fillColor=none;top=0;left=0;bottom=0;right=1;align=left;verticalAlign=middle;spacing=10;overflow=hidden;html=1;whiteSpace=wrap;fontSize=14;fontColor=#0F172A;strokeColor=#CBD5E1;">
+          <mxGeometry x="1390" y="0" width="270" height="100" as="geometry">
+            <mxRectangle width="270" height="100" as="alternateBounds" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="p3-bang-hang-3-cot-5" parent="p3-bang-hang-3" vertex="1" value="Có nếu tour chưa xoá và chuyến chưa từng có khách" style="shape=partialRectangle;connectable=0;fillColor=none;top=0;left=0;bottom=0;right=1;align=left;verticalAlign=middle;spacing=10;overflow=hidden;html=1;whiteSpace=wrap;fontSize=14;fontColor=#0F172A;strokeColor=#CBD5E1;">
+          <mxGeometry x="1660" y="0" width="290" height="100" as="geometry">
+            <mxRectangle width="290" height="100" as="alternateBounds" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="p3-bang-hang-3-cot-6" parent="p3-bang-hang-3" vertex="1" value="Mở bán lại nếu tour chưa xoá." style="shape=partialRectangle;connectable=0;fillColor=none;top=0;left=0;bottom=0;right=0;align=left;verticalAlign=middle;spacing=10;overflow=hidden;html=1;whiteSpace=wrap;fontSize=14;fontColor=#0F172A;strokeColor=#CBD5E1;">
+          <mxGeometry x="1950" y="0" width="410" height="100" as="geometry">
+            <mxRectangle width="410" height="100" as="alternateBounds" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="p3-bang-hang-4" parent="p3-bang" vertex="1" value="" style="shape=tableRow;horizontal=0;startSize=0;swimlaneHead=0;swimlaneBody=0;fillColor=#F8FAFC;collapsible=0;dropTarget=0;top=0;left=0;right=0;bottom=1;">
+          <mxGeometry x="0" y="380" width="2360" height="100" as="geometry" />
+        </mxCell>
+        <mxCell id="p3-bang-hang-4-cot-0" parent="p3-bang-hang-4" vertex="1" value="&lt;b&gt;PAST&lt;/b&gt;" style="shape=partialRectangle;connectable=0;fillColor=none;top=0;left=0;bottom=0;right=1;align=left;verticalAlign=middle;spacing=10;overflow=hidden;html=1;whiteSpace=wrap;fontSize=14;fontColor=#0F172A;strokeColor=#CBD5E1;">
+          <mxGeometry x="0" y="0" width="250" height="100" as="geometry">
+            <mxRectangle width="250" height="100" as="alternateBounds" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="p3-bang-hang-4-cot-1" parent="p3-bang-hang-4" vertex="1" value="Không có trong lịch hoặc thẻ Đặt tour.&lt;br&gt;Admin mặc định ẩn; có thể bật xem chuyến đã qua." style="shape=partialRectangle;connectable=0;fillColor=none;top=0;left=0;bottom=0;right=1;align=left;verticalAlign=middle;spacing=10;overflow=hidden;html=1;whiteSpace=wrap;fontSize=14;fontColor=#0F172A;strokeColor=#CBD5E1;">
+          <mxGeometry x="250" y="0" width="510" height="100" as="geometry">
+            <mxRectangle width="510" height="100" as="alternateBounds" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="p3-bang-hang-4-cot-2" parent="p3-bang-hang-4" vertex="1" value="Không · 400.&lt;br&gt;“Chuyến này đã đóng đặt chỗ. Bạn vui lòng chọn ngày khác.”" style="shape=partialRectangle;connectable=0;fillColor=none;top=0;left=0;bottom=0;right=1;align=left;verticalAlign=middle;spacing=10;overflow=hidden;html=1;whiteSpace=wrap;fontSize=14;fontColor=#0F172A;strokeColor=#CBD5E1;">
+          <mxGeometry x="760" y="0" width="390" height="100" as="geometry">
+            <mxRectangle width="390" height="100" as="alternateBounds" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="p3-bang-hang-4-cot-3" parent="p3-bang-hang-4" vertex="1" value="Không" style="shape=partialRectangle;connectable=0;fillColor=none;top=0;left=0;bottom=0;right=1;align=left;verticalAlign=middle;spacing=10;overflow=hidden;html=1;whiteSpace=wrap;fontSize=14;fontColor=#0F172A;strokeColor=#CBD5E1;">
+          <mxGeometry x="1150" y="0" width="240" height="100" as="geometry">
+            <mxRectangle width="240" height="100" as="alternateBounds" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="p3-bang-hang-4-cot-4" parent="p3-bang-hang-4" vertex="1" value="Không" style="shape=partialRectangle;connectable=0;fillColor=none;top=0;left=0;bottom=0;right=1;align=left;verticalAlign=middle;spacing=10;overflow=hidden;html=1;whiteSpace=wrap;fontSize=14;fontColor=#0F172A;strokeColor=#CBD5E1;">
+          <mxGeometry x="1390" y="0" width="270" height="100" as="geometry">
+            <mxRectangle width="270" height="100" as="alternateBounds" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="p3-bang-hang-4-cot-5" parent="p3-bang-hang-4" vertex="1" value="Có nếu tour chưa xoá và chuyến chưa từng có khách" style="shape=partialRectangle;connectable=0;fillColor=none;top=0;left=0;bottom=0;right=1;align=left;verticalAlign=middle;spacing=10;overflow=hidden;html=1;whiteSpace=wrap;fontSize=14;fontColor=#0F172A;strokeColor=#CBD5E1;">
+          <mxGeometry x="1660" y="0" width="290" height="100" as="geometry">
+            <mxRectangle width="290" height="100" as="alternateBounds" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="p3-bang-hang-4-cot-6" parent="p3-bang-hang-4" vertex="1" value="Không · đóng hoặc mở lại đều trả 409." style="shape=partialRectangle;connectable=0;fillColor=none;top=0;left=0;bottom=0;right=0;align=left;verticalAlign=middle;spacing=10;overflow=hidden;html=1;whiteSpace=wrap;fontSize=14;fontColor=#0F172A;strokeColor=#CBD5E1;">
+          <mxGeometry x="1950" y="0" width="410" height="100" as="geometry">
+            <mxRectangle width="410" height="100" as="alternateBounds" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="p3-can-nho" parent="p3-1" vertex="1" value="&lt;b&gt;Điểm cần nhớ&lt;/b&gt;&lt;br&gt;Đóng bán lưu thành cờ riêng. Trả chỗ khi huỷ đơn giữ nguyên cờ này; số chỗ công khai của chuyến đã đóng là 0 và website hiện Hết chỗ.&lt;br&gt;Admin vẫn thấy chỗ còn theo total_seats − booked_seats. Đơn cũ đọc ngày từ chuyến, nên đã từng có khách thì khoá đổi ngày và xoá.&lt;br&gt;Chưa từng có khách nghĩa là chưa có đơn tham chiếu, kể cả đơn đã huỷ, và booked_seats = 0. Xoá thật được cả chuyến PAST nếu thoả.&lt;br&gt;Đặt trực tuyến bắt đầu từ ngày mai. Giảm tổng chỗ chỉ được đến mức booked_seats và tối thiểu 1." style="html=1;whiteSpace=wrap;fontSize=14;fontColor=#0F172A;rounded=0;align=left;verticalAlign=middle;spacing=14;fillColor=#FFFBEB;strokeColor=#B45309;strokeWidth=1.5;">
+          <mxGeometry x="40" y="2360" width="2360" height="170" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+  <diagram id="p4-trang" name="04 · Loại phòng &amp; lịch bay">
+    <mxGraphModel dx="1200" dy="800" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="0" pageScale="1" pageWidth="2440" pageHeight="2500" math="0" shadow="0">
+      <root>
+        <mxCell id="p4-0" />
+        <mxCell id="p4-1" parent="p4-0" />
+        <mxCell id="p4-tieu-de" parent="p4-1" vertex="1" value="&lt;b&gt;GoTrips · Loại phòng &amp;amp; lịch bay&lt;/b&gt;" style="text;html=1;whiteSpace=wrap;fontSize=14;fontColor=#0F172A;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;fontSize=24;fontStyle=1;">
+          <mxGeometry x="40" y="20" width="2360" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="p4-phu-de" parent="p4-1" vertex="1" value="Điều kiện bán, cách tính chỗ còn và giới hạn thao tác của admin · 28/11/2026" style="text;html=1;whiteSpace=wrap;fontSize=14;fontColor=#0F172A;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;fontColor=#475569;">
+          <mxGeometry x="40" y="120" width="2360" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="p4-cach-doc" parent="p4-1" vertex="1" value="&lt;b&gt;Cách đọc&lt;/b&gt;&lt;br&gt;● Bắt đầu  ·  ◉ Kết thúc  ·  Hộp bo góc viền liền: trạng thái lưu  ·  Hộp bo góc viền đứt: trạng thái tính ra  ·  ◇ Rẽ nhánh, đọc điều kiện trên mũi tên ra&lt;br&gt;→ Chuyển hiện có  ·  ⋯→ Tự động theo ngày  ·  – – → Nét đứt xám: Chưa có  ·  Vàng: đang chờ  ·  Xanh lá: đang hoạt động  ·  Xám: tạm ẩn, đóng bán, hết chỗ  ·  Đỏ: đã huỷ, đã xoá, đã qua" style="html=1;whiteSpace=wrap;fontSize=14;fontColor=#0F172A;rounded=0;align=left;verticalAlign=middle;spacing=14;fillColor=#FFFBEB;strokeColor=#B45309;strokeWidth=1.5;">
+          <mxGeometry x="40" y="210" width="2360" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="p4-luu" parent="p4-1" vertex="1" value="&lt;b&gt;Lưu ở đâu&lt;/b&gt;&lt;br&gt;Loại phòng  ·  hotel_room_types.total_rooms lưu tổng số phòng. hotel_bookings lưu rooms, check_in, check_out. Tình trạng bán và phòng còn trống được tính ra.&lt;br&gt;Lịch bay hằng ngày  ·  flight_schedules lưu economy_seats, premium_economy_seats, business_seats, first_seats.&lt;br&gt;Số ghế giữ theo ngày/hạng lấy từ flight_booking_segments và người đi trong đơn. isBookable, timingEditable, deletable và minimumTotalRooms đều được tính ra." style="html=1;whiteSpace=wrap;fontSize=14;fontColor=#0F172A;rounded=0;align=left;verticalAlign=middle;spacing=14;fillColor=#FFFBEB;strokeColor=#B45309;strokeWidth=1.5;">
+          <mxGeometry x="40" y="350" width="2360" height="110" as="geometry" />
+        </mxCell>
+        <mxCell id="p4-phong" parent="p4-1" vertex="1" value="&lt;b&gt;Loại phòng · mở bán theo tổng số phòng&lt;/b&gt;" style="text;html=1;whiteSpace=wrap;fontSize=14;fontColor=#0F172A;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;fontSize=18;fontStyle=1;">
+          <mxGeometry x="40" y="520" width="1100" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="p4-may-bay" parent="p4-1" vertex="1" value="&lt;b&gt;Lịch bay · tạo, cập nhật và xoá&lt;/b&gt;" style="text;html=1;whiteSpace=wrap;fontSize=14;fontColor=#0F172A;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;fontSize=18;fontStyle=1;">
+          <mxGeometry x="1260" y="520" width="1140" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="p4-phong-bat-dau" parent="p4-1" vertex="1" value="" style="ellipse;shape=startState;html=1;aspect=fixed;fillColor=#0F172A;strokeColor=#0F172A;">
+          <mxGeometry x="40" y="630" width="30" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="p4-phong-chon" parent="p4-1" vertex="1" value="" style="rhombus;html=1;fillColor=#FFFFFF;strokeColor=#475569;strokeWidth=1.6;">
+          <mxGeometry x="570" y="690" width="40" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="p4-phong-dang-ban" parent="p4-1" vertex="1" value="&lt;b&gt;Đang bán&lt;/b&gt;&lt;br&gt;total_rooms &amp;gt; 0&lt;br&gt;(tính ra)&lt;br&gt;Website: hiện nếu khách sạn ACTIVE&lt;br&gt;Admin: sửa, xoá theo cờ" style="html=1;whiteSpace=wrap;fontSize=14;fontColor=#0F172A;rounded=1;arcSize=20;spacing=6;align=center;verticalAlign=middle;strokeWidth=1.6;fillColor=#DCFCE7;strokeColor=#15803D;dashed=1;dashPattern=6 4;">
+          <mxGeometry x="80" y="780" width="260" height="100" as="geometry" />
+        </mxCell>
+        <mxCell id="p4-phong-ngung-ban" parent="p4-1" vertex="1" value="&lt;b&gt;Ngừng nhận đặt&lt;/b&gt;&lt;br&gt;total_rooms = 0&lt;br&gt;(tính ra)&lt;br&gt;Website: ẩn, loại khỏi giá từ&lt;br&gt;Admin: sửa, xoá theo cờ" style="html=1;whiteSpace=wrap;fontSize=14;fontColor=#0F172A;rounded=1;arcSize=20;spacing=6;align=center;verticalAlign=middle;strokeWidth=1.6;fillColor=#E5E7EB;strokeColor=#6B7280;dashed=1;dashPattern=6 4;">
+          <mxGeometry x="850" y="780" width="270" height="100" as="geometry" />
+        </mxCell>
+        <mxCell id="p4-phong-ket-thuc" parent="p4-1" vertex="1" value="" style="ellipse;shape=endState;html=1;aspect=fixed;fillColor=#0F172A;strokeColor=#0F172A;">
+          <mxGeometry x="580" y="1030" width="30" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="p4-phong-tr-tao" parent="p4-1" edge="1" source="p4-phong-bat-dau" target="p4-phong-chon" value="Nhân viên · tạo loại phòng [khách sạn chưa xoá]&lt;br&gt;POST /admin/hotels/{id}/room-types" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;endSize=7;strokeWidth=1.6;fontSize=13;fontColor=#334155;labelBackgroundColor=#FFFFFF;strokeColor=#475569;exitX=1;exitY=0.33333333;exitPerimeter=0;entryX=.5;entryY=0;entryPerimeter=0;">
+          <mxGeometry x="-1" relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="590" y="640" />
+            </Array>
+            <mxPoint x="245.0" y="0.0" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="p4-phong-tr-ban" parent="p4-1" edge="1" source="p4-phong-chon" target="p4-phong-dang-ban" value="[totalRooms &amp;gt; 0]" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;endSize=7;strokeWidth=1.6;fontSize=13;fontColor=#334155;labelBackgroundColor=#FFFFFF;strokeColor=#475569;exitX=0;exitY=0.5;exitPerimeter=0;entryX=0.5;entryY=0;entryPerimeter=0;">
+          <mxGeometry x="-1" relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="210" y="710" />
+            </Array>
+            <mxPoint x="-185.0" y="0.0" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="p4-phong-tr-chua-ban" parent="p4-1" edge="1" source="p4-phong-chon" target="p4-phong-ngung-ban" value="[totalRooms = 0]" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;endSize=7;strokeWidth=1.6;fontSize=13;fontColor=#334155;labelBackgroundColor=#FFFFFF;strokeColor=#475569;exitX=1;exitY=0.5;exitPerimeter=0;entryX=0.51851852;entryY=0;entryPerimeter=0;">
+          <mxGeometry x="-1" relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="990" y="710" />
+            </Array>
+            <mxPoint x="185.0" y="0.0" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="p4-phong-tr-ngung" parent="p4-1" edge="1" source="p4-phong-dang-ban" target="p4-phong-ngung-ban" value="Nhân viên · đưa totalRooms về 0&lt;br&gt;[minimumTotalRooms = 0]&lt;br&gt;PUT /admin/room-types/{id}" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;endSize=7;strokeWidth=1.6;fontSize=13;fontColor=#334155;labelBackgroundColor=#FFFFFF;strokeColor=#475569;exitX=1;exitY=0.22;exitPerimeter=0;entryX=0;entryY=0.22;entryPerimeter=0;">
+          <mxGeometry x="-1" relative="1" as="geometry">
+            <mxPoint x="255.0" y="-9.0" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="p4-phong-tr-mo" parent="p4-1" edge="1" source="p4-phong-ngung-ban" target="p4-phong-dang-ban" value="Nhân viên · tăng totalRooms trên 0&lt;br&gt;PUT /admin/room-types/{id}" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;endSize=7;strokeWidth=1.6;fontSize=13;fontColor=#334155;labelBackgroundColor=#FFFFFF;strokeColor=#475569;exitX=0;exitY=0.86;exitPerimeter=0;entryX=1;entryY=0.86;entryPerimeter=0;">
+          <mxGeometry x="-1" relative="1" as="geometry">
+            <mxPoint x="-255.0" y="2.0" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="p4-phong-tr-xoa-ban" parent="p4-1" edge="1" source="p4-phong-dang-ban" target="p4-phong-ket-thuc" value="Nhân viên · xoá [deletable]&lt;br&gt;DELETE /admin/room-types/{id}" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;endSize=7;strokeWidth=1.6;fontSize=13;fontColor=#334155;labelBackgroundColor=#FFFFFF;strokeColor=#475569;exitX=0.5;exitY=1;exitPerimeter=0;entryX=0;entryY=0.33333333;entryPerimeter=0;">
+          <mxGeometry x="-1" relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="210" y="1040" />
+            </Array>
+            <mxPoint x="142.0" y="160.0" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="p4-phong-tr-xoa-ngung" parent="p4-1" edge="1" source="p4-phong-ngung-ban" target="p4-phong-ket-thuc" value="Nhân viên · xoá [deletable]&lt;br&gt;DELETE /admin/room-types/{id}" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;endSize=7;strokeWidth=1.6;fontSize=13;fontColor=#334155;labelBackgroundColor=#FFFFFF;strokeColor=#475569;exitX=0.51851852;exitY=1;exitPerimeter=0;entryX=1;entryY=0.33333333;entryPerimeter=0;">
+          <mxGeometry x="-1" relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="990" y="1040" />
+            </Array>
+            <mxPoint x="-180.0" y="160.0" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="p4-bay-bat-dau" parent="p4-1" vertex="1" value="" style="ellipse;shape=startState;html=1;aspect=fixed;fillColor=#0F172A;strokeColor=#0F172A;">
+          <mxGeometry x="1260" y="820" width="30" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="p4-bay-dang-co" parent="p4-1" vertex="1" value="&lt;b&gt;Lịch đang có trong danh mục&lt;/b&gt;&lt;br&gt;Chạy hằng ngày · không có cột trạng thái&lt;br&gt;Website: tìm theo ngày và hạng&lt;br&gt;Admin: cờ theo lịch sử đơn" style="html=1;whiteSpace=wrap;fontSize=14;fontColor=#0F172A;rounded=1;arcSize=20;spacing=6;align=center;verticalAlign=middle;strokeWidth=1.6;fillColor=#DCFCE7;strokeColor=#15803D;">
+          <mxGeometry x="1600" y="780" width="290" height="100" as="geometry" />
+        </mxCell>
+        <mxCell id="p4-bay-ket-thuc" parent="p4-1" vertex="1" value="" style="ellipse;shape=endState;html=1;aspect=fixed;fillColor=#0F172A;strokeColor=#0F172A;">
+          <mxGeometry x="2260" y="820" width="30" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="p4-bay-ngung-ban" parent="p4-1" vertex="1" value="&lt;b&gt;Ngừng bán lịch còn đơn&lt;/b&gt;&lt;br&gt;Chưa có trong hệ thống" style="html=1;whiteSpace=wrap;fontSize=14;fontColor=#0F172A;rounded=1;arcSize=20;spacing=6;align=center;verticalAlign=middle;strokeWidth=1.6;fillColor=#F8FAFC;strokeColor=#9CA3AF;dashed=1;dashPattern=6 4;">
+          <mxGeometry x="2070" y="950" width="280" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="p4-bay-tr-tao" parent="p4-1" edge="1" source="p4-bay-bat-dau" target="p4-bay-dang-co" value="Nhân viên · tạo lịch [hãng và chặng hợp lệ]&lt;br&gt;POST /admin/flight-schedules" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;endSize=7;strokeWidth=1.6;fontSize=13;fontColor=#334155;labelBackgroundColor=#FFFFFF;strokeColor=#475569;exitX=1;exitY=0.5;exitPerimeter=0;entryX=0;entryY=0.5;entryPerimeter=0;">
+          <mxGeometry x="-1" relative="1" as="geometry">
+            <mxPoint x="160.0" y="-8.0" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="p4-bay-tr-sua" parent="p4-1" edge="1" source="p4-bay-dang-co" target="p4-bay-dang-co" value="Nhân viên · cập nhật giá, sức chứa, giờ và thời lượng&lt;br&gt;[Giờ và thời lượng chỉ đổi khi timingEditable]&lt;br&gt;PUT /admin/flight-schedules/{id}" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;endSize=7;strokeWidth=1.6;fontSize=13;fontColor=#334155;labelBackgroundColor=#FFFFFF;strokeColor=#475569;exitX=0.27586207;exitY=0;exitPerimeter=0;entryX=0.79310345;entryY=0;entryPerimeter=0;">
+          <mxGeometry x="-1" relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="1680" y="660" />
+              <mxPoint x="1830" y="660" />
+            </Array>
+            <mxPoint x="65.0" y="-125.0" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="p4-bay-tr-xoa" parent="p4-1" edge="1" source="p4-bay-dang-co" target="p4-bay-ket-thuc" value="Nhân viên · xoá [deletable]&lt;br&gt;DELETE /admin/flight-schedules/{id}" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;endSize=7;strokeWidth=1.6;fontSize=13;fontColor=#334155;labelBackgroundColor=#FFFFFF;strokeColor=#475569;exitX=1;exitY=0.5;exitPerimeter=0;entryX=0;entryY=0.5;entryPerimeter=0;">
+          <mxGeometry x="-1" relative="1" as="geometry">
+            <mxPoint x="180.0" y="0.0" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="p4-bay-tr-ngung" parent="p4-1" edge="1" source="p4-bay-dang-co" target="p4-bay-ngung-ban" value="Chưa có: ngừng bán một lịch bay&lt;br&gt;còn đơn trong tương lai" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;endSize=7;strokeWidth=1.6;fontSize=13;fontColor=#334155;labelBackgroundColor=#FFFFFF;strokeColor=#9CA3AF;dashed=1;dashPattern=6 4;exitX=0.51724138;exitY=1;exitPerimeter=0;entryX=0;entryY=0.5;entryPerimeter=0;">
+          <mxGeometry x="-1" relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="1760" y="990" />
+            </Array>
+            <mxPoint x="130.0" y="100.0" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="p4-phong-luot" parent="p4-1" vertex="1" value="&lt;b&gt;Còn phòng cho khoảng ngày này?&lt;/b&gt;" style="text;html=1;whiteSpace=wrap;fontSize=14;fontColor=#0F172A;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;fontSize=18;fontStyle=1;">
+          <mxGeometry x="40" y="1110" width="1100" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="p4-bay-luot" parent="p4-1" vertex="1" value="&lt;b&gt;Có đặt được cho ngày, hạng ghế và đoàn này?&lt;/b&gt;" style="text;html=1;whiteSpace=wrap;fontSize=14;fontColor=#0F172A;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;fontSize=18;fontStyle=1;">
+          <mxGeometry x="1260" y="1110" width="1140" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="p4-phong-hoi" parent="p4-1" vertex="1" value="" style="ellipse;shape=startState;html=1;aspect=fixed;fillColor=#0F172A;strokeColor=#0F172A;">
+          <mxGeometry x="40" y="1200" width="30" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="p4-phong-du" parent="p4-1" vertex="1" value="" style="rhombus;html=1;fillColor=#FFFFFF;strokeColor=#475569;strokeWidth=1.6;">
+          <mxGeometry x="580" y="1260" width="40" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="p4-phong-dap-ung" parent="p4-1" vertex="1" value="&lt;b&gt;Đủ phòng cho lượt hỏi&lt;/b&gt;&lt;br&gt;Phòng trống ≥ số phòng yêu cầu&lt;br&gt;(tính ra)&lt;br&gt;Website: đủ điều kiện lên kết quả&lt;br&gt;Website: nhận phòng từ ngày mai" style="html=1;whiteSpace=wrap;fontSize=14;fontColor=#0F172A;rounded=1;arcSize=20;spacing=6;align=center;verticalAlign=middle;strokeWidth=1.6;fillColor=#DCFCE7;strokeColor=#15803D;dashed=1;dashPattern=6 4;">
+          <mxGeometry x="80" y="1410" width="300" height="110" as="geometry" />
+        </mxCell>
+        <mxCell id="p4-phong-thieu" parent="p4-1" vertex="1" value="&lt;b&gt;Thiếu phòng cho lượt hỏi&lt;/b&gt;&lt;br&gt;Phòng trống &amp;lt; số phòng yêu cầu&lt;br&gt;(tính ra)&lt;br&gt;Website: loại khỏi lượt tìm&lt;br&gt;Website: không đặt được (API 409)" style="html=1;whiteSpace=wrap;fontSize=14;fontColor=#0F172A;rounded=1;arcSize=20;spacing=6;align=center;verticalAlign=middle;strokeWidth=1.6;fillColor=#E5E7EB;strokeColor=#6B7280;dashed=1;dashPattern=6 4;">
+          <mxGeometry x="820" y="1410" width="300" height="110" as="geometry" />
+        </mxCell>
+        <mxCell id="p4-phong-tr-hoi" parent="p4-1" edge="1" source="p4-phong-hoi" target="p4-phong-du" value="Khách · tìm hoặc đặt cho loại đang bán, phù hợp sức chứa&lt;br&gt;GET /hotels · POST /bookings/hotels&lt;br&gt;Phòng trống = max(0, total_rooms − tổng phòng của đơn giao kỳ)" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;endSize=7;strokeWidth=1.6;fontSize=13;fontColor=#334155;labelBackgroundColor=#FFFFFF;strokeColor=#475569;exitX=1;exitY=0.66666667;exitPerimeter=0;entryX=0.5;entryY=0;entryPerimeter=0;">
+          <mxGeometry x="-1" relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="600" y="1220" />
+            </Array>
+            <mxPoint x="248.0" y="-5.0" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="p4-phong-tr-du" parent="p4-1" edge="1" source="p4-phong-du" target="p4-phong-dap-ung" value="[Đủ số phòng yêu cầu]&lt;br&gt;Tìm chọn loại đủ chỗ có giá thấp nhất" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;endSize=7;strokeWidth=1.6;fontSize=13;fontColor=#334155;labelBackgroundColor=#FFFFFF;strokeColor=#475569;exitX=0;exitY=0.5;exitPerimeter=0;entryX=0.5;entryY=0;entryPerimeter=0;">
+          <mxGeometry x="-1" relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="420" y="1280" />
+              <mxPoint x="420" y="1350" />
+              <mxPoint x="230" y="1350" />
+            </Array>
+            <mxPoint x="-250.0" y="45.0" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="p4-phong-tr-thieu" parent="p4-1" edge="1" source="p4-phong-du" target="p4-phong-thieu" value="[Thiếu số phòng yêu cầu]&lt;br&gt;Khách sạn chỉ rời kết quả nếu không có loại nào phù hợp" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;endSize=7;strokeWidth=1.6;fontSize=13;fontColor=#334155;labelBackgroundColor=#FFFFFF;strokeColor=#475569;exitX=1;exitY=0.5;exitPerimeter=0;entryX=0.5;entryY=0;entryPerimeter=0;">
+          <mxGeometry x="-1" relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="970" y="1280" />
+            </Array>
+            <mxPoint x="320.0" y="45.0" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="p4-bay-hoi" parent="p4-1" vertex="1" value="" style="ellipse;shape=startState;html=1;aspect=fixed;fillColor=#0F172A;strokeColor=#0F172A;">
+          <mxGeometry x="1260" y="1200" width="30" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="p4-bay-du" parent="p4-1" vertex="1" value="" style="rhombus;html=1;fillColor=#FFFFFF;strokeColor=#475569;strokeWidth=1.6;">
+          <mxGeometry x="1810" y="1260" width="40" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="p4-bay-dap-ung" parent="p4-1" vertex="1" value="&lt;b&gt;Đặt được&lt;/b&gt;&lt;br&gt;isBookable = true&lt;br&gt;(tính ra)&lt;br&gt;Website: nút Chọn bật&lt;br&gt;Website: đặt được khi API xác nhận lại" style="html=1;whiteSpace=wrap;fontSize=14;fontColor=#0F172A;rounded=1;arcSize=20;spacing=6;align=center;verticalAlign=middle;strokeWidth=1.6;fillColor=#DCFCE7;strokeColor=#15803D;dashed=1;dashPattern=6 4;">
+          <mxGeometry x="1300" y="1410" width="310" height="110" as="geometry" />
+        </mxCell>
+        <mxCell id="p4-bay-thieu" parent="p4-1" vertex="1" value="&lt;b&gt;Chưa đặt được&lt;/b&gt;&lt;br&gt;isBookable = false&lt;br&gt;(tính ra)&lt;br&gt;Website: khoá nút Chọn&lt;br&gt;Website: báo bay hôm nay hoặc Không đủ ghế" style="html=1;whiteSpace=wrap;fontSize=14;fontColor=#0F172A;rounded=1;arcSize=20;spacing=6;align=center;verticalAlign=middle;strokeWidth=1.6;fillColor=#E5E7EB;strokeColor=#6B7280;dashed=1;dashPattern=6 4;">
+          <mxGeometry x="2060" y="1410" width="340" height="110" as="geometry" />
+        </mxCell>
+        <mxCell id="p4-bay-tr-hoi" parent="p4-1" edge="1" source="p4-bay-hoi" target="p4-bay-du" value="Khách · tìm hoặc đặt theo ngày, hạng và số khách&lt;br&gt;GET /flights · GET /flights/{scheduleId}&lt;br&gt;POST /bookings/flights · kiểm lại từng chặng" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;endSize=7;strokeWidth=1.6;fontSize=13;fontColor=#334155;labelBackgroundColor=#FFFFFF;strokeColor=#475569;exitX=1;exitY=0.66666667;exitPerimeter=0;entryX=0.5;entryY=0;entryPerimeter=0;">
+          <mxGeometry x="-1" relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="1830" y="1220" />
+            </Array>
+            <mxPoint x="265.0" y="-5.0" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="p4-bay-tr-du" parent="p4-1" edge="1" source="p4-bay-du" target="p4-bay-dap-ung" value="[Ngày từ mai và đủ ghế cho người lớn + trẻ em]" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;endSize=7;strokeWidth=1.6;fontSize=13;fontColor=#334155;labelBackgroundColor=#FFFFFF;strokeColor=#475569;exitX=0;exitY=0.5;exitPerimeter=0;entryX=0.51612903;entryY=0;entryPerimeter=0;">
+          <mxGeometry x="-1" relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="1460" y="1280" />
+            </Array>
+            <mxPoint x="-225.0" y="50.0" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="p4-bay-tr-thieu" parent="p4-1" edge="1" source="p4-bay-du" target="p4-bay-thieu" value="[Bay hôm nay hoặc thiếu ghế]" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;endSize=7;strokeWidth=1.6;fontSize=13;fontColor=#334155;labelBackgroundColor=#FFFFFF;strokeColor=#475569;exitX=1;exitY=0.5;exitPerimeter=0;entryX=0.5;entryY=0;entryPerimeter=0;">
+          <mxGeometry x="-1" relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="2230" y="1280" />
+            </Array>
+            <mxPoint x="250.0" y="50.0" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="p4-phong-quan-tri" parent="p4-1" vertex="1" value="&lt;b&gt;Admin · sửa hoặc xoá loại phòng&lt;/b&gt;&lt;br&gt;Khách sạn đã xoá khoá sửa và xoá loại phòng. Nếu được sửa, giảm totalRooms chỉ đến minimumTotalRooms: số phòng đang giữ cao nhất trong một đêm kể từ hôm nay.&lt;br&gt;Giảm quá mức → 409 · “Không giảm được: có đêm đang giữ…”&lt;br&gt;deletable = true khi chưa từng có đơn. Đã có đơn, kể cả đã huỷ → 409 · “Không xoá được loại phòng này vì đã có đơn đặt (kể cả đơn đã huỷ).…”&lt;br&gt;Đưa loại đang bán cuối cùng về 0 hoặc xoá loại đó làm khách sạn rời website. Xem trang 02." style="html=1;whiteSpace=wrap;fontSize=14;fontColor=#0F172A;rounded=0;align=left;verticalAlign=middle;spacing=14;fillColor=#FFFBEB;strokeColor=#B45309;strokeWidth=1.5;">
+          <mxGeometry x="40" y="1580" width="1100" height="190" as="geometry" />
+        </mxCell>
+        <mxCell id="p4-bay-quan-tri" parent="p4-1" vertex="1" value="&lt;b&gt;Admin · sửa hoặc xoá lịch bay&lt;/b&gt;&lt;br&gt;timingEditable và deletable đều là false khi lịch từng có đơn, kể cả đơn đã huỷ hoặc chuyến đã bay. Vẫn sửa giá và sức chứa hợp lệ.&lt;br&gt;Sửa giờ hoặc thời lượng → 409 · “Lịch bay từng có đơn nên giờ bay phải giữ nguyên.”  ·  “Lịch bay từng có đơn nên thời lượng phải giữ nguyên.”&lt;br&gt;Xoá → 409 · “Lịch bay từng có đơn nên không thể xoá.”&lt;br&gt;Giảm ghế theo từng hạng: tối thiểu là số ghế giữ cao nhất trong một ngày kể từ hôm nay; thấp hơn → 409 · “Có ngày đã bán…”&lt;br&gt;Hãng bay, sân bay và chặng bay phổ biến không có cột trạng thái." style="html=1;whiteSpace=wrap;fontSize=14;fontColor=#0F172A;rounded=0;align=left;verticalAlign=middle;spacing=14;fillColor=#FFFBEB;strokeColor=#B45309;strokeWidth=1.5;">
+          <mxGeometry x="1260" y="1580" width="1140" height="190" as="geometry" />
+        </mxCell>
+        <mxCell id="p4-bang" parent="p4-1" vertex="1" value="&lt;b&gt;So sánh cách giữ chỗ&lt;/b&gt;" style="shape=table;startSize=40;container=1;collapsible=1;childLayout=tableLayout;fixedRows=1;rowLines=1;fontStyle=1;align=center;resizeLast=1;html=1;fontSize=16;fillColor=#DBEAFE;strokeColor=#1D4ED8;fontColor=#0F172A;">
+          <mxGeometry x="40" y="1830" width="2360" height="320" as="geometry">
+            <mxRectangle width="2360" height="40" as="alternateBounds" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="p4-bang-hang-0" parent="p4-bang" vertex="1" value="" style="shape=tableRow;horizontal=0;startSize=0;swimlaneHead=0;swimlaneBody=0;fillColor=#E5E7EB;collapsible=0;dropTarget=0;top=0;left=0;right=0;bottom=1;">
+          <mxGeometry x="0" y="40" width="2360" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="p4-bang-hang-0-cot-0" parent="p4-bang-hang-0" vertex="1" value="&lt;b&gt;Dịch vụ&lt;/b&gt;" style="shape=partialRectangle;connectable=0;fillColor=none;top=0;left=0;bottom=0;right=1;align=left;verticalAlign=middle;spacing=10;overflow=hidden;html=1;whiteSpace=wrap;fontSize=14;fontColor=#0F172A;strokeColor=#CBD5E1;">
+          <mxGeometry x="0" y="0" width="240" height="40" as="geometry">
+            <mxRectangle width="240" height="40" as="alternateBounds" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="p4-bang-hang-0-cot-1" parent="p4-bang-hang-0" vertex="1" value="&lt;b&gt;Lưu số đã đặt hay đếm từ đơn?&lt;/b&gt;" style="shape=partialRectangle;connectable=0;fillColor=none;top=0;left=0;bottom=0;right=1;align=left;verticalAlign=middle;spacing=10;overflow=hidden;html=1;whiteSpace=wrap;fontSize=14;fontColor=#0F172A;strokeColor=#CBD5E1;">
+          <mxGeometry x="240" y="0" width="710" height="40" as="geometry">
+            <mxRectangle width="710" height="40" as="alternateBounds" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="p4-bang-hang-0-cot-2" parent="p4-bang-hang-0" vertex="1" value="&lt;b&gt;Khi huỷ đơn&lt;/b&gt;" style="shape=partialRectangle;connectable=0;fillColor=none;top=0;left=0;bottom=0;right=1;align=left;verticalAlign=middle;spacing=10;overflow=hidden;html=1;whiteSpace=wrap;fontSize=14;fontColor=#0F172A;strokeColor=#CBD5E1;">
+          <mxGeometry x="950" y="0" width="620" height="40" as="geometry">
+            <mxRectangle width="620" height="40" as="alternateBounds" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="p4-bang-hang-0-cot-3" parent="p4-bang-hang-0" vertex="1" value="&lt;b&gt;Ngừng bán&lt;/b&gt;" style="shape=partialRectangle;connectable=0;fillColor=none;top=0;left=0;bottom=0;right=1;align=left;verticalAlign=middle;spacing=10;overflow=hidden;html=1;whiteSpace=wrap;fontSize=14;fontColor=#0F172A;strokeColor=#CBD5E1;">
+          <mxGeometry x="1570" y="0" width="500" height="40" as="geometry">
+            <mxRectangle width="500" height="40" as="alternateBounds" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="p4-bang-hang-0-cot-4" parent="p4-bang-hang-0" vertex="1" value="&lt;b&gt;Đơn vị đếm&lt;/b&gt;" style="shape=partialRectangle;connectable=0;fillColor=none;top=0;left=0;bottom=0;right=0;align=left;verticalAlign=middle;spacing=10;overflow=hidden;html=1;whiteSpace=wrap;fontSize=14;fontColor=#0F172A;strokeColor=#CBD5E1;">
+          <mxGeometry x="2070" y="0" width="290" height="40" as="geometry">
+            <mxRectangle width="290" height="40" as="alternateBounds" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="p4-bang-hang-1" parent="p4-bang" vertex="1" value="" style="shape=tableRow;horizontal=0;startSize=0;swimlaneHead=0;swimlaneBody=0;fillColor=#FFFFFF;collapsible=0;dropTarget=0;top=0;left=0;right=0;bottom=1;">
+          <mxGeometry x="0" y="80" width="2360" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="p4-bang-hang-1-cot-0" parent="p4-bang-hang-1" vertex="1" value="&lt;b&gt;Tour&lt;/b&gt;" style="shape=partialRectangle;connectable=0;fillColor=none;top=0;left=0;bottom=0;right=1;align=left;verticalAlign=middle;spacing=10;overflow=hidden;html=1;whiteSpace=wrap;fontSize=14;fontColor=#0F172A;strokeColor=#CBD5E1;">
+          <mxGeometry x="0" y="0" width="240" height="80" as="geometry">
+            <mxRectangle width="240" height="80" as="alternateBounds" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="p4-bang-hang-1-cot-1" parent="p4-bang-hang-1" vertex="1" value="Lưu tour_departures.booked_seats." style="shape=partialRectangle;connectable=0;fillColor=none;top=0;left=0;bottom=0;right=1;align=left;verticalAlign=middle;spacing=10;overflow=hidden;html=1;whiteSpace=wrap;fontSize=14;fontColor=#0F172A;strokeColor=#CBD5E1;">
+          <mxGeometry x="240" y="0" width="710" height="80" as="geometry">
+            <mxRectangle width="710" height="80" as="alternateBounds" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="p4-bang-hang-1-cot-2" parent="p4-bang-hang-1" vertex="1" value="Giảm booked_seats theo số khách trong đơn huỷ." style="shape=partialRectangle;connectable=0;fillColor=none;top=0;left=0;bottom=0;right=1;align=left;verticalAlign=middle;spacing=10;overflow=hidden;html=1;whiteSpace=wrap;fontSize=14;fontColor=#0F172A;strokeColor=#CBD5E1;">
+          <mxGeometry x="950" y="0" width="620" height="80" as="geometry">
+            <mxRectangle width="620" height="80" as="alternateBounds" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="p4-bang-hang-1-cot-3" parent="p4-bang-hang-1" vertex="1" value="Đóng bán chuyến bằng sales_closed." style="shape=partialRectangle;connectable=0;fillColor=none;top=0;left=0;bottom=0;right=1;align=left;verticalAlign=middle;spacing=10;overflow=hidden;html=1;whiteSpace=wrap;fontSize=14;fontColor=#0F172A;strokeColor=#CBD5E1;">
+          <mxGeometry x="1570" y="0" width="500" height="80" as="geometry">
+            <mxRectangle width="500" height="80" as="alternateBounds" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="p4-bang-hang-1-cot-4" parent="p4-bang-hang-1" vertex="1" value="Chỗ" style="shape=partialRectangle;connectable=0;fillColor=none;top=0;left=0;bottom=0;right=0;align=left;verticalAlign=middle;spacing=10;overflow=hidden;html=1;whiteSpace=wrap;fontSize=14;fontColor=#0F172A;strokeColor=#CBD5E1;">
+          <mxGeometry x="2070" y="0" width="290" height="80" as="geometry">
+            <mxRectangle width="290" height="80" as="alternateBounds" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="p4-bang-hang-2" parent="p4-bang" vertex="1" value="" style="shape=tableRow;horizontal=0;startSize=0;swimlaneHead=0;swimlaneBody=0;fillColor=#F8FAFC;collapsible=0;dropTarget=0;top=0;left=0;right=0;bottom=1;">
+          <mxGeometry x="0" y="160" width="2360" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="p4-bang-hang-2-cot-0" parent="p4-bang-hang-2" vertex="1" value="&lt;b&gt;Khách sạn&lt;/b&gt;" style="shape=partialRectangle;connectable=0;fillColor=none;top=0;left=0;bottom=0;right=1;align=left;verticalAlign=middle;spacing=10;overflow=hidden;html=1;whiteSpace=wrap;fontSize=14;fontColor=#0F172A;strokeColor=#CBD5E1;">
+          <mxGeometry x="0" y="0" width="240" height="80" as="geometry">
+            <mxRectangle width="240" height="80" as="alternateBounds" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="p4-bang-hang-2-cot-1" parent="p4-bang-hang-2" vertex="1" value="Cộng rooms ở các đơn chưa huỷ có kỳ ở giao nhau với kỳ đang hỏi." style="shape=partialRectangle;connectable=0;fillColor=none;top=0;left=0;bottom=0;right=1;align=left;verticalAlign=middle;spacing=10;overflow=hidden;html=1;whiteSpace=wrap;fontSize=14;fontColor=#0F172A;strokeColor=#CBD5E1;">
+          <mxGeometry x="240" y="0" width="710" height="80" as="geometry">
+            <mxRectangle width="710" height="80" as="alternateBounds" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="p4-bang-hang-2-cot-2" parent="p4-bang-hang-2" vertex="1" value="Đơn huỷ rời phép đếm; phòng trống được tính lại." style="shape=partialRectangle;connectable=0;fillColor=none;top=0;left=0;bottom=0;right=1;align=left;verticalAlign=middle;spacing=10;overflow=hidden;html=1;whiteSpace=wrap;fontSize=14;fontColor=#0F172A;strokeColor=#CBD5E1;">
+          <mxGeometry x="950" y="0" width="620" height="80" as="geometry">
+            <mxRectangle width="620" height="80" as="alternateBounds" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="p4-bang-hang-2-cot-3" parent="p4-bang-hang-2" vertex="1" value="Đưa total_rooms về 0 nếu không còn phòng phải giữ." style="shape=partialRectangle;connectable=0;fillColor=none;top=0;left=0;bottom=0;right=1;align=left;verticalAlign=middle;spacing=10;overflow=hidden;html=1;whiteSpace=wrap;fontSize=14;fontColor=#0F172A;strokeColor=#CBD5E1;">
+          <mxGeometry x="1570" y="0" width="500" height="80" as="geometry">
+            <mxRectangle width="500" height="80" as="alternateBounds" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="p4-bang-hang-2-cot-4" parent="p4-bang-hang-2" vertex="1" value="Phòng × đêm" style="shape=partialRectangle;connectable=0;fillColor=none;top=0;left=0;bottom=0;right=0;align=left;verticalAlign=middle;spacing=10;overflow=hidden;html=1;whiteSpace=wrap;fontSize=14;fontColor=#0F172A;strokeColor=#CBD5E1;">
+          <mxGeometry x="2070" y="0" width="290" height="80" as="geometry">
+            <mxRectangle width="290" height="80" as="alternateBounds" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="p4-bang-hang-3" parent="p4-bang" vertex="1" value="" style="shape=tableRow;horizontal=0;startSize=0;swimlaneHead=0;swimlaneBody=0;fillColor=#FFFFFF;collapsible=0;dropTarget=0;top=0;left=0;right=0;bottom=1;">
+          <mxGeometry x="0" y="240" width="2360" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="p4-bang-hang-3-cot-0" parent="p4-bang-hang-3" vertex="1" value="&lt;b&gt;Vé máy bay&lt;/b&gt;" style="shape=partialRectangle;connectable=0;fillColor=none;top=0;left=0;bottom=0;right=1;align=left;verticalAlign=middle;spacing=10;overflow=hidden;html=1;whiteSpace=wrap;fontSize=14;fontColor=#0F172A;strokeColor=#CBD5E1;">
+          <mxGeometry x="0" y="0" width="240" height="80" as="geometry">
+            <mxRectangle width="240" height="80" as="alternateBounds" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="p4-bang-hang-3-cot-1" parent="p4-bang-hang-3" vertex="1" value="Đếm hành khách có ghế của đơn chưa huỷ theo lịch, ngày bay và hạng ghế." style="shape=partialRectangle;connectable=0;fillColor=none;top=0;left=0;bottom=0;right=1;align=left;verticalAlign=middle;spacing=10;overflow=hidden;html=1;whiteSpace=wrap;fontSize=14;fontColor=#0F172A;strokeColor=#CBD5E1;">
+          <mxGeometry x="240" y="0" width="710" height="80" as="geometry">
+            <mxRectangle width="710" height="80" as="alternateBounds" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="p4-bang-hang-3-cot-2" parent="p4-bang-hang-3" vertex="1" value="Đơn huỷ rời phép đếm; số ghế còn được tính lại." style="shape=partialRectangle;connectable=0;fillColor=none;top=0;left=0;bottom=0;right=1;align=left;verticalAlign=middle;spacing=10;overflow=hidden;html=1;whiteSpace=wrap;fontSize=14;fontColor=#0F172A;strokeColor=#CBD5E1;">
+          <mxGeometry x="950" y="0" width="620" height="80" as="geometry">
+            <mxRectangle width="620" height="80" as="alternateBounds" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="p4-bang-hang-3-cot-3" parent="p4-bang-hang-3" vertex="1" value="Chưa có thao tác ngừng bán lịch còn đơn trong tương lai." style="shape=partialRectangle;connectable=0;fillColor=none;top=0;left=0;bottom=0;right=1;align=left;verticalAlign=middle;spacing=10;overflow=hidden;html=1;whiteSpace=wrap;fontSize=14;fontColor=#0F172A;strokeColor=#CBD5E1;">
+          <mxGeometry x="1570" y="0" width="500" height="80" as="geometry">
+            <mxRectangle width="500" height="80" as="alternateBounds" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="p4-bang-hang-3-cot-4" parent="p4-bang-hang-3" vertex="1" value="Ghế × ngày × hạng" style="shape=partialRectangle;connectable=0;fillColor=none;top=0;left=0;bottom=0;right=0;align=left;verticalAlign=middle;spacing=10;overflow=hidden;html=1;whiteSpace=wrap;fontSize=14;fontColor=#0F172A;strokeColor=#CBD5E1;">
+          <mxGeometry x="2070" y="0" width="290" height="80" as="geometry">
+            <mxRectangle width="290" height="80" as="alternateBounds" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="p4-can-nho" parent="p4-1" vertex="1" value="&lt;b&gt;Điểm cần nhớ&lt;/b&gt;&lt;br&gt;Khách sạn và vé tính số còn trống từ đơn chưa huỷ. Ghế còn = max(0, sức chứa hạng − số khách có ghế); em bé không chiếm ghế.&lt;br&gt;Phòng được đếm trên toàn khoảng nhận–trả. Hai đơn không chung đêm nào vẫn bị cộng nếu cùng giao với khoảng hỏi. Giảm số phòng xong, một kỳ dài vẫn có thể báo hết.&lt;br&gt;Tìm khách sạn cho phép ngày nhận hôm nay. Đặt trực tuyến trả 400 · “Đặt phòng trực tuyến chỉ nhận phòng từ ngày mai. Bạn vui lòng chọn ngày khác.”&lt;br&gt;Khi thực sự hết phòng, lệnh đặt trả 409 · “Loại phòng này đã hết phòng trong khoảng ngày đã chọn. Bạn vui lòng đổi ngày hoặc chọn loại phòng khác.”&lt;br&gt;Lịch bay chưa có thao tác ngừng bán khi còn đơn trong tương lai." style="html=1;whiteSpace=wrap;fontSize=14;fontColor=#0F172A;rounded=0;align=left;verticalAlign=middle;spacing=14;fillColor=#FFFBEB;strokeColor=#B45309;strokeWidth=1.5;">
+          <mxGeometry x="40" y="2210" width="2360" height="210" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

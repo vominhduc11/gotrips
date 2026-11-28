@@ -5,6 +5,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
@@ -21,7 +22,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 /**
- * Đăng ký / đăng nhập / người dùng hiện tại.
+ * Đăng ký / đăng nhập / quản lý tài khoản hiện tại.
  * Lỗi trả theo {@code ProblemDetail} (xem GlobalExceptionHandler) và được client (Orval + ApiError) chuyển thành
  * ngoại lệ, nên spec chỉ khai báo kết quả thành công để client sinh ra có kiểu gọn: 400 (dữ liệu sai, kèm
  * {@code errors[]} theo field), 401 (sai thông tin / token không hợp lệ), 409 (email đã đăng ký).
@@ -55,5 +56,25 @@ public class AuthController {
     @GetMapping("/me")
     public UserResponse me(@AuthenticationPrincipal Jwt jwt) {
         return authService.getCurrentUser(JwtUserId.from(jwt));
+    }
+
+    @Operation(operationId = "updateMe", summary = "Cập nhật hồ sơ của người dùng đang đăng nhập",
+            description = "Thay toàn bộ hồ sơ có thể sửa. Bỏ trường phone, gửi null hoặc để trống sẽ xoá số đã lưu. "
+                    + "Lỗi: 400 dữ liệu không hợp lệ (kèm errors[] theo field), "
+                    + "401 thiếu token, token không hợp lệ hoặc tài khoản không còn tồn tại.",
+            security = @SecurityRequirement(name = OpenApiConfig.BEARER_SCHEME))
+    @PutMapping("/me")
+    public UserResponse updateMe(@AuthenticationPrincipal Jwt jwt, @Valid @RequestBody UpdateProfileRequest request) {
+        return authService.updateProfile(JwtUserId.from(jwt), request);
+    }
+
+    @Operation(operationId = "changeMyPassword", summary = "Đổi mật khẩu của người dùng đang đăng nhập",
+            description = "Lỗi: 400 dữ liệu không hợp lệ hoặc sai mật khẩu hiện tại (kèm errors[] theo field), "
+                    + "401 thiếu token, token không hợp lệ hoặc tài khoản không còn tồn tại.",
+            security = @SecurityRequirement(name = OpenApiConfig.BEARER_SCHEME))
+    @PutMapping("/me/password")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void changeMyPassword(@AuthenticationPrincipal Jwt jwt, @Valid @RequestBody ChangePasswordRequest request) {
+        authService.changeMyPassword(JwtUserId.from(jwt), request);
     }
 }

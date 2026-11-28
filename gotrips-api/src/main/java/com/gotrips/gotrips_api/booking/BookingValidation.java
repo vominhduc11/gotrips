@@ -18,9 +18,6 @@ final class BookingValidation {
     /** Cùng định dạng với đăng ký nhận ưu đãi (không dùng {@code @Email} vì chấp nhận {@code a@b}). */
     static final String EMAIL = "|[^\\s@]+@[^\\s@]+\\.[^\\s@]{2,}";
 
-    /** Di động Việt Nam: 0 hoặc +84, đầu số 3/5/7/8/9, rồi 8 chữ số; được cách nhóm bằng dấu cách hoặc chấm. */
-    static final String VIETNAM_PHONE = "|(?:\\+84|0)[35789](?:[ .]?\\d){8}";
-
     static final int NOTE_MAX_LENGTH = 500;
     static final String NOTE_MAX_MESSAGE = "Ghi chú không được quá 500 ký tự.";
 

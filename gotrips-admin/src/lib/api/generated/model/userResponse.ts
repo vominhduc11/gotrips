@@ -13,5 +13,7 @@ export interface UserResponse {
   id: string;
   email: string;
   fullName: string;
+  /** @nullable */
+  phone: string | null;
   roles: UserResponseRolesItem[];
 }

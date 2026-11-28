@@ -12,7 +12,7 @@ export function useLogout() {
 
   function logout() {
     startTransition(async () => {
-      await logoutAction();
+      await logoutAction(window.location.pathname === "/account");
       toast.success("Bạn đã đăng xuất");
       router.refresh();
     });

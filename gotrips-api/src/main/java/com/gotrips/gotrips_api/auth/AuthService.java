@@ -67,17 +67,38 @@ public class AuthService {
     }
 
     @Transactional
+    public UserResponse updateProfile(UUID userId, UpdateProfileRequest request) {
+        User user = lockCurrentUser(userId);
+        user.changeFullName(request.fullName());
+        user.changePhone(request.phone());
+        return userMapper.toResponse(user);
+    }
+
+    @Transactional
+    public void changeMyPassword(UUID userId, ChangePasswordRequest request) {
+        changePassword(lockCurrentUser(userId), request.currentPassword(), request.newPassword());
+    }
+
+    @Transactional
     public void changeAdminPassword(UUID userId, AdminChangePasswordRequest request) {
-        // Hai yêu cầu đổi mật khẩu đồng thời phải kiểm lại mật khẩu trên bản ghi sau khi có khoá.
-        User user = users.lockById(userId)
-                .orElseThrow(() -> new UnauthorizedException("Phiên đăng nhập không còn hợp lệ."));
+        User user = lockCurrentUser(userId);
         if (!user.hasStaffAccess()) {
             throw new AccessDeniedException("Tài khoản không còn quyền truy cập trang quản trị.");
         }
-        if (!passwordEncoder.matches(request.currentPassword(), user.getPasswordHash())) {
+        changePassword(user, request.currentPassword(), request.newPassword());
+    }
+
+    private User lockCurrentUser(UUID userId) {
+        // Tuần tự hoá cập nhật cùng tài khoản và kiểm mật khẩu trên bản ghi sau khi có khoá.
+        return users.lockById(userId)
+                .orElseThrow(() -> new UnauthorizedException("Phiên đăng nhập không còn hợp lệ."));
+    }
+
+    private void changePassword(User user, String currentPassword, String newPassword) {
+        if (!passwordEncoder.matches(currentPassword, user.getPasswordHash())) {
             throw new InvalidRequestException("currentPassword", "Mật khẩu hiện tại không đúng.");
         }
-        user.changePasswordHash(passwordEncoder.encode(request.newPassword()));
+        user.changePasswordHash(passwordEncoder.encode(newPassword));
     }
 
     record AdminLogin(UserResponse user, JwtService.IssuedToken token) {

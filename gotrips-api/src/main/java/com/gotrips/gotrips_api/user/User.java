@@ -51,6 +51,9 @@ public class User {
     @Column(name = "full_name", nullable = false, length = 100)
     private String fullName;
 
+    @Column(length = 30)
+    private String phone;
+
     // LAZY: chỉ nạp khi cần (repository dùng @EntityGraph); open-in-view tắt nên không lazy-load ngoài transaction.
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
@@ -86,5 +89,13 @@ public class User {
 
     public void changePasswordHash(String passwordHash) {
         this.passwordHash = passwordHash;
+    }
+
+    public void changeFullName(String fullName) {
+        this.fullName = fullName;
+    }
+
+    public void changePhone(String phone) {
+        this.phone = phone;
     }
 }

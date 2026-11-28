@@ -1,9 +1,12 @@
 package com.gotrips.gotrips_api.auth;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.hamcrest.Matchers.nullValue;
 import static org.hamcrest.Matchers.startsWith;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -19,12 +22,17 @@ import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.context.annotation.Import;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 
@@ -48,6 +56,8 @@ class AuthControllerTests {
     MockMvc mvc;
     @Autowired
     UserRepository users;
+    @Autowired
+    JdbcTemplate jdbc;
     /** Khoá ký thật của ứng dụng — dùng để dựng token hỏng đúng một chỗ (hết hạn, sai issuer...). */
     @Autowired
     SecretKey jwtSigningKey;
@@ -80,6 +90,150 @@ class AuthControllerTests {
         String body = login(email, password).andExpect(status().isOk()).andReturn().getResponse()
                 .getContentAsString(StandardCharsets.UTF_8);
         return JsonPath.read(body, "$.accessToken");
+    }
+
+    private ResultActions updateProfile(String token, String fullName) throws Exception {
+        return putProfile(token, """
+                {"fullName":"%s"}""".formatted(fullName));
+    }
+
+    private ResultActions putProfile(String token, String body) throws Exception {
+        return mvc.perform(put("/auth/me").header(HttpHeaders.AUTHORIZATION, "Bearer " + token)
+                .contentType(MediaType.APPLICATION_JSON).content(body));
+    }
+
+    private ResultActions changePassword(String token, String currentPassword, String newPassword) throws Exception {
+        return mvc.perform(put("/auth/me/password").header(HttpHeaders.AUTHORIZATION, "Bearer " + token)
+                .contentType(MediaType.APPLICATION_JSON).content("""
+                        {"currentPassword":"%s","newPassword":"%s"}""".formatted(currentPassword, newPassword)));
+    }
+
+    @Test
+    void updatesTheCurrentUsersNameAndPreservesEmailAndRoles() throws Exception {
+        String email = uniqueEmail();
+        register("Nguyễn Văn An", email, PASSWORD).andExpect(status().isCreated());
+        String token = loginAndGetToken(email, PASSWORD);
+
+        updateProfile(token, "  Nguyễn Văn Bình  ")
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.fullName").value("Nguyễn Văn Bình"))
+                .andExpect(jsonPath("$.email").value(email))
+                .andExpect(jsonPath("$.roles[0]").value("CUSTOMER"));
+
+        mvc.perform(get("/auth/me").header(HttpHeaders.AUTHORIZATION, "Bearer " + token))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.fullName").value("Nguyễn Văn Bình"));
+    }
+
+    @ParameterizedTest
+    @ValueSource(ints = { 0, 101 })
+    void rejectsInvalidProfileNames(int length) throws Exception {
+        String token = sign(validClaims(registeredUserId()));
+
+        updateProfile(token, "  " + "a".repeat(length) + "  ")
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.errors[0].field").value("fullName"));
+    }
+
+    @Test
+    void newAccountsHaveNullPhoneInLoginAndProfile() throws Exception {
+        String email = uniqueEmail();
+        register("Nguyễn Văn An", email, PASSWORD).andExpect(status().isCreated());
+        String body = login(email, PASSWORD).andExpect(status().isOk())
+                .andExpect(jsonPath("$.user.phone").value(nullValue()))
+                .andReturn().getResponse().getContentAsString(StandardCharsets.UTF_8);
+        String token = JsonPath.read(body, "$.accessToken");
+
+        mvc.perform(get("/auth/me").header(HttpHeaders.AUTHORIZATION, "Bearer " + token))
+                .andExpect(status().isOk()).andExpect(jsonPath("$.phone").value(nullValue()));
+    }
+
+    @Test
+    void savesAndUpdatesPhoneAndReturnsItInProfileAndLogin() throws Exception {
+        String email = uniqueEmail();
+        register("Nguyễn Văn An", email, PASSWORD).andExpect(status().isCreated());
+        String token = loginAndGetToken(email, PASSWORD);
+
+        putProfile(token, """
+                {"fullName":"Nguyễn Văn An","phone":"  0901 234 567  "}""")
+                .andExpect(status().isOk()).andExpect(jsonPath("$.phone").value("0901 234 567"));
+        putProfile(token, """
+                {"fullName":"Nguyễn Văn An","phone":"+84 901 234 567"}""")
+                .andExpect(status().isBadRequest()).andExpect(jsonPath("$.errors[0].field").value("phone"));
+        putProfile(token, """
+                {"fullName":"Nguyễn Văn An","phone":"+84901.234.567"}""")
+                .andExpect(status().isOk()).andExpect(jsonPath("$.phone").value("+84901.234.567"));
+
+        mvc.perform(get("/auth/me").header(HttpHeaders.AUTHORIZATION, "Bearer " + token))
+                .andExpect(status().isOk()).andExpect(jsonPath("$.phone").value("+84901.234.567"));
+        login(email, PASSWORD).andExpect(status().isOk()).andExpect(jsonPath("$.user.phone").value("+84901.234.567"));
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = { "", ",\"phone\":null", ",\"phone\":\"\"", ",\"phone\":\"   \"" })
+    void clearsSavedPhoneWhenOmittedNullOrBlank(String phoneProperty) throws Exception {
+        String token = sign(validClaims(registeredUserId()));
+        putProfile(token, """
+                {"fullName":"Nguyễn Văn An","phone":"0901234567"}""")
+                .andExpect(status().isOk()).andExpect(jsonPath("$.phone").value("0901234567"));
+
+        putProfile(token, "{\"fullName\":\"Nguyễn Văn An\"" + phoneProperty + "}")
+                .andExpect(status().isOk()).andExpect(jsonPath("$.phone").value(nullValue()));
+        mvc.perform(get("/auth/me").header(HttpHeaders.AUTHORIZATION, "Bearer " + token))
+                .andExpect(status().isOk()).andExpect(jsonPath("$.phone").value(nullValue()));
+    }
+
+    @Test
+    void rejectsEmptyPhoneAtDatabaseLevel() throws Exception {
+        assertThatThrownBy(() -> jdbc.update("""
+                insert into users (email, password_hash, full_name, phone) values (?, ?, ?, '')
+                """, uniqueEmail(), "khong-dung-de-dang-nhap", "Nguyễn Văn An"))
+                .isInstanceOf(DataIntegrityViolationException.class)
+                .hasMessageContaining("users_phone_not_blank");
+    }
+
+    @Test
+    void accountWritesRejectTheTokenOfADeletedUser() throws Exception {
+        UUID userId = registeredUserId();
+        String token = sign(validClaims(userId));
+        users.deleteById(userId);
+
+        updateProfile(token, "Nguyễn Văn Bình").andExpect(status().isUnauthorized())
+                .andExpect(jsonPath("$.detail").value("Phiên đăng nhập không còn hợp lệ."));
+        changePassword(token, PASSWORD, "matkhauMoi123").andExpect(status().isUnauthorized())
+                .andExpect(jsonPath("$.detail").value("Phiên đăng nhập không còn hợp lệ."));
+    }
+
+    @Test
+    void changesPasswordAndKeepsPreviouslyIssuedTokenValid() throws Exception {
+        String email = uniqueEmail();
+        String newPassword = "matkhauMoi123";
+        register("Nguyễn Văn An", email, PASSWORD).andExpect(status().isCreated());
+        String token = loginAndGetToken(email, PASSWORD);
+
+        changePassword(token, PASSWORD, newPassword).andExpect(status().isNoContent());
+
+        login(email, PASSWORD).andExpect(status().isUnauthorized());
+        login(email, newPassword).andExpect(status().isOk());
+        mvc.perform(get("/auth/me").header(HttpHeaders.AUTHORIZATION, "Bearer " + token))
+                .andExpect(status().isOk());
+    }
+
+    @ParameterizedTest
+    @CsvSource({ "matkhau-sai, matkhauMoi123, currentPassword", "matkhau123, yeu, newPassword" })
+    void rejectsWrongCurrentPasswordOrWeakNewPassword(String current, String next, String field) throws Exception {
+        String token = sign(validClaims(registeredUserId()));
+
+        changePassword(token, current, next).andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.errors[0].field").value(field));
+    }
+
+    @Test
+    void rejectsANewPasswordOver72Utf8Bytes() throws Exception {
+        String token = sign(validClaims(registeredUserId()));
+
+        changePassword(token, PASSWORD, "ấ".repeat(24) + "1").andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.errors[0].field").value("newPassword"));
     }
 
     // ---------- đăng ký ----------
